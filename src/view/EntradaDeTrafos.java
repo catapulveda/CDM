@@ -120,10 +120,12 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         
         //CARGAR Y LLENAR EL COMBOBOX DE LOS CLIENTES        
         modelo.Cliente.cargarComboNombreClientes(comboCliente);
+        comboCliente.setUI(JComboBoxColor.JComboBoxColor.createUI(comboCliente));
 //        model.Ciudad.cargarComboNombreCiudades(this.entradaDeTrafos.comboCiudad);
 
         //CARGAR Y LLENAR EL COMBOBOX DE LOS CONDUCTORES
         modelo.Conductor.llenarComboConductores(comboConductor);
+        comboConductor.setUI(JComboBoxColor.JComboBoxColor.createUI(comboConductor));
         
         //MUESTRA EL CONTENIDO DEL COMBOBOX AL MAXIMO ANCHO DEL ITEM MAS LARGO
         comboCliente.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
@@ -162,7 +164,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         
         //COLUMNA TIPO DE TRANSFORMADOR
         tablaTrafos.getColumnModel().getColumn(21).setCellEditor(new DefaultCellEditor(new JComboBox(TIPOS)));
-        tablaTrafos.getColumnModel().getColumn(21).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(TIPOS));                
+//        tablaTrafos.getColumnModel().getColumn(21).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(TIPOS));                
         
         //COLUMNA MARCAS
         tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getJTextFieldMarcas()));
@@ -274,9 +276,9 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             ResultSet rs = conexion.CONSULTAR(sql);
             while(rs.next()){
                 if(!listaSeries.contains(rs.getString("idtransformador"))){
-                    System.out.println(rs.getString("idtransformador")+" AGREGADO");
+//                    System.out.println(rs.getString("idtransformador")+" AGREGADO");
                     listaSeries.add(rs.getString("idtransformador"));
-                }                
+                }
                 modeloTabla.addRow(new Object[]{
                     rs.getInt("idtransformador"),
                     rs.getInt("item"),//"N°",
@@ -312,8 +314,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     }
     
     public boolean actualizaTrafo(String columna, int fila, int col){
-        if(new ConexionBD().GUARDAR(" UPDATE transformador SET "+columna+"='"+modeloTabla.getValueAt(fila, col)+"' "
-                + " WHERE idtransformador='"+modeloTabla.getValueAt(fila, 0)+"' AND "
+        if(new ConexionBD().GUARDAR(" UPDATE transformador SET "+columna+"='"+modeloTabla.getValueAt(fila, col).toString().trim()+"' "
+                + " WHERE idtransformador='"+modeloTabla.getValueAt(fila, 0).toString().trim()+"' AND "
                 + " identrada='"+IDENTRADA+"' ")){
             return true;
         }
@@ -342,6 +344,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                 cjFechaRecepcion.setDate(rs.getDate("fecharecepcion"));
                 cjPlacaVehiculo.setText(rs.getString("placavehiculo"));
                 cjObservaciones.setText(rs.getString("observacion"));                
+                checkNuevos.setSelected(rs.getBoolean("nuevo"));
             }
             conexion.CERRAR();
             YACARGO = true;                    
@@ -368,6 +371,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         subMenuEntradaDeTrafos = new javax.swing.JPopupMenu();
         subMenuItemEliminarTrafo = new javax.swing.JMenuItem();
@@ -390,9 +394,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjBuscarSerie = new CompuChiqui.JTextFieldPopup();
         jSeparator6 = new javax.swing.JToolBar.Separator();
         checkOrdenar = new javax.swing.JCheckBox();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jPanel3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         comboCliente = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
@@ -405,7 +408,6 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjLote = new CompuChiqui.JTextFieldPopup();
         jLabel8 = new javax.swing.JLabel();
         cjContrato = new CompuChiqui.JTextFieldPopup();
-        jLabel9 = new javax.swing.JLabel();
         cjOp = new CompuChiqui.JTextFieldPopup();
         jLabel10 = new javax.swing.JLabel();
         cjCentroDeCostos = new CompuChiqui.JTextFieldPopup();
@@ -413,9 +415,10 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjFechaRecepcion = new com.toedter.calendar.JDateChooser();
         jLabel11 = new javax.swing.JLabel();
         cjPlacaVehiculo = new CompuChiqui.JTextFieldPopup();
+        jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         cjObservaciones = new CompuChiqui.JCTextArea();
-        jLabel2 = new javax.swing.JLabel();
+        checkNuevos = new javax.swing.JCheckBox();
         jToolBar1 = new javax.swing.JToolBar();
         btnAgregarFila = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
@@ -425,6 +428,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jSeparator3 = new javax.swing.JToolBar.Separator();
         btnImprimrFormatos = new javax.swing.JButton();
         jSeparator4 = new javax.swing.JToolBar.Separator();
+        btnInsertar = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         menuEditar = new javax.swing.JMenu();
@@ -579,137 +583,234 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                 .addGroup(panelTablaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelTablaLayout.createSequentialGroup()
                         .addGap(1, 1, 1)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE))
-                    .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jToolBar3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE))
+                    .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+                    .addComponent(jToolBar3, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)))
         );
         panelTablaLayout.setVerticalGroup(
             panelTablaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTablaLayout.createSequentialGroup()
                 .addComponent(jToolBar3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(13, 13, 13)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jSplitPane1.setRightComponent(panelTabla);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel1.setLayout(new java.awt.GridLayout(20, 1));
+        jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel3.setLayout(new java.awt.GridBagLayout());
 
         jLabel3.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel3.setText("Cliente:");
-        jPanel1.add(jLabel3);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel3, gridBagConstraints);
 
         comboCliente.setMaximumRowCount(20);
+        comboCliente.setAutoscrolls(true);
         comboCliente.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 comboClienteItemStateChanged(evt);
             }
         });
-        jPanel1.add(comboCliente);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(comboCliente, gridBagConstraints);
 
         jLabel4.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel4.setText("Ciudad:");
-        jPanel1.add(jLabel4);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel4, gridBagConstraints);
 
         comboCiudad.setMaximumRowCount(20);
-        jPanel1.add(comboCiudad);
+        comboCiudad.setAutoscrolls(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(comboCiudad, gridBagConstraints);
 
         jLabel6.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel6.setText("Conductor:");
-        jPanel1.add(jLabel6);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel6, gridBagConstraints);
 
         comboConductor.setMaximumRowCount(20);
-        jPanel1.add(comboConductor);
+        comboConductor.setAutoscrolls(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(comboConductor, gridBagConstraints);
 
         jLabel5.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel5.setText("ID Entrada:");
-        jPanel1.add(jLabel5);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel5, gridBagConstraints);
 
         cjIdEntradaAlmacen.setPlaceholder("N° Entrada Almacen");
-        jPanel1.add(cjIdEntradaAlmacen);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.ipadx = 100;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(cjIdEntradaAlmacen, gridBagConstraints);
 
         jLabel7.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel7.setText("Lote:");
-        jPanel1.add(jLabel7);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel7, gridBagConstraints);
 
         cjLote.setPlaceholder("Lote");
-        jPanel1.add(cjLote);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.ipadx = 100;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(cjLote, gridBagConstraints);
 
         jLabel8.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel8.setText("Contrato:");
-        jPanel1.add(jLabel8);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel8, gridBagConstraints);
 
         cjContrato.setPlaceholder("Contrato");
-        jPanel1.add(cjContrato);
-
-        jLabel9.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        jLabel9.setText("Orden de Prod.");
-        jPanel1.add(jLabel9);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 13;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(cjContrato, gridBagConstraints);
 
         cjOp.setPlaceholder("Orden De Produccion");
-        jPanel1.add(cjOp);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.ipadx = 100;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(cjOp, gridBagConstraints);
 
         jLabel10.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel10.setText("Cent. costos:");
-        jPanel1.add(jLabel10);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel10, gridBagConstraints);
 
         cjCentroDeCostos.setPlaceholder("Centro de Costos");
-        jPanel1.add(cjCentroDeCostos);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 15;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(cjCentroDeCostos, gridBagConstraints);
 
         jLabel1.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel1.setText("Fecha Recepcion:");
-        jPanel1.add(jLabel1);
-        jPanel1.add(cjFechaRecepcion);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 16;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 17;
+        gridBagConstraints.ipadx = 100;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(cjFechaRecepcion, gridBagConstraints);
 
         jLabel11.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel11.setText("Placa Vehiculo:");
-        jPanel1.add(jLabel11);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 18;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel11, gridBagConstraints);
 
         cjPlacaVehiculo.setPlaceholder("Placa vehiculo");
-        jPanel1.add(cjPlacaVehiculo);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 19;
+        gridBagConstraints.ipadx = 100;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(cjPlacaVehiculo, gridBagConstraints);
+
+        jLabel2.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
+        jLabel2.setText("Observaciones:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 20;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 0, 4);
+        jPanel3.add(jLabel2, gridBagConstraints);
 
         cjObservaciones.setColumns(20);
         cjObservaciones.setRows(5);
         cjObservaciones.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         jScrollPane2.setViewportView(cjObservaciones);
 
-        jLabel2.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        jLabel2.setText("Observaciones:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 21;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 4, 4);
+        jPanel3.add(jScrollPane2, gridBagConstraints);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addGap(4, 4, 4))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 4, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        checkNuevos.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
+        checkNuevos.setText("Orden de Produccion: ( Nuevos ? )");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        jPanel3.add(checkNuevos, gridBagConstraints);
 
-        jScrollPane4.setViewportView(jPanel2);
+        jScrollPane3.setViewportView(jPanel3);
 
-        jSplitPane1.setLeftComponent(jScrollPane4);
+        jSplitPane1.setLeftComponent(jScrollPane3);
 
         jToolBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jToolBar1.setFloatable(false);
@@ -774,6 +875,20 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jToolBar1.add(btnImprimrFormatos);
         jToolBar1.add(jSeparator4);
 
+        btnInsertar.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
+        btnInsertar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/check.png"))); // NOI18N
+        btnInsertar.setText("Insertar");
+        btnInsertar.setToolTipText("Generar entrada de almacen");
+        btnInsertar.setFocusable(false);
+        btnInsertar.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnInsertar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnInsertar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInsertarActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnInsertar);
+
         jMenu1.setText("Archivo");
         jMenuBar1.add(jMenu1);
 
@@ -810,10 +925,10 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 597, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -821,7 +936,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -842,8 +957,9 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     }//GEN-LAST:event_menuEditarActionPerformed
 
     private void btnImprimrFormatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimrFormatosActionPerformed
-        subMenuImprimirFormatos.show(btnImprimrFormatos, (int) (btnImprimrFormatos.getAlignmentX()+btnImprimrFormatos.getWidth()/2), 
-        (int) (btnImprimrFormatos.getAlignmentY()+btnImprimrFormatos.getHeight()) );
+        subMenuImprimirFormatos.show(btnImprimrFormatos, 
+            (int) (btnImprimrFormatos.getAlignmentX()+btnImprimrFormatos.getWidth()/2), 
+            (int) (btnImprimrFormatos.getAlignmentY()+btnImprimrFormatos.getHeight()) );
     }//GEN-LAST:event_btnImprimrFormatosActionPerformed
 
     private void btnAgregarFilaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarFilaActionPerformed
@@ -902,7 +1018,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             boolean estado = false;
             String observaciones = cjObservaciones.getText();
 
-            if(Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("AUXPLANTA")){
+            if(Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("PROGRAMADOR")){
                 String ACTUALIZA_LOTE = "";
                 if(LOTE_ABIERTO){//SI EL LOTE ESTA ABIERTO, ACTUALIZO.
                     ACTUALIZA_LOTE = " UPDATE entrada SET ";
@@ -914,14 +1030,16 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                     ACTUALIZA_LOTE += " lote='"+lote+"' , ";
                     ACTUALIZA_LOTE += " contrato='"+contrato+ "' , ";
                     ACTUALIZA_LOTE += " op='" +op+ "' , ";
-                    ACTUALIZA_LOTE += " centrodecostos='"+centrodecostos+"' , ";                        
+                    ACTUALIZA_LOTE += " centrodecostos='"+centrodecostos+"' , ";
+                    ACTUALIZA_LOTE += " fecharecepcion='"+fecharecepcion+"' , ";
                     ACTUALIZA_LOTE += " fechaactualizado='"+fechaRegistro+"' ,  ";
                     ACTUALIZA_LOTE += " observacion='"+observaciones+"' , ";
-                    ACTUALIZA_LOTE += " placavehiculo='"+placa+"' ";
+                    ACTUALIZA_LOTE += " placavehiculo='"+placa+"' , ";
+                    ACTUALIZA_LOTE += " nuevo='"+checkNuevos.isSelected()+"' ";
                     ACTUALIZA_LOTE += " WHERE identrada='" + IDENTRADA + "' ";
                 }else{//DE LO CONTRARIO 
                     ACTUALIZA_LOTE = " INSERT INTO entrada (idcliente,idciudad,idconductor,idusuario,identradaalmacen,nombrepc,lote, ";
-                    ACTUALIZA_LOTE += " contrato,op,centrodecostos,fecharecepcion,fecharegistrado,estado,observacion,placavehiculo) VALUES \n( ";
+                    ACTUALIZA_LOTE += " contrato,op,centrodecostos,fecharecepcion,fecharegistrado,estado,observacion,placavehiculo,nuevo) VALUES \n( ";
                     ACTUALIZA_LOTE += " '" +idCliente+ "' , ";
                     ACTUALIZA_LOTE += " '" +idCiudad+ "' , ";
                     ACTUALIZA_LOTE += " '" +idConductor+ "' , ";
@@ -936,7 +1054,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                     ACTUALIZA_LOTE += " '" +fechaRegistro+ "' , ";
                     ACTUALIZA_LOTE += " '" +false+ "' , ";
                     ACTUALIZA_LOTE += " '" +observaciones+ "' , ";
-                    ACTUALIZA_LOTE += " '" +placa+ "' ";
+                    ACTUALIZA_LOTE += " '" +placa+ "' , ";
+                    ACTUALIZA_LOTE += " '" +checkNuevos.isSelected()+ "' ";
                     ACTUALIZA_LOTE += " ) ";
                 }
 
@@ -1056,7 +1175,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                     try{
                         btnImprimrFormatos.setEnabled(false);
                         btnImprimrFormatos.setIcon(new ImageIcon(getClass().getResource("/recursos/images/gif.gif")));
-                        JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/ENTRADADEALMACEN.jasper").toString()));
+                        JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/ENTRADADEALMACEN_NUEVA.jasper").toString()));
                         Map<String, Object> p = new HashMap<String, Object>();
                         p.put("IDLOTE", IDENTRADA);
                         JasperPrint jasperprint = JasperFillManager.fillReport(reporte, p, conexion.conectar());                        
@@ -1133,18 +1252,22 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                         modelo.Metodos.M("EL PERSONAL DE ALMACEN AUN NO A TERMINADO DE VERIFICAR ESTE LOTE\n", "advertencia.png");
                         return;
                     }
-                    JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/ENTRADADETRAFOS.jasper").toString()));
+                    String reporte = "ENTRADADETRAFOS";                    
+                    if(checkNuevos.isSelected()){
+                        reporte = "ENTRADADETRAFOS_NUEVOS";
+                    }
+                    JasperReport jasper = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/"+reporte+".jasper").toString()));
                     Map<String, Object> p = new HashMap<String, Object>();
                     JasperPrint jasperprint = null;
                     p.put("IDENTRADA", IDENTRADA);
-                    p.put("ORDEN", checkOrdenar.isSelected());
-                    jasperprint = JasperFillManager.fillReport(reporte, p, conexion.conectar());                
+                    p.put("ORDEN", checkOrdenar.isSelected());                   
+                    jasperprint = JasperFillManager.fillReport(jasper, p, conexion.conectar());                    
                     JasperViewer.viewReport(jasperprint, false);
-                }                
+                }
             }else{
                 modelo.Metodos.M("NO HAY NINGUN LOTE ABIERTO PARA GENERAR LOS FORMATOS\n", "advertencia.png");
             }                        
-        }catch(SQLException | MalformedURLException | JRException ex){
+        }catch(Exception ex){
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
             Metodos.ERROR(ex, "ERROR");
         }
@@ -1157,7 +1280,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     private void subMenuImprimirMuestrasDeAceiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuImprimirMuestrasDeAceiteActionPerformed
         try{            
             DialogoImprimirAceite dia = new DialogoImprimirAceite(this, rootPaneCheckingEnabled);
-            dia.setIdentrada(getIDENTRADA());
+            dia.setIdentrada(getIDENTRADA());            
             this.setExtendedState(ICONIFIED);
             dia.setVisible(true);
         } catch (Exception e) {
@@ -1279,6 +1402,48 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjBuscarSerie.grabFocus();
     }//GEN-LAST:event_subMenuFiltrarActionPerformed
 
+    private void btnInsertarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertarActionPerformed
+        try{
+            if(tablaTrafos.getRowCount()==1){
+                String serie = modeloTabla.getValueAt(0, 4).toString();
+                int veces = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el numero de item a insertar:", 0));
+                if(veces>0 && !serie.isEmpty()){
+                    int serien = Integer.parseInt(serie);
+                    for (int i = 2; i <= veces; i++) {                        
+                        modeloTabla.addRow(new Object[]{
+                            "",
+                            (i),//"N°",
+                            "",//"REMISION",
+                            "",//"N° EMPRESA",
+                            (serien+=1),//"N° SEIRE",
+                            modeloTabla.getValueAt(0, 5),//"MARCA",
+                            modeloTabla.getValueAt(0, 6),//"KVA",
+                            modeloTabla.getValueAt(0, 7),//"FASE",
+                            modeloTabla.getValueAt(0, 8),//"TENSION P",
+                            0,//"A.T",
+                            0,//"B.T",
+                            0,//"H.A",
+                            0,//"H.B",
+                            false,//"INT",
+                            false,//"EXT",
+                            "",//"HERRAJE",
+                            modeloTabla.getValueAt(0, 16),//"AÑO",
+                            modeloTabla.getValueAt(0, 17),//"PESO",
+                            modeloTabla.getValueAt(0, 18),//"ACEITE",
+                            "",//"OBSERVACION",
+                            modeloTabla.getValueAt(0, 20),//"SERVICIO",
+                            modeloTabla.getValueAt(0, 21),//"TIPO", 
+                        });
+                    }
+                }
+            }else{
+                modelo.Metodos.M("Inserte sólo una fila con los datos principales del transformador.", "advertencia.png");
+            }
+        }catch (Exception e){
+            modelo.Metodos.M("ERROR\n"+e, "error.png");
+        }
+    }//GEN-LAST:event_btnInsertarActionPerformed
+
     private void unirPaginas(JasperPrint source, JasperPrint dst){
         List<JRPrintPage> pages = source.getPages();
         pages.stream().forEach((page) ->{
@@ -1328,6 +1493,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     public javax.swing.JButton btnBorrarFila;
     public javax.swing.JButton btnGuardar;
     public javax.swing.JButton btnImprimrFormatos;
+    public javax.swing.JButton btnInsertar;
+    private javax.swing.JCheckBox checkNuevos;
     public javax.swing.JCheckBox checkOrdenar;
     public CompuChiqui.JTextFieldPopup cjBuscarSerie;
     public CompuChiqui.JTextFieldPopup cjCentroDeCostos;
@@ -1351,14 +1518,12 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;

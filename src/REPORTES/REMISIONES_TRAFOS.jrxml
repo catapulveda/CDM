@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Remisiones" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6569b73d-ad90-4959-abb8-76b9832009dd">
-	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="259"/>
+	<property name="ireport.y" value="288"/>
 	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF" radius="0">
 		<box>
 			<topPen lineWidth="0.25" lineColor="#000000"/>
@@ -52,7 +52,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 		<![CDATA[SELECT * FROM remision WHERE idremision=$P{IDREMISION}]]>
 	</queryString>
 	<field name="idremision" class="java.lang.Integer"/>
-	<field name="iddespacho" class="java.math.BigDecimal"/>
+	<field name="iddespacho" class="java.lang.Integer"/>
 	<field name="numero_remision" class="java.lang.String"/>
 	<field name="cliente_remision" class="java.lang.String"/>
 	<field name="ciudad_remision" class="java.lang.String"/>
@@ -70,6 +70,12 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 	<field name="factura_numero" class="java.lang.String"/>
 	<field name="empresa_remision" class="java.lang.String"/>
 	<field name="estado" class="java.lang.Boolean"/>
+	<field name="fechacreacion" class="java.sql.Timestamp"/>
+	<field name="idusuario" class="java.lang.Integer"/>
+	<field name="nitcliente" class="java.lang.String"/>
+	<field name="empresatransportadora" class="java.lang.String"/>
+	<field name="idcliente" class="java.lang.Integer"/>
+	<field name="responsable" class="java.lang.String"/>
 	<background>
 		<band height="752" splitType="Stretch">
 			<image hAlign="Center" vAlign="Middle">
@@ -79,23 +85,23 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 		</band>
 	</background>
 	<pageHeader>
-		<band height="164" splitType="Stretch">
-			<rectangle radius="5">
-				<reportElement mode="Transparent" x="0" y="94" width="572" height="65" uuid="fabd78ae-5f66-407d-a2b4-9923f54f1cbe"/>
-				<graphicElement>
-					<pen lineWidth="0.25" lineStyle="Solid"/>
-				</graphicElement>
-			</rectangle>
+		<band height="175" splitType="Stretch">
 			<rectangle radius="5">
 				<reportElement x="481" y="1" width="91" height="58" uuid="a2568d18-03bc-440f-b723-e21fd8845708"/>
 				<graphicElement>
 					<pen lineWidth="0.25"/>
 				</graphicElement>
 			</rectangle>
+			<rectangle radius="5">
+				<reportElement mode="Transparent" x="0" y="94" width="572" height="80" uuid="fabd78ae-5f66-407d-a2b4-9923f54f1cbe"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Solid"/>
+				</graphicElement>
+			</rectangle>
 			<textField>
 				<reportElement x="481" y="25" width="91" height="34" uuid="0053ad94-7e8f-4600-91f4-ea133f05891e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="20" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{numero_remision}]]></textFieldExpression>
 			</textField>
@@ -115,7 +121,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["DESTINO: "+$F{destino_remision}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["NIT / CEDULA: "+$F{nitcliente}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="2" y="120" width="310" height="13" uuid="01de81e8-2f75-4446-98d6-bd4ee8ca6814"/>
@@ -132,11 +138,11 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 				<textFieldExpression><![CDATA["TELEFONO: "+$F{telefono_remision}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="2" y="146" width="310" height="13" uuid="2b4aaeca-00e1-4eda-97e0-49e1ea05ff20"/>
+				<reportElement x="322" y="120" width="249" height="13" uuid="2b4aaeca-00e1-4eda-97e0-49e1ea05ff20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["CONTRATO: "+$F{contrato_remision}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["FACTURA: "+$F{factura_numero}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="322" y="81" width="250" height="13" uuid="9c245715-bda3-4901-8427-4531a9f08298"/>
@@ -146,35 +152,35 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 				<textFieldExpression><![CDATA["FECHA: "+new SimpleDateFormat("EEE, d MMM yyyy").format($F{fecha_remision}).toUpperCase()]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="322" y="94" width="250" height="13" uuid="f9141c54-d4c6-4828-993b-a12846155870"/>
+				<reportElement x="322" y="94" width="249" height="13" uuid="f9141c54-d4c6-4828-993b-a12846155870"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA["CENTRO DE COSTOS: "+$F{centrodecostos_remision}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="322" y="107" width="250" height="13" uuid="a61ff285-0530-478e-ab2d-5ef3a6c34e7e"/>
+				<reportElement x="322" y="107" width="249" height="13" uuid="a61ff285-0530-478e-ab2d-5ef3a6c34e7e"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["FACTURA: "+$F{factura_numero}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["CONTRATO: "+$F{contrato_remision}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="322" y="120" width="250" height="13" uuid="159a7661-33a4-4ff9-b97f-49e579b76d9c"/>
+				<reportElement x="322" y="133" width="249" height="13" uuid="159a7661-33a4-4ff9-b97f-49e579b76d9c"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA["CONDUCTOR: "+$F{conductor_remision}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="322" y="133" width="250" height="13" uuid="37bbdf9b-ed80-4902-bf59-bcc90375b4e6"/>
+				<reportElement x="322" y="146" width="249" height="13" uuid="37bbdf9b-ed80-4902-bf59-bcc90375b4e6"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA["CEDULA: "+$F{cedula_remision}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="322" y="146" width="250" height="13" uuid="1d347373-7252-41dc-b63a-9181f83798a4"/>
+				<reportElement x="322" y="159" width="249" height="13" uuid="1d347373-7252-41dc-b63a-9181f83798a4"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -251,6 +257,20 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 				</textElement>
 				<text><![CDATA[REMISION]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="2" y="159" width="310" height="13" uuid="9775166a-71c2-4126-95c0-08de8ea746ce"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["RESPONSABLE: "+(($F{responsable}==null)?"":$F{responsable})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="146" width="310" height="13" uuid="6e44a86e-bb47-44e8-aa9f-eb400c6cd74b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DESTINO: "+$F{destino_remision}]]></textFieldExpression>
+			</textField>
 		</band>
 	</pageHeader>
 	<detail>
@@ -276,7 +296,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
 							<textField>
-								<reportElement x="1" y="1" width="25" height="12" uuid="66ed7a37-a0fd-4986-8269-50306d421e89"/>
+								<reportElement stretchType="RelativeToBandHeight" x="1" y="1" width="25" height="12" uuid="66ed7a37-a0fd-4986-8269-50306d421e89"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="9"/>
 								</textElement>
@@ -296,7 +316,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
 							<textField>
-								<reportElement style="table_CH" mode="Transparent" x="0" y="1" width="56" height="12" uuid="62bf1c86-dc2e-4cf1-b86d-63cc0fb71a51"/>
+								<reportElement style="table_CH" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="56" height="12" isPrintWhenDetailOverflows="true" uuid="62bf1c86-dc2e-4cf1-b86d-63cc0fb71a51"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="9"/>
 								</textElement>
@@ -316,7 +336,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
 							<textField>
-								<reportElement mode="Transparent" x="0" y="1" width="79" height="12" uuid="ee3ae9a1-ed4e-4c05-924f-52c29ec576f2"/>
+								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="79" height="12" uuid="ee3ae9a1-ed4e-4c05-924f-52c29ec576f2"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="10"/>
 								</textElement>
@@ -336,7 +356,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
 							<textField>
-								<reportElement mode="Transparent" x="0" y="1" width="35" height="12" uuid="490b82d8-f306-4fc2-b964-0fcf5dedfc31"/>
+								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="35" height="12" uuid="490b82d8-f306-4fc2-b964-0fcf5dedfc31"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="9"/>
 								</textElement>
@@ -356,7 +376,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
 							<textField>
-								<reportElement mode="Transparent" x="0" y="1" width="26" height="12" uuid="39b0abd4-cd08-46bb-89e6-71286cd3c2c5"/>
+								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="26" height="12" uuid="39b0abd4-cd08-46bb-89e6-71286cd3c2c5"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="9"/>
 								</textElement>
@@ -376,7 +396,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
 							<textField>
-								<reportElement mode="Transparent" x="0" y="1" width="76" height="12" uuid="20df2e2d-1854-407b-b77b-4f59e1dba4c5"/>
+								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="76" height="12" uuid="20df2e2d-1854-407b-b77b-4f59e1dba4c5"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="9"/>
 								</textElement>
@@ -395,8 +415,8 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
-							<textField>
-								<reportElement mode="Transparent" x="0" y="1" width="71" height="12" uuid="231815a8-a9d7-4987-a099-453cebe8e4eb"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="71" height="12" uuid="231815a8-a9d7-4987-a099-453cebe8e4eb"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="9"/>
 								</textElement>
@@ -415,8 +435,8 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
-							<textField>
-								<reportElement mode="Transparent" x="0" y="1" width="76" height="12" uuid="1746e341-930c-486e-b7a7-e936280a2baf"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="76" height="12" uuid="1746e341-930c-486e-b7a7-e936280a2baf"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="9"/>
 								</textElement>
@@ -435,8 +455,8 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
-							<textField>
-								<reportElement mode="Transparent" x="0" y="1" width="75" height="12" uuid="75565d4b-268e-45a3-874b-2b931034e41c"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="75" height="12" uuid="75565d4b-268e-45a3-874b-2b931034e41c"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Arial" size="9"/>
 								</textElement>
@@ -456,7 +476,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 						</jr:columnHeader>
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
 							<textField>
-								<reportElement x="0" y="1" width="50" height="12" uuid="50b1c61d-86c8-48ad-8562-d7d5f1c00150"/>
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="1" width="50" height="12" uuid="50b1c61d-86c8-48ad-8562-d7d5f1c00150"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Arial" size="10"/>
 								</textElement>
@@ -501,7 +521,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
 					<font fontName="Arial" size="7" isBold="false"/>
 				</textElement>
-				<text><![CDATA[RMPO-04-10-01 | V. 05 | 30/10/2015]]></text>
+				<text><![CDATA[RMPO-04-10-01 | V. 07 | 29/08/2018]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="0" y="11" width="356" height="10" uuid="2a6c01d3-92be-4b53-9c8c-d91295a946e4"/>
@@ -549,7 +569,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="7" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["RMPO-04-10-01 | V. 06 | 03/02/2017 | Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["RMPO-04-10-01 | V. 07 | 29/08/2018 | Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
 				<reportElement x="531" y="44" width="40" height="10" uuid="b6d108ea-7023-49cc-ae81-bade150c5f9b"/>

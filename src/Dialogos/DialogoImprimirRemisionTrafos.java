@@ -410,47 +410,47 @@ import net.sf.jasperreports.view.JasperViewer;
 
                     ResultSet rs = null;
                     String sql = "";
-                            if(isACTUALIZANDO()){
-                                sql = " UPDATE remision SET ";
-                                sql += " cliente_remision='"+getCliente()+"' , ciudad_remision='"+ciudad+"' , ";
-                                sql += " destino_remision='"+direccion+"' , telefono_remision='"+telefono+"' , ";
-                                sql += " contrato_remision='"+getContrato()+"' , centrodecostos_remision='"+getCentrodecostos()+"' , ";
-                                sql += " conductor_remision='"+conductor+"' , cedula_remision='"+cedula+"' , ";
-                                sql += " placa_remision='"+placa+"' , fecha_remision='"+fecha+"' , tipo_remision='SIN RETORNO' , ";
-                                sql += " servicio_remision='"+getSERVICIO()+"' , descripcion_remision='"+observaciones+"' , ";
-                                sql += " factura_numero='"+factura+"' , idusuario="+sesion.getIdUsuario()+" ";
-                                sql += " WHERE idremision="+getIDREMISION()+" ";
-                            }else{
-                                sql = " INSERT INTO remision (iddespacho, numero_remision, cliente_remision, ";
-                                sql += "  ciudad_remision, destino_remision, telefono_remision, contrato_remision,  ";
-                                sql += " centrodecostos_remision, conductor_remision, cedula_remision, placa_remision, ";
-                                sql += " fecha_remision, tipo_remision, servicio_remision, descripcion_remision,  ";
-                                sql += " factura_numero, empresa_remision, estado, fechacreacion, idusuario ) ";
-                                sql += " VALUES ( "+getIDDESPACHO()+" , '"+remision+"' , '"+getCliente()+"' , '"+ciudad+"' , ";
-                                sql += " '"+direccion+"' , '"+telefono+"' , '"+getContrato()+"' , '"+getCentrodecostos()+"' , ";
-                                sql += " '"+conductor+"' , '"+cedula+"' , '"+placa+"' , '"+fecha+"' , 'SIN RETORNO' , ";
-                                sql += " '"+getSERVICIO()+"' , '"+observaciones+"' , '"+factura+"' ,  ";
-                                sql += " 'CDM' , 'TRUE' , '"+new java.util.Date()+"' , "+sesion.getIdUsuario()+" ) ";
-                            }                        
+                    if(isACTUALIZANDO()){
+                        sql = " UPDATE remision SET ";
+                        sql += " cliente_remision='"+getCliente()+"' , ciudad_remision='"+ciudad+"' , ";
+                        sql += " destino_remision='"+direccion+"' , telefono_remision='"+telefono+"' , ";
+                        sql += " contrato_remision='"+getContrato()+"' , centrodecostos_remision='"+getCentrodecostos()+"' , ";
+                        sql += " conductor_remision='"+conductor+"' , cedula_remision='"+cedula+"' , ";
+                        sql += " placa_remision='"+placa+"' , fecha_remision='"+fecha+"' , tipo_remision='SIN RETORNO' , ";
+                        sql += " servicio_remision='"+getSERVICIO()+"' , descripcion_remision='"+observaciones+"' , ";
+                        sql += " factura_numero='"+factura+"' , idusuario="+sesion.getIdUsuario()+" ";
+                        sql += " WHERE idremision="+getIDREMISION()+" ";
+                    }else{
+                        sql = " INSERT INTO remision (iddespacho, numero_remision, cliente_remision, ";
+                        sql += "  ciudad_remision, destino_remision, telefono_remision, contrato_remision,  ";
+                        sql += " centrodecostos_remision, conductor_remision, cedula_remision, placa_remision, ";
+                        sql += " fecha_remision, tipo_remision, servicio_remision, descripcion_remision,  ";
+                        sql += " factura_numero, empresa_remision, estado, fechacreacion, idusuario ) ";
+                        sql += " VALUES ( "+getIDDESPACHO()+" , '"+remision+"' , '"+getCliente()+"' , '"+ciudad+"' , ";
+                        sql += " '"+direccion+"' , '"+telefono+"' , '"+getContrato()+"' , '"+getCentrodecostos()+"' , ";
+                        sql += " '"+conductor+"' , '"+cedula+"' , '"+placa+"' , '"+fecha+"' , 'SIN RETORNO' , ";
+                        sql += " '"+getSERVICIO()+"' , '"+observaciones+"' , '"+factura+"' ,  ";
+                        sql += " 'CDM' , 'TRUE' , '"+new java.util.Date()+"' , "+sesion.getIdUsuario()+" ) ";
+                    }                        
 
-                            if(conexion.GUARDAR(sql)){
+                    if(conexion.GUARDAR(sql)){
 
-                                int IDREMISION = (isACTUALIZANDO())?getIDREMISION():modelo.Metodos.getUltimoID("remision", "idremision");
+                        int IDREMISION = (isACTUALIZANDO())?getIDREMISION():modelo.Metodos.getUltimoID("remision", "idremision");
 
-                                if(!isACTUALIZANDO()){
-                                    int nremision = modelo.Metodos.getConsecutivoRemision("cdmsinretorno",true);
-                                    cjRemision.setText(""+nremision);
-                                    remision = ""+nremision;                            
-                                }                        
+                        if(!isACTUALIZANDO()){
+                            int nremision = modelo.Metodos.getConsecutivoRemision("cdmsinretorno",true);
+                            cjRemision.setText(""+nremision);
+                            remision = ""+nremision;                            
+                        }                        
 
-                                Map<String, Object> p = new HashMap<>();
-                                p.put("IDREMISION", IDREMISION);
-                                JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/REMISIONES_TRAFOS.jasper").toString()));
-                                JasperPrint reporte_view = JasperFillManager.fillReport(reporte, p, conexion.conectar());
-                                JasperViewer jviewer = new JasperViewer(reporte_view, false);
-                                jviewer.setTitle("Remision No " + remision);
-                                jviewer.setVisible(true);
-                            }
+                        Map<String, Object> p = new HashMap<>();
+                        p.put("IDREMISION", IDREMISION);
+                        JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/REMISIONES_TRAFOS.jasper").toString()));
+                        JasperPrint reporte_view = JasperFillManager.fillReport(reporte, p, conexion.conectar());
+                        JasperViewer jviewer = new JasperViewer(reporte_view, false);
+                        jviewer.setTitle("Remision No " + remision);
+                        jviewer.setVisible(true);
+                    }
                 }catch(Exception e){
                     Logger.getLogger(DialogoImprimirRemisionTrafos.class.getName()).log(Level.SEVERE, null, e);
                     Metodos.ERROR(e, "ERROR AL INTENTAR GENERAR LA REMISION DE LOS TRANSFORMADORES.");

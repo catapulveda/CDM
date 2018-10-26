@@ -36,6 +36,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
 import modelo.Ciudad;
+import modelo.Cliente;
 import modelo.Conductor;
 import modelo.ConexionBD;
 import modelo.HerramientaConsorcio;
@@ -85,7 +86,9 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         Enter(cjfactura, cjcedula);
 
         cjfecha.setDate(new Date());
-
+        
+        modelo.Cliente.cargarComboNombreClientes(comboCliente);
+        comboCliente.setUI(JComboBoxColor.JComboBoxColor.createUI(comboCliente));
     }
 
     public void AbrirEncabezadoRemision(ResultSet rs) {
@@ -96,7 +99,9 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
 //            if (rs.next()) {
                 NUMERO_REMISION = rs.getString("numero_remision");
                 setTitle("REMISION N° " + NUMERO_REMISION);
-                cjcliente.setText(rs.getString("cliente_remision"));
+                comboCliente.getModel().setSelectedItem(new Cliente(rs.getInt("idcliente"), rs.getString("nombrecliente"), rs.getString("nitcliente")));
+                cjresponsable.setText(rs.getString("responsable"));
+                //cjcliente.setText(rs.getString("cliente_remision"));
                 cjciudad.setText(rs.getString("ciudad_remision"));
                 cjdestino.setText(rs.getString("destino_remision"));
                 cjtelefono.setText(rs.getString("telefono_remision"));
@@ -304,7 +309,6 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         comboempresa = new javax.swing.JComboBox();
         jLabel15 = new javax.swing.JLabel();
-        cjcliente = new CompuChiqui.JTextFieldPopup();
         btnAgregarCliente = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         cjciudad = new javax.swing.JTextField();
@@ -332,6 +336,9 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjempresatransportadora = new javax.swing.JTextField();
         cjnitcedulacliente = new CompuChiqui.JTextFieldPopup();
         jLabel17 = new javax.swing.JLabel();
+        comboCliente = new javax.swing.JComboBox<>();
+        jLabel18 = new javax.swing.JLabel();
+        cjresponsable = new CompuChiqui.JTextFieldPopup();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -549,7 +556,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+            .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jToolBar3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -592,18 +599,9 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel15, gridBagConstraints);
 
-        cjcliente.setPlaceholder("Cliente");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanel3.add(cjcliente, gridBagConstraints);
-
         btnAgregarCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/add.png"))); // NOI18N
         btnAgregarCliente.setToolTipText("Actualizar consecutivo");
+        btnAgregarCliente.setEnabled(false);
         btnAgregarCliente.setFocusable(false);
         btnAgregarCliente.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnAgregarCliente.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -624,7 +622,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel6.setText("CIUDAD:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel6, gridBagConstraints);
@@ -632,7 +630,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjciudad.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -651,7 +649,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(btnAgregarConductor1, gridBagConstraints);
@@ -661,7 +659,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel4.setText("DESTINO:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel4, gridBagConstraints);
@@ -669,7 +667,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjdestino.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -681,7 +679,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel5.setText("TELEFONO:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel5, gridBagConstraints);
@@ -689,7 +687,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjtelefono.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -701,7 +699,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel12.setText("CONDUCTOR:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel12, gridBagConstraints);
@@ -709,7 +707,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjconductor.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -728,7 +726,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(btnAgregarConductor, gridBagConstraints);
@@ -738,7 +736,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel13.setText("CEDULA:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel13, gridBagConstraints);
@@ -746,7 +744,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjcedula.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -758,7 +756,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel14.setText("PLACA:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel14, gridBagConstraints);
@@ -766,7 +764,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjplaca.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weighty = 1.0;
@@ -778,7 +776,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel11.setText("FACTURA:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel11, gridBagConstraints);
@@ -786,7 +784,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjfactura.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weighty = 1.0;
@@ -798,7 +796,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel10.setText("CONTRATO:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel10, gridBagConstraints);
@@ -806,7 +804,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjcontrato.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -818,7 +816,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel3.setText("C. DE COSTOS:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel3, gridBagConstraints);
@@ -826,7 +824,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjcentrodecostos.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -838,13 +836,13 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel1.setText("FECHA:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.ipadx = 25;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weighty = 1.0;
@@ -856,7 +854,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         jLabel16.setText("EMPRESA:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel16, gridBagConstraints);
@@ -864,7 +862,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjempresatransportadora.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -874,7 +872,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         cjnitcedulacliente.setPlaceholder("NIT / CEDULA");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -883,13 +881,42 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
 
         jLabel17.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
         jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel17.setText("NIT / CEDULA:");
+        jLabel17.setText("RES`PONSABLE:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel17, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanel3.add(comboCliente, gridBagConstraints);
+
+        jLabel18.setFont(new java.awt.Font("SansSerif", 1, 10)); // NOI18N
+        jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel18.setText("NIT / CEDULA:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanel3.add(jLabel18, gridBagConstraints);
+
+        cjresponsable.setPlaceholder("Responsable / Contacto");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        jPanel3.add(cjresponsable, gridBagConstraints);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -958,7 +985,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
             btn_generar.setEnabled(false);
             Map<String, Object> p = new HashMap<>();
             JasperPrint reporte_view;
-            JasperReport reporte;
+            JasperReport reporte;          
             reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/" + getREPORTE() + ".jasper").toString()));
             p.put("IDREMISION", IDREMISION);
             reporte_view = JasperFillManager.fillReport(reporte, p, conexion.conectar());
@@ -980,7 +1007,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
     private void btn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_guardarActionPerformed
         try {
 //            boolean CONTINUAR = false;
-            String pregunta = (!isACTUALIZANDO()) ? "SE GUARDARÁ LA REMISION " + cjnoremision.getText() + " " + TIPO + " DE " + comboempresa.getSelectedItem() + " AL CLIENTE " + cjcliente.getText() + ", DESEA CONTINUAR ? " : "Desea Actualizar la Remision ?";
+            String pregunta = (!isACTUALIZANDO()) ? "SE GUARDARÁ LA REMISION " + cjnoremision.getText() + " " + TIPO + " DE " + comboempresa.getSelectedItem() + " AL CLIENTE " + comboCliente.getSelectedItem().toString() + ", DESEA CONTINUAR ? " : "Desea Actualizar la Remision ?";
             if (checkremisionnueva.isSelected()) {
                 pregunta = "HAZ SELECCIONADO LA OPCION NUEVA REMISION, POR LO TANTO SE REGISTRARÁ UNA NUEVA REMISION CON UN NUEVO CONSECUTIVO.";
                 setACTUALIZANDO(false);
@@ -991,7 +1018,8 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
             String GUARDA_REMISION = null;
             if (isACTUALIZANDO()) {
                 GUARDA_REMISION = " UPDATE remision SET ";
-                GUARDA_REMISION += " cliente_remision='" + cjcliente.getText().trim() + "' , ";
+                GUARDA_REMISION += " cliente_remision='" + comboCliente.getSelectedItem().toString() + "' , ";
+                GUARDA_REMISION += " idcliente="+((Cliente)comboCliente.getModel().getSelectedItem()).getIdCliente()+" , ";
                 GUARDA_REMISION += " ciudad_remision='" + cjciudad.getText() + "' , destino_remision='" + cjdestino.getText() + "' , ";
                 GUARDA_REMISION += " telefono_remision='" + cjtelefono.getText() + "' , contrato_remision='" + cjcontrato.getText() + "' , ";
                 GUARDA_REMISION += " centrodecostos_remision='" + cjcentrodecostos.getText() + "' , conductor_remision='" + cjconductor.getText() + "' , ";
@@ -1003,7 +1031,8 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                 GUARDA_REMISION += " empresa_remision='"+comboempresa.getSelectedItem()+"' , ";
                 GUARDA_REMISION += " idusuario="+sesion.getIdUsuario()+" , ";
                 GUARDA_REMISION += " nitcliente='"+cjnitcedulacliente.getText().trim()+"' , ";
-                GUARDA_REMISION += " empresatransportadora='"+cjempresatransportadora.getText().trim()+"' ";
+                GUARDA_REMISION += " empresatransportadora='"+cjempresatransportadora.getText().trim()+"' , ";
+                GUARDA_REMISION += " responsable='"+cjresponsable.getText().trim()+"'  ";
                 GUARDA_REMISION += " WHERE idremision='" + getIDREMISION() + "' ";
             } else {
                 GUARDA_REMISION = " INSERT INTO remision ( numero_remision , cliente_remision , ";
@@ -1011,8 +1040,9 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                 GUARDA_REMISION += " contrato_remision , centrodecostos_remision , conductor_remision , ";
                 GUARDA_REMISION += " cedula_remision , placa_remision,  ";
                 GUARDA_REMISION += " fecha_remision, tipo_remision, descripcion_remision, factura_numero, ";
-                GUARDA_REMISION += " empresa_remision, estado, fechacreacion, idusuario , nitcliente, empresatransportadora ) VALUES (";
-                GUARDA_REMISION += " '" + cjnoremision.getText() + "' , '" + cjcliente.getText().toString() + "' , ";
+                GUARDA_REMISION += " empresa_remision, estado, fechacreacion, idusuario , nitcliente, ";
+                GUARDA_REMISION += " empresatransportadora, idcliente, responsable, iddespacho ) VALUES ( ";
+                GUARDA_REMISION += " '" + cjnoremision.getText() + "' , '" + comboCliente.getSelectedItem().toString() + "' , ";
                 GUARDA_REMISION += " '" + cjciudad.getText() + "' , '" + cjdestino.getText() + "' , ";
                 GUARDA_REMISION += " '" + cjtelefono.getText() + "' , '" + cjcontrato.getText() + "' , ";
                 GUARDA_REMISION += " '" + cjcentrodecostos.getText() + "' , '" + cjconductor.getText() + "' , ";
@@ -1025,7 +1055,10 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                 GUARDA_REMISION += " 'TRUE' , '" + new java.util.Date() + "' , ";
                 GUARDA_REMISION += " "+sesion.getIdUsuario()+" , ";
                 GUARDA_REMISION += " '"+cjnitcedulacliente.getText().trim()+"' , ";
-                GUARDA_REMISION += " '"+cjempresatransportadora.getText().trim()+"'  ";
+                GUARDA_REMISION += " '"+cjempresatransportadora.getText().trim()+"' ,  ";
+                GUARDA_REMISION += " "+((Cliente)comboCliente.getModel().getSelectedItem()).getIdCliente()+" , ";
+                GUARDA_REMISION += " '"+cjresponsable.getText().trim()+"' , ";
+                GUARDA_REMISION += " 0 ";
                 GUARDA_REMISION += " ) ";
             }
 
@@ -1048,14 +1081,20 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                     String GUARDA_DATOS = " INSERT INTO datosremision_consorcio VALUES \n";
                     boolean GUARDADATOS = false;
                     for (int i = 0; i < tablaHerramientas.getRowCount(); i++) {
+                        System.out.println("RECORRIENDO TABLA");
                         tablaHerramientas.scrollRectToVisible(tablaHerramientas.getCellRect(i, 0, true));
                         tablaHerramientas.setRowSelectionInterval(i, i);
                         Object datos[] = {getT(i, 1), getT(i, 2), getT(i, 3)};
-
-                        if(!lista.isEmpty() && !lista.contains(Integer.parseInt(datos[0].toString()))){
-                            GUARDADATOS = true;
-                            GUARDA_DATOS += "  ('" + (i + 1) + "' , '" + getIDREMISION() + "'  , '" + datos[0] + "' , '" + datos[2] + "') ,\n";
-                            lista.add(Integer.parseInt(datos[0].toString()));
+                        try{
+                            if(!lista.contains(Integer.parseInt(datos[0].toString()))){
+                                System.out.println(" !lista.isEmpty() && !lista.contains(Integer.parseInt(datos[0].toString()) ");
+                                GUARDADATOS = true;
+                                GUARDA_DATOS += "  ('" + (i + 1) + "' , '" + getIDREMISION() + "'  , '" + datos[0] + "' , '" + datos[2] + "') ,\n";
+                                lista.add(Integer.parseInt(datos[0].toString()));
+                            }else{
+                                System.out.println("NADA");
+                            }
+                        }catch(NullPointerException e){
                         }
                     }
                     //GUARDA LOS DATOS DE LAS HERRAMIENTAS ASOCIADAS A LA REMISION
@@ -1158,16 +1197,15 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
             if (!checkremisionnueva.isSelected()) {
                 int filas[] = tablaHerramientas.getSelectedRows();
                 for (int i = filas.length - 1; i >= 0; i--) {
-
                     if (getIDREMISION() > 0) {
                         if (conexion.GUARDAR("DELETE FROM datosremision_consorcio WHERE idremision=" + getIDREMISION() + " "
                             + "AND idherramienta=" + tablaHerramientas.getValueAt(filas[i], 1) + " ")) {
                         modeloHerramientas.removeRow(filas[i]);
+                        }else{
+                            modeloHerramientas.removeRow(filas[i]);
+                        }
                     }
-                } else {
-                    modeloHerramientas.removeRow(filas[i]);
                 }
-            }
         } else {
             modelo.Metodos.M("NO SE PUEDEN ELIMINAR HERRAMIENTA DE LA TABLA HASTA DESACTIVAR LA CASILLA DE 'REMISION NUEVA'.", "advertencia.png");
         }
@@ -1227,7 +1265,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, clientes, "Seleccione un cliente", JOptionPane.DEFAULT_OPTION, new ImageIcon(getClass().getResource("/recursos/images/conductor.png")));
         if (clientes.getSelectedIndex() > 0) {
             modelo.Cliente c = clientes.getItemAt(clientes.getSelectedIndex());
-            cjcliente.setText(c.getNombreCliente());
+//            cjcliente.setText(c.getNombreCliente());
         }
     }//GEN-LAST:event_btnAgregarClienteActionPerformed
 
@@ -1291,9 +1329,9 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
     public static javax.swing.JMenuItem SubMenuSeleecionarTodo;
     public static javax.swing.JPopupMenu SubMenuTexto;
     private CompuChiqui.JCTextArea areadeTexto;
-    private javax.swing.JButton btnAgregarCliente;
-    private javax.swing.JButton btnAgregarConductor;
-    private javax.swing.JButton btnAgregarConductor1;
+    public javax.swing.JButton btnAgregarCliente;
+    public javax.swing.JButton btnAgregarConductor;
+    public javax.swing.JButton btnAgregarConductor1;
     private javax.swing.JButton btnAgregarFila;
     private javax.swing.JButton btnBuscarNombreHerramienta;
     private javax.swing.JButton btn_generar;
@@ -1303,7 +1341,6 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
     private javax.swing.JTextField cjcedula;
     private javax.swing.JTextField cjcentrodecostos;
     private javax.swing.JTextField cjciudad;
-    private CompuChiqui.JTextFieldPopup cjcliente;
     private javax.swing.JTextField cjconductor;
     private javax.swing.JTextField cjcontrato;
     private javax.swing.JTextField cjdestino;
@@ -1313,7 +1350,9 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
     private CompuChiqui.JTextFieldPopup cjnitcedulacliente;
     private javax.swing.JTextField cjnoremision;
     private javax.swing.JTextField cjplaca;
+    private CompuChiqui.JTextFieldPopup cjresponsable;
     private javax.swing.JTextField cjtelefono;
+    public javax.swing.JComboBox<Cliente> comboCliente;
     public javax.swing.JComboBox comboempresa;
     private javax.swing.JTabbedPane contenedor;
     private javax.swing.JButton jButton2;
@@ -1326,6 +1365,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

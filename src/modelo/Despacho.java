@@ -58,7 +58,10 @@ public class Despacho {
         modelo.ConexionBD con = new ConexionBD();
         try {            
             con.conectar();
-            ResultSet rs = con.CONSULTAR("SELECT * FROM despacho d INNER JOIN cliente c ON d.idcliente=c.idcliente INNER JOIN usuario u USING(idusuario) ORDER BY d.idcliente, d.iddespacho ASC");
+            ResultSet rs = con.CONSULTAR("SELECT * FROM despacho d "
+                    + "INNER JOIN cliente c ON d.idcliente=c.idcliente "
+                    + "INNER JOIN usuario u USING(idusuario) "
+                    + "ORDER BY fecha_despacho DESC");
             while(rs.next()){
                 modelo.addRow(new Object[]{
                     rs.getInt("iddespacho"),

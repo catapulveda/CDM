@@ -23,6 +23,7 @@ import modelo.ConexionBD;
 import modelo.CustomTableModel;
 import view.DespachoARemision;
 import view.REMISIONESCDM;
+import view2.DespachoARemision2;
 
 public class PanelRemisiones extends javax.swing.JPanel {
 
@@ -44,11 +45,9 @@ public class PanelRemisiones extends javax.swing.JPanel {
         
 //        cargarTablaRemisiones();
         
-        comboBuscar.setUI(JComboBoxColor.JComboBoxColor.createUI(comboBuscar));
         comboTipo.setUI(JComboBoxColor.JComboBoxColor.createUI(comboTipo));
         comboEmpresa.setUI(JComboBoxColor.JComboBoxColor.createUI(comboEmpresa));
         
-        comboBuscar.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
         comboTipo.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
         comboEmpresa.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
     }
@@ -90,8 +89,6 @@ public class PanelRemisiones extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         cjBuscar = new CompuChiqui.JTextFieldPopup();
         jSeparator3 = new javax.swing.JToolBar.Separator();
-        jLabel3 = new javax.swing.JLabel();
-        comboBuscar = new javax.swing.JComboBox<>();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jLabel1 = new javax.swing.JLabel();
         comboTipo = new javax.swing.JComboBox<>();
@@ -163,20 +160,6 @@ public class PanelRemisiones extends javax.swing.JPanel {
         });
         jToolBar1.add(cjBuscar);
         jToolBar1.add(jSeparator3);
-
-        jLabel3.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        jLabel3.setText("Buscar por:");
-        jToolBar1.add(jLabel3);
-
-        comboBuscar.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        comboBuscar.setForeground(new java.awt.Color(255, 255, 255));
-        comboBuscar.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "REMISION", "CLIENTE", "CONDUCTOR", "DESTINO" }));
-        comboBuscar.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                comboBuscarItemStateChanged(evt);
-            }
-        });
-        jToolBar1.add(comboBuscar);
         jToolBar1.add(jSeparator1);
 
         jLabel1.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
@@ -266,20 +249,8 @@ public class PanelRemisiones extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cjBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjBuscarKeyReleased
-        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscar.getText().toUpperCase(), ID_BUSQUEDA));
+        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscar.getText().toUpperCase()));
     }//GEN-LAST:event_cjBuscarKeyReleased
-
-    private void comboBuscarItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBuscarItemStateChanged
-        if(evt.getStateChange() == ItemEvent.SELECTED){
-            switch(comboBuscar.getSelectedIndex()){
-                case 0:ID_BUSQUEDA = 2;cjBuscar.setPlaceholder("Ingrese el numero de remision");break;
-                case 1:ID_BUSQUEDA = 4;cjBuscar.setPlaceholder("Ingrese el nombre del cliente");break;
-                case 2:ID_BUSQUEDA = 7;cjBuscar.setPlaceholder("Ingrese el nombre del conductor");break;
-                case 3:ID_BUSQUEDA = 6;cjBuscar.setPlaceholder("Ingrese una direccion de referencia");break;
-            }            
-            repaint();
-        }
-    }//GEN-LAST:event_comboBuscarItemStateChanged
 
     private void comboTipoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboTipoItemStateChanged
         if(evt.getStateChange()==ItemEvent.SELECTED){
@@ -296,7 +267,7 @@ public class PanelRemisiones extends javax.swing.JPanel {
     private void submenuItemEliminarRemisionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submenuItemEliminarRemisionActionPerformed
         try{
             int fila[] = tablaRemisiones.getSelectedRows();
-            if((Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("AUXPLANTA"))){
+            if((Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("PROGRAMADOR"))){
                 if(JOptionPane.showConfirmDialog(null, "Desea continuar eliminado las remisiones seleccionadas?")== JOptionPane.YES_OPTION){
                     for (int i = fila.length-1; i >= 0; i--) {
                         conexion.conectar();                    
@@ -347,7 +318,7 @@ public class PanelRemisiones extends javax.swing.JPanel {
             int fila = tablaRemisiones.getSelectedRow();
             int idremision = (int)tablaRemisiones.getValueAt(fila, 0);
             conexion.conectar();
-            ResultSet rs = conexion.CONSULTAR("SELECT * FROM remision WHERE idremision="+idremision);
+            ResultSet rs = conexion.CONSULTAR("SELECT * FROM remision r INNER JOIN cliente c ON c.idcliente=r.idcliente WHERE idremision="+idremision);
             try {
                 rs.next();
                 if(rs.getInt("iddespacho")==0){
@@ -359,7 +330,7 @@ public class PanelRemisiones extends javax.swing.JPanel {
                     
                     if(rs.getString("tipo_remision").equals("CON RETORNO")){
                         remisiones.setTIPO("CON RETORNO");
-                        if(rs.getString("empresa_remision").equals("CDM")){
+                        if(rs.getString("empresa_remision").equals("CDM") || rs.getString("empresa_remision").equals("MEDIDORES")){
                             remisiones.setCONSECUTIVO_EMPRESA("cdmretorno");
                             remisiones.setREPORTE("REMISIONCDM");
                         }else if(rs.getString("empresa_remision").equals("CONSORCIO")){
@@ -381,7 +352,7 @@ public class PanelRemisiones extends javax.swing.JPanel {
                     remisiones.setVisible(true);
                     
                 }else if(rs.getInt("iddespacho")>0){
-                    DespachoARemision dar = new DespachoARemision();
+                    DespachoARemision2 dar = new DespachoARemision2();
                     dar.setACTUALIZANDO(true);
                     dar.setIDREMISION(idremision);
                     dar.cargarTabla();
@@ -411,13 +382,11 @@ public class PanelRemisiones extends javax.swing.JPanel {
     private javax.swing.JMenuItem SubMenuItemAnularRemision;
     public javax.swing.JButton btnCargarRemisiones;
     private CompuChiqui.JTextFieldPopup cjBuscar;
-    private javax.swing.JComboBox<String> comboBuscar;
     private javax.swing.JComboBox<String> comboEmpresa;
     private javax.swing.JComboBox<String> comboTipo;
     public javax.swing.JButton generarExcelDespachos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;

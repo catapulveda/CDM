@@ -229,7 +229,7 @@ public class Metodos {
         e.printStackTrace(pw);
         if(archivo.exists()) {
             try {
-                bw = new BufferedWriter(new FileWriter(archivo));
+                bw = new BufferedWriter(new FileWriter(archivo, true));
                 bw.write(sw.toString()+"\n\n\n");
             } catch (IOException ex) {
                 Logger.getLogger(Metodos.class.getName()).log(Level.SEVERE, null, ex);

@@ -1,5 +1,6 @@
-package view;
+package view2;
 
+import view.*;
 import Dialogos.BuscarEnDespacho;
 import JTableAutoResizeColumn.TableColumnAdjuster;
 import java.awt.event.ItemEvent;
@@ -26,7 +27,7 @@ import modelo.ConexionBD;
 import modelo.CustomTableModel;
 import modelo.Metodos;
 
-public class DespachoARemision extends javax.swing.JFrame {
+public class DespachoARemision2 extends javax.swing.JFrame {
 
     TableColumnAdjuster ajustarColumna;
     
@@ -49,7 +50,7 @@ public class DespachoARemision extends javax.swing.JFrame {
         "HUMEDAD","PUNTO CALIENTE EN FASE",
         "SOBRECARGA","SOBRETENSION DE ORIGEN ARTMOSFERICO O MANIOBRA"};
     
-    public DespachoARemision(){
+    public DespachoARemision2(){
         initComponents();
         
         ajustarColumna = new TableColumnAdjuster(tabla);
@@ -144,7 +145,7 @@ public class DespachoARemision extends javax.swing.JFrame {
         SQL += "LEFT JOIN remision r USING(idremision)\n";
         SQL += "INNER JOIN ciudad c USING(idciudad) WHERE\n";
         SQL += (ACTUALIZANDO)?" t.idremision="+getIDREMISION()+" ":" t.iddespacho="+getIDDESPACHO();
-        SQL += " "+((comboServicio.getSelectedIndex()>0)?" AND t.serviciosalida='"+comboServicio.getSelectedItem()+"' ":"")+" ";
+        //SQL += " "+((comboServicio.getSelectedIndex()>0)?" AND t.serviciosalida='"+comboServicio.getSelectedItem()+"' ":"")+" ";
         SQL += "ORDER BY lote DESC, fase ASC, kvasalida ASC, marca ASC, item ASC";
         
         conexion.conectar();
@@ -237,7 +238,7 @@ public class DespachoARemision extends javax.swing.JFrame {
             });
             
         } catch (SQLException ex) {
-            Logger.getLogger(DespachoARemision.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DespachoARemision2.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
             conexion.CERRAR();
         }
@@ -253,17 +254,18 @@ public class DespachoARemision extends javax.swing.JFrame {
     public void cargarServicios(){
         String sql = " SELECT DISTINCT(t.serviciosalida) FROM transformador t WHERE ";
         sql += (isACTUALIZANDO())?"t.idremision="+getIDREMISION():"t.iddespacho="+getIDDESPACHO();
+        sql += "ORDER BY 1 DESC";
         conexion.conectar();
         ResultSet rs = conexion.CONSULTAR(sql);
         try {
             if(!isACTUALIZANDO()){
                 comboServicio.addItem("TODOS");
             }            
-            while(rs.next()){
+            while(rs.next()){                
                 comboServicio.addItem(rs.getString("serviciosalida"));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(DespachoARemision.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DespachoARemision2.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
             conexion.CERRAR();
         }
@@ -430,7 +432,7 @@ public class DespachoARemision extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cjBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjBuscarKeyReleased
-        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscar.getText().toUpperCase(), 5));
+        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscar.getText().toUpperCase()));
     }//GEN-LAST:event_cjBuscarKeyReleased
 
     private void btnRefrescar3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefrescar3ActionPerformed
@@ -456,7 +458,7 @@ public class DespachoARemision extends javax.swing.JFrame {
                     cjBuscar.setText("");
                     cargarTabla();
                 } catch(Exception e){
-                    Logger.getLogger(DespachoARemision.class.getName()).log(Level.SEVERE, null, e);
+                    Logger.getLogger(DespachoARemision2.class.getName()).log(Level.SEVERE, null, e);
                     Metodos.ERROR(e, "ERROR AL INTENTAR DEVOLVER LOS TRANSFORMADORES SELECCIONADOS A PLANTA.");
                 }finally{
                     btnDevolver.setEnabled(true);
@@ -468,105 +470,60 @@ public class DespachoARemision extends javax.swing.JFrame {
 
     private void comboServicioItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboServicioItemStateChanged
         if(evt.getStateChange() == ItemEvent.DESELECTED){
-            cargarTabla();
+//            cargarTabla();
+            if(comboServicio.getSelectedIndex()==0){
+                rowSorter.setRowFilter(RowFilter.regexFilter("", 13));
+            }else{
+                rowSorter.setRowFilter(RowFilter.regexFilter(comboServicio.getSelectedItem().toString().toUpperCase(), 13));
+            }            
         }
     }//GEN-LAST:event_comboServicioItemStateChanged
 
     private void btnImprimirRemisionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirRemisionActionPerformed
-        
-        ResultSet rs = null;
-        Dialogos.DialogoImprimirRemisionTrafos dirt = new Dialogos.DialogoImprimirRemisionTrafos(this, rootPaneCheckingEnabled);
-        boolean MOSTRAR = false;
+        DialogoImprimirRemisionTrafos1 diag = new DialogoImprimirRemisionTrafos1(this, true); 
         
         if(isACTUALIZANDO()){
-            conexion.conectar();            
-            rs = conexion.CONSULTAR("SELECT * FROM remision r \n" +
-                                    "INNER JOIN transformador t USING(idremision)\n" +
-                                    "INNER JOIN entrada e ON t.identrada=e.identrada\n" +
-                                    "INNER JOIN cliente c ON e.idcliente=c.idcliente\n" +
-                                    "WHERE r.idremision="+getIDREMISION()+" LIMIT 1");
-            try{
-                if(rs.next()){
-                    MOSTRAR = true;
-                    dirt.setACTUALIZANDO(true);
-                    dirt.setIDREMISION(getIDREMISION());
-                    dirt.cargarEncabezado(rs);
-                }
-            }catch(SQLException ex){
-                Logger.getLogger(DespachoARemision.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
+            diag.setIDREMISION(getIDREMISION());            
+            diag.setACTUALIZANDO(true);
+            diag.setVisible(true);
         }else{
-           String sql = "";
-            if(comboServicio.getSelectedIndex()==0){
-                sql = "SELECT * FROM remision WHERE iddespacho="+getIDDESPACHO()+" ";
-            }else if(comboServicio.getSelectedIndex()>0){
-                String servicio = (comboServicio.getSelectedItem().toString().equals("MANTENIMIENTO"))?"REPARACION":comboServicio.getSelectedItem().toString();            
-                sql = "SELECT * FROM remision WHERE iddespacho="+getIDDESPACHO()+" AND servicio_remision='"+servicio+"' ";
-            }
-
-            conexion.conectar();
-            rs = conexion.CONSULTAR(sql);
-            try{
+            String SERVICIO = comboServicio.getSelectedItem().toString();
+            String sql = (comboServicio.getSelectedIndex()>0)
+                    ?"SELECT * FROM remision WHERE iddespacho="+getIDDESPACHO()+" AND "+(SERVICIO.equals("REPARACION")||SERVICIO.equals("MANTENIMIENTO")?"(servicio_remision='REPARACION' OR servicio_remision='MANTENIMIENTO')":"servicio_remision='"+SERVICIO+"'")+" "
+                    :"SELECT * FROM remision WHERE iddespacho="+getIDDESPACHO();                
+            try {
+                conexion.conectar();
+                ResultSet rs = conexion.CONSULTAR(sql);
                 if(rs.next()){
-                    JOptionPane.showMessageDialog(this, "YA SE ENCUENTRA GENERADA UNA REMISION PARA ÉSTE DESPACHO.\nVERIFIQUE LA REMISION QUE DESEA GENERAR O DIRIJASE A LA TABLA REMISIONES.", "FALTA INFORMACION", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/recursos/images/advertencia.png")));
+                    Metodos.M("YA EXISTE UNA REMISION PARA "+((comboServicio.getSelectedIndex()>0)?"EL SERVICIO ("+comboServicio.getSelectedItem()+") ":"EL DESPACHO")+" SELECCIONADO", "error.png");
                     return;
-                }else{
-                    rs = conexion.CONSULTAR("SELECT e.contrato, e.centrodecostos, c.nombrecliente FROM transformador t \n" +
-                                            "INNER JOIN entrada e ON t.identrada=e.identrada\n" +
-                                            "INNER JOIN cliente c ON e.idcliente=c.idcliente\n" +
-                                            "WHERE t.iddespacho="+getIDDESPACHO()+" LIMIT 1");
-                    if(rs.next()){
-                        MOSTRAR = true;
-                        dirt.setIDDESPACHO(getIDDESPACHO());
-                        dirt.setCentrodecostos(rs.getString("centrodecostos"));
-                        dirt.setContrato(rs.getString("contrato"));
-                        dirt.setCliente(rs.getString("nombrecliente"));
-                    }else{
-                        JOptionPane.showMessageDialog(this, "NO SE ENCONTRO EL CENTRO DE COSTOS, CONTRATO NI CLIENTE PARA PODER GENERAR LOS DATOS DE ENCABEZADO DE LA REMISION.", "FALTA INFORMACION", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/recursos/images/advertencia.png")));
-                    }
                 }
-            }catch(SQLException ex){
-                Logger.getLogger(DespachoARemision.class.getName()).log(Level.SEVERE, null, ex);
-            } 
+            } catch (SQLException ex) {Metodos.ERROR(ex, "ERROR AL BUSCAR LA REMISION");}
+            
+            int SERVICIOS = 0;
+            for (int i = 0; i < comboServicio.getItemCount(); i++) {
+                SERVICIO = comboServicio.getItemAt(i);
+                if(SERVICIO.equals("TODOS")){
+                    continue;
+                }
+                if(SERVICIO.equals("REPARACION")||SERVICIO.equals("MANTENIMIENTO")){
+                    SERVICIOS++;
+                }else{
+                    SERVICIOS = 1;
+                }
+                SERVICIO = (comboServicio.getSelectedIndex()>0)?comboServicio.getSelectedItem().toString():SERVICIO;
+                
+                diag = new DialogoImprimirRemisionTrafos1(this, true);
+                diag.setIDDESPACHO(getIDDESPACHO());
+                diag.setSERVICIO(SERVICIO);                
+                diag.setVisible(SERVICIOS==1);
+                
+                if(comboServicio.getSelectedIndex()>0){break;}
+            }
         }
         
-        if(MOSTRAR){
-//            this.setExtendedState(ICONIFIED);
-            int SERVICIOS = 0;
-            for (int i = 0; i < comboServicio.getItemCount() ; i++){
-                
-                String SERVICIO = (comboServicio.getSelectedIndex()==0)?comboServicio.getItemAt(i):comboServicio.getSelectedItem().toString();
-                if(!SERVICIO.equals("TODOS")){
-                    //SUMARA 1 SI ES REPARACION O MANTENIMIENTO LLEGANDO A 2, SÓLO SE GENERA CUANDO SEA 1.
-                    if(SERVICIO.equals("REPARACION") || SERVICIO.equals("MANTENIMIENTO")){
-                        SERVICIOS++;
-                        SERVICIO = "REPARACION";
-                    }else{
-                        SERVICIOS = 1;
-                    }
-//                    SERVICIOS += (SERVICIO.equals("REPARACION") || SERVICIO.equals("MANTENIMIENTO"))?(SERVICIOS++):1;
-//                    SERVICIO = (SERVICIO.equals("REPARACION") || SERVICIO.equals("MANTENIMIENTO"))?"REPARACION":SERVICIO;                                                                                
-                    SERVICIO = (comboServicio.getSelectedIndex()>0)?comboServicio.getSelectedItem().toString():SERVICIO;
-                    //SI SE HA SELECCIONADO UN SERVICIO LA VARIABLE TOMARA ESE VALOR DEL SERVICIO SELECCIONADO
-                                                            
-                    dirt.setSERVICIO(SERVICIO);
-                    
-                    String sql = "SELECT COUNT(*), d.nodespacho FROM transformador t INNER JOIN despacho d USING(iddespacho) WHERE t.iddespacho="+getIDDESPACHO()+" AND ";
-                    sql += (SERVICIO.equals("REPARACION"))?"(serviciosalida='REPARACION' OR serviciosalida='MANTENIMIENTO')":"serviciosalida='"+SERVICIO+"' ";
-                    sql += " GROUP BY d.iddespacho ";
-                    conexion.conectar();
-                    rs = conexion.CONSULTAR(sql);                    
-                    try {if(rs.next()){dirt.cargarObservaciones(rs);}} catch (SQLException ex) {Logger.getLogger(DespachoARemision.class.getName()).log(Level.SEVERE, null, ex);}
-                                                            
-                    dirt.setVisible((SERVICIOS <= 1));                  
-                    
-                    if(comboServicio.getSelectedIndex()>0){
-                        break;
-                    }
-                }
-            }           
-        }
-        cargarTabla();        
+        cargarTabla();
     }//GEN-LAST:event_btnImprimirRemisionActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
@@ -592,8 +549,9 @@ public class DespachoARemision extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DespachoARemision.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DespachoARemision2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
         
         //</editor-fold>
@@ -601,7 +559,7 @@ public class DespachoARemision extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new DespachoARemision().setVisible(true);
+                new DespachoARemision2().setVisible(true);
             }
         });
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EntradaDeTransformadores" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="772" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="1e815148-a7a8-4fe7-bcd9-f939cce00a8d">
-	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="403"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF" radius="0">
 		<box>
@@ -46,7 +46,7 @@
 		<field name="numeroempresa" class="java.lang.String"/>
 		<field name="numeroserie" class="java.lang.String"/>
 		<field name="marca" class="java.lang.String"/>
-		<field name="kvaentrada" class="java.lang.Double"/>
+		<field name="kvaentrada" class="java.lang.String"/>
 		<field name="kvasalida" class="java.lang.Double"/>
 		<field name="fase" class="java.lang.Integer"/>
 		<field name="tpe" class="java.lang.Integer"/>
@@ -76,15 +76,6 @@
 		<field name="iddespacho" class="java.lang.Integer"/>
 		<field name="idremision" class="java.lang.Integer"/>
 		<field name="numero_remision" class="java.lang.String"/>
-	</subDataset>
-	<subDataset name="Diferencias" uuid="0cefede3-cd62-4528-841b-992bf19d6f68">
-		<parameter name="IDENTRADA_DIF" class="java.lang.Integer">
-			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
-		</parameter>
-		<queryString>
-			<![CDATA[SELECT d.descripcion FROM diferenciasentrada d INNER JOIN entrada e USING(identrada) WHERE e.identrada=$P{IDENTRADA_DIF} ORDER BY iddiferencia]]>
-		</queryString>
-		<field name="descripcion" class="java.lang.String"/>
 	</subDataset>
 	<parameter name="IDENTRADA" class="java.lang.Integer"/>
 	<parameter name="ORDEN" class="java.lang.Boolean">
@@ -123,13 +114,7 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 	<field name="direccionciudad" class="java.lang.String"/>
 	<field name="telefonociudad" class="java.lang.String"/>
 	<pageHeader>
-		<band height="112">
-			<rectangle radius="5">
-				<reportElement mode="Transparent" x="4" y="78" width="764" height="31" uuid="ab8d911c-289f-4c1e-9570-dfa927feb4e0"/>
-				<graphicElement>
-					<pen lineWidth="0.125"/>
-				</graphicElement>
-			</rectangle>
+		<band height="76">
 			<rectangle radius="5">
 				<reportElement mode="Opaque" x="469" y="3" width="300" height="55" uuid="9f507b3d-6b17-4d03-b459-b14206facbf1"/>
 				<graphicElement>
@@ -152,7 +137,7 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Enter Sansman" size="14"/>
 				</textElement>
-				<text><![CDATA[ENTRADA DE TRANSFORMADORES A PLANTA]]></text>
+				<text><![CDATA[CONTROL DE TRANSFORMADORES]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
 				<reportElement x="471" y="4" width="299" height="13" uuid="8711822e-87d9-440c-8976-3d8fb6332e4e"/>
@@ -184,16 +169,6 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 				</textElement>
 				<textFieldExpression><![CDATA["ORDEN DE PRODUCCION: "+$F{op}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="6" y="81" width="234" height="13" uuid="5d4996ee-06bf-4b35-888a-73bdf98a338b"/>
-				<box>
-					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Franklin Gothic Medium" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA["CIUDAD: "+$F{nombreciudad}]]></textFieldExpression>
-			</textField>
 			<textField pattern="EEEEE dd MMMMM yyyy" isBlankWhenNull="true">
 				<reportElement x="471" y="32" width="299" height="13" uuid="a3f706f7-2fea-418c-827c-505ae6085745"/>
 				<box>
@@ -202,57 +177,7 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Franklin Gothic Medium" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA["FECHA DE RECEPCION: "+new SimpleDateFormat("EEE, d MMM yyyy").format($F{fecharecepcion}).toUpperCase()]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd-MMM-yy" isBlankWhenNull="true">
-				<reportElement x="6" y="94" width="234" height="13" uuid="f5d68ff8-51e3-4927-80c5-668aed4a2a62"/>
-				<box>
-					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Franklin Gothic Medium" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA["CONDUCTOR: "+$F{nombreconductor}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="267" y="81" width="234" height="13" uuid="a0b414bd-91fb-4548-bf79-474983e41a96"/>
-				<box>
-					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Franklin Gothic Medium" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA["CENTRO DE COSTOS: "+$F{centrodecostos}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="528" y="81" width="234" height="13" uuid="bec5c485-295a-42d6-adcb-2d71f53d6a7c"/>
-				<box>
-					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Franklin Gothic Medium" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA["CONTRATO: "+$F{contrato}]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd-MMM-yy" isBlankWhenNull="true">
-				<reportElement x="267" y="94" width="234" height="13" uuid="b92268e4-893c-49ce-8472-8ef86d42b9ea"/>
-				<box>
-					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Franklin Gothic Medium" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA["PLACA VEHICULO: "+$F{placavehiculo}]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd-MMM-yy" isBlankWhenNull="true">
-				<reportElement x="528" y="94" width="234" height="13" uuid="f8a9efda-b668-453f-85f8-c5f28ad897c9"/>
-				<box>
-					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Franklin Gothic Medium" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Nº ENTRADA: "+$F{identradaalmacen}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["FECHA: "+new SimpleDateFormat("EEE, d MMM yyyy").format($F{fecharecepcion}).toUpperCase()]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
@@ -271,15 +196,6 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					</datasetRun>
 					<jr:columnGroup width="396" uuid="c9a384da-fd3a-4b99-9a08-a077d5e5d4ca">
-						<jr:columnHeader style="table_TH" height="30" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="396" height="30" uuid="df005506-00eb-49be-8411-3ade5005d0de"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Calibri" isBold="true"/>
-								</textElement>
-								<text><![CDATA[CARACTERSTICAS:]]></text>
-							</staticText>
-						</jr:columnHeader>
 						<jr:column width="21" uuid="ba59c2b1-67b9-4a0a-97d5-acba34f0a317">
 							<jr:columnHeader style="table_TH" height="13" rowSpan="1">
 								<staticText>
@@ -444,183 +360,10 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 							</jr:detailCell>
 						</jr:column>
 					</jr:columnGroup>
-					<jr:columnGroup width="43" uuid="1dd06340-b193-46bd-b848-0fdad38bb071">
-						<jr:columnHeader style="table_TH" height="30" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="43" height="30" uuid="24b1f7ed-2300-46b7-b829-49e1b596df9f"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
-									<font fontName="Calibri" isBold="true"/>
-								</textElement>
-								<text><![CDATA[Aislador]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:column width="21" uuid="330518e7-579f-4822-9b04-58188da61618">
-							<jr:columnHeader style="table_TH" height="13" rowSpan="1">
-								<staticText>
-									<reportElement x="0" y="0" width="21" height="13" uuid="64282283-af9a-4bad-b7fc-6170166e0033"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri" isBold="true"/>
-									</textElement>
-									<text><![CDATA[A.T]]></text>
-								</staticText>
-							</jr:columnHeader>
-							<jr:detailCell style="table_CH" height="15" rowSpan="1">
-								<textField>
-									<reportElement x="0" y="0" width="21" height="15" uuid="ebaf4428-a1ec-4bf4-9c14-d0db741c326b"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri"/>
-									</textElement>
-									<textFieldExpression><![CDATA[$F{aat}]]></textFieldExpression>
-								</textField>
-							</jr:detailCell>
-						</jr:column>
-						<jr:column width="22" uuid="2cd8b505-fe22-4a3c-af71-17fa2a6c620b">
-							<jr:columnHeader style="table_TH" height="13" rowSpan="1">
-								<staticText>
-									<reportElement x="0" y="0" width="22" height="13" uuid="e5c614ec-8c5d-4de9-94a4-9aa2e1726e60"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri" isBold="true"/>
-									</textElement>
-									<text><![CDATA[B.T]]></text>
-								</staticText>
-							</jr:columnHeader>
-							<jr:detailCell style="table_CH" height="15" rowSpan="1">
-								<textField>
-									<reportElement x="0" y="0" width="22" height="15" uuid="bba3ff35-55e0-46d3-aefa-4f525e197650"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri"/>
-									</textElement>
-									<textFieldExpression><![CDATA[$F{abt}]]></textFieldExpression>
-								</textField>
-							</jr:detailCell>
-						</jr:column>
-					</jr:columnGroup>
-					<jr:columnGroup width="37" uuid="323ab99e-41de-4c24-b153-0a7d6277c046">
-						<jr:columnHeader style="table_TH" height="30" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="37" height="30" uuid="aea99f48-b20e-4d93-951a-79ebba307039"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Calibri" isBold="true"/>
-								</textElement>
-								<text><![CDATA[Herraje]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:column width="19" uuid="5af13475-1d19-4d91-8135-473a7f4d4fee">
-							<jr:columnHeader style="table_TH" height="13" rowSpan="1">
-								<staticText>
-									<reportElement x="0" y="0" width="19" height="13" uuid="663bbb98-926b-4de1-bcd3-cf179f9a3af6"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri" isBold="true"/>
-									</textElement>
-									<text><![CDATA[A.T]]></text>
-								</staticText>
-							</jr:columnHeader>
-							<jr:detailCell style="table_CH" height="15" rowSpan="1">
-								<textField>
-									<reportElement x="0" y="0" width="19" height="15" uuid="9d2dc699-02be-4757-ae39-00fb8d1263bb"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri"/>
-									</textElement>
-									<textFieldExpression><![CDATA[$F{hat}]]></textFieldExpression>
-								</textField>
-							</jr:detailCell>
-						</jr:column>
-						<jr:column width="18" uuid="7a10c2c2-fb31-470a-89df-9ac947e28731">
-							<jr:columnHeader style="table_TH" height="13" rowSpan="1">
-								<staticText>
-									<reportElement x="0" y="0" width="18" height="13" uuid="f9622f54-f03b-42ef-a244-0ba0b498c931"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri" isBold="true"/>
-									</textElement>
-									<text><![CDATA[B.T]]></text>
-								</staticText>
-							</jr:columnHeader>
-							<jr:detailCell style="table_CH" height="15" rowSpan="1">
-								<textField>
-									<reportElement x="0" y="0" width="18" height="15" uuid="97440ae3-8171-4cf5-83f7-40e75157c791"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri"/>
-									</textElement>
-									<textFieldExpression><![CDATA[$F{hbt}]]></textFieldExpression>
-								</textField>
-							</jr:detailCell>
-						</jr:column>
-					</jr:columnGroup>
-					<jr:columnGroup width="54" uuid="7c6b8970-5501-4b93-a97c-ddce9a81cf30">
-						<jr:columnHeader style="table_TH" height="30" rowSpan="1">
-							<staticText>
-								<reportElement x="0" y="0" width="54" height="30" uuid="a35cda20-5b30-4e08-9d2d-fe15d0489efe"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Calibri" isBold="true"/>
-								</textElement>
-								<text><![CDATA[Conmutador]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:column width="25" uuid="5ad52f1b-f5b9-4a8f-989f-1d5bfa86aaee">
-							<jr:columnHeader style="table_TH" height="13" rowSpan="1">
-								<staticText>
-									<reportElement x="0" y="0" width="25" height="13" uuid="27a9f10f-eb1c-49b3-b136-03fa616286a3"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri" isBold="true"/>
-									</textElement>
-									<text><![CDATA[INT]]></text>
-								</staticText>
-							</jr:columnHeader>
-							<jr:detailCell style="table_CH" height="15" rowSpan="1">
-								<textField>
-									<reportElement x="0" y="0" width="25" height="15" uuid="71c67732-88b4-476c-a625-0288f282bb9a"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri"/>
-									</textElement>
-									<textFieldExpression><![CDATA[$F{ci}.equals( true ) ? "X":""]]></textFieldExpression>
-								</textField>
-							</jr:detailCell>
-						</jr:column>
-						<jr:column width="29" uuid="4600b42a-7d6f-4f6c-ba79-9b34d3d8294b">
-							<jr:columnHeader style="table_TH" height="13" rowSpan="1">
-								<staticText>
-									<reportElement x="0" y="0" width="29" height="13" uuid="0d1e605f-3e16-449e-b7e2-eb9d6961a1d5"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri" isBold="true"/>
-									</textElement>
-									<text><![CDATA[EXT]]></text>
-								</staticText>
-							</jr:columnHeader>
-							<jr:detailCell style="table_CH" height="15" rowSpan="1">
-								<textField>
-									<reportElement x="0" y="0" width="29" height="15" uuid="0266ba9b-55b3-4cb4-9583-a82307a44e52"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri"/>
-									</textElement>
-									<textFieldExpression><![CDATA[$F{ce}.equals( true ) ? "X":""]]></textFieldExpression>
-								</textField>
-							</jr:detailCell>
-						</jr:column>
-					</jr:columnGroup>
-					<jr:column width="35" uuid="63172627-3a1d-4441-b1d8-764a75765187">
-						<jr:columnHeader style="table_TH" height="43" rowSpan="2">
-							<staticText>
-								<reportElement x="0" y="0" width="35" height="43" uuid="82a76fb7-d35f-40e2-85a3-32cdee376c1d"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Calibri" isBold="true"/>
-								</textElement>
-								<text><![CDATA[HERRAJE]]></text>
-							</staticText>
-						</jr:columnHeader>
-						<jr:detailCell style="table_CH" height="15" rowSpan="1">
-							<textField>
-								<reportElement x="0" y="0" width="35" height="15" uuid="26302e4f-3756-4348-a19c-f0405504573d"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Calibri"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{herraje}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
 					<jr:column width="29" uuid="c19336be-0cde-40ba-a9ca-02dd0fd61076">
-						<jr:columnHeader style="table_TH" height="43" rowSpan="2">
+						<jr:columnHeader style="table_TH" height="13" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="29" height="43" uuid="93fd3c89-0065-4095-a3f9-d51e6ed79f2d"/>
+								<reportElement x="0" y="0" width="29" height="13" uuid="93fd3c89-0065-4095-a3f9-d51e6ed79f2d"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri" isBold="true"/>
 								</textElement>
@@ -638,9 +381,9 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="29" uuid="59a15a7a-5b99-4c30-919a-4c8f2a3096a5">
-						<jr:columnHeader style="table_TH" height="43" rowSpan="2">
+						<jr:columnHeader style="table_TH" height="13" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="29" height="43" uuid="2dbf3d24-966c-4a18-bb53-5bb3363b9112"/>
+								<reportElement x="0" y="0" width="29" height="13" uuid="2dbf3d24-966c-4a18-bb53-5bb3363b9112"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri" isBold="true"/>
 								</textElement>
@@ -658,9 +401,9 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="30" uuid="948924f6-6c00-4641-bf72-c6c733daee63">
-						<jr:columnHeader style="table_TH" height="43" rowSpan="2">
+						<jr:columnHeader style="table_TH" height="13" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="30" height="43" uuid="f14045bc-432b-4cd8-b04a-3174cf6b415b"/>
+								<reportElement x="0" y="0" width="30" height="13" uuid="f14045bc-432b-4cd8-b04a-3174cf6b415b"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri" isBold="true"/>
 								</textElement>
@@ -678,9 +421,9 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="61" uuid="55abfb8d-d6d9-4f32-8686-f6346ea26960">
-						<jr:columnHeader style="table_TH" height="43" rowSpan="2">
+						<jr:columnHeader style="table_TH" height="13" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="61" height="43" uuid="f3f8e22d-0ca4-400b-bbfd-dd46667e85d7"/>
+								<reportElement x="0" y="0" width="61" height="13" uuid="f3f8e22d-0ca4-400b-bbfd-dd46667e85d7"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri" isBold="true"/>
 								</textElement>
@@ -698,9 +441,9 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="51" uuid="2b9f5059-8db0-4cdb-98a9-ccba8b8f7042">
-						<jr:columnHeader style="table_TH" height="43" rowSpan="2">
+						<jr:columnHeader style="table_TH" height="13" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="50" height="43" uuid="631d980d-7209-4561-ae90-4b07c4e0aff6"/>
+								<reportElement x="0" y="0" width="50" height="13" uuid="631d980d-7209-4561-ae90-4b07c4e0aff6"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri" isBold="true"/>
 								</textElement>
@@ -717,52 +460,21 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-				</jr:table>
-			</componentElement>
-		</band>
-		<band height="21">
-			<componentElement>
-				<reportElement key="TablaDiferencias" style="BordesTabla1" stretchType="RelativeToTallestObject" x="4" y="3" width="766" height="15" uuid="5aff64ee-a6ca-4168-a9ac-a91b4390f744"/>
-				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="Diferencias" uuid="cec15327-e71a-4310-b133-c07a0f66c3be">
-						<datasetParameter name="IDENTRADA_DIF">
-							<datasetParameterExpression><![CDATA[$P{IDENTRADA}]]></datasetParameterExpression>
-						</datasetParameter>
-						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-					</datasetRun>
-					<jr:columnGroup width="765" uuid="b44edf52-cf49-4cce-98b6-87798e68ffd1">
-						<jr:columnHeader style="table_TH" height="19" rowSpan="1">
+					<jr:column width="168" uuid="b1b0bad6-8cb1-470d-b00e-46480757c3fc">
+						<jr:tableHeader height="0" rowSpan="1"/>
+						<jr:tableFooter height="0" rowSpan="1"/>
+						<jr:columnHeader style="table_TH" height="13" rowSpan="1">
 							<staticText>
-								<reportElement x="11" y="0" width="748" height="19" uuid="180c4b2d-7e7f-4db5-b19b-416fbb0c2ae5"/>
-								<textElement textAlignment="Left" verticalAlignment="Middle">
-									<font fontName="Calibri" size="14" isBold="true"/>
+								<reportElement x="0" y="0" width="168" height="13" uuid="a4007a64-d511-4843-a8ab-8ce79129fac5"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Calibri" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Observaciones Y Diferencias:]]></text>
+								<text><![CDATA[CLIENTE]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:column width="33" uuid="ae5e0259-56d6-4fff-94c8-61947d5574cc">
-							<jr:detailCell style="table_CH" height="13" rowSpan="1">
-								<textField>
-									<reportElement x="0" y="0" width="33" height="13" uuid="688ff69f-4c73-4da3-a8b2-f33d9c44c89b"/>
-									<textElement textAlignment="Center" verticalAlignment="Middle">
-										<font fontName="Calibri"/>
-									</textElement>
-									<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
-								</textField>
-							</jr:detailCell>
-						</jr:column>
-						<jr:column width="732" uuid="85046eda-9213-4a9e-8c8f-0e51fa590af8">
-							<jr:detailCell style="table_CH" height="13" rowSpan="1">
-								<textField isStretchWithOverflow="true">
-									<reportElement x="0" y="0" width="732" height="13" uuid="def1442d-6a71-482b-9607-70d7efbbb076"/>
-									<textElement textAlignment="Left" verticalAlignment="Middle">
-										<font fontName="Calibri"/>
-									</textElement>
-									<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
-								</textField>
-							</jr:detailCell>
-						</jr:column>
-					</jr:columnGroup>
+						<jr:columnFooter height="0" rowSpan="1"/>
+						<jr:detailCell style="table_CH" height="15" rowSpan="1"/>
+					</jr:column>
 				</jr:table>
 			</componentElement>
 		</band>

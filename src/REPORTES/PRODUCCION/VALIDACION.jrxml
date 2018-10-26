@@ -596,7 +596,7 @@ REALIZADO]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="13" rowSpan="1">
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement x="0" y="0" width="50" height="13" uuid="3b894964-5aa8-4055-a0ef-1784ab092031"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri" size="8" isStrikeThrough="false"/>

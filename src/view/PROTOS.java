@@ -1113,7 +1113,7 @@ public class PROTOS extends javax.swing.JFrame{
         jLabel21.setText("Referencia:");
         jPanel3.add(jLabel21);
 
-        comboReferenciaAceite.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HYVOLT", "LUB TROIL TIPO II", "FR3", "EPM", "INHIBIDO TIPO II", "N/A" }));
+        comboReferenciaAceite.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HYVOLT", "LUB TROIL TIPO II", "FR3", "EPM", "INHIBIDO TIPO II", "NYTRO IZAR II", "N/A" }));
         jPanel3.add(comboReferenciaAceite);
 
         jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);

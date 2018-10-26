@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConsorcioRetono" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6569b73d-ad90-4959-abb8-76b9832009dd">
-	<property name="ireport.zoom" value="5.0"/>
-	<property name="ireport.x" value="1508"/>
-	<property name="ireport.y" value="518"/>
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="288"/>
 	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF">
 		<box>
 			<topPen lineWidth="0.125" lineColor="#000000"/>
@@ -71,16 +71,18 @@
 	<field name="idusuario" class="java.lang.Integer"/>
 	<field name="nitcliente" class="java.lang.String"/>
 	<field name="empresatransportadora" class="java.lang.String"/>
+	<field name="idcliente" class="java.lang.Integer"/>
+	<field name="responsable" class="java.lang.String"/>
 	<pageHeader>
-		<band height="186" splitType="Stretch">
+		<band height="191" splitType="Stretch">
 			<rectangle radius="5">
-				<reportElement mode="Transparent" x="292" y="96" width="280" height="87" uuid="41dbd8a3-ca69-47f7-9682-c9853222816e"/>
+				<reportElement mode="Transparent" x="292" y="96" width="280" height="70" uuid="41dbd8a3-ca69-47f7-9682-c9853222816e"/>
 				<graphicElement>
 					<pen lineWidth="0.125" lineStyle="Solid"/>
 				</graphicElement>
 			</rectangle>
 			<rectangle radius="5">
-				<reportElement mode="Transparent" x="0" y="96" width="280" height="87" uuid="b6cb6015-c3e0-42d0-ba7d-c992e7e38eab"/>
+				<reportElement mode="Transparent" x="0" y="96" width="280" height="95" uuid="b6cb6015-c3e0-42d0-ba7d-c992e7e38eab"/>
 				<graphicElement>
 					<pen lineWidth="0.125" lineStyle="Solid"/>
 				</graphicElement>
@@ -163,7 +165,7 @@
 				<text><![CDATA[Tel.: (7) 5732010 - 5732013 - 5732014]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="50" y="151" width="225" height="13" uuid="a3396419-a6fa-4d74-b687-cde0fa1a4faf"/>
+				<reportElement x="69" y="151" width="206" height="13" uuid="a3396419-a6fa-4d74-b687-cde0fa1a4faf"/>
 				<box>
 					<pen lineWidth="0.0" lineStyle="Dotted"/>
 					<topPen lineWidth="0.0" lineStyle="Dotted"/>
@@ -208,7 +210,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Ebrima" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[NOMBRE:]]></text>
+				<text><![CDATA[EMPRESA:]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="350" y="125" width="217" height="13" uuid="b9d43dc1-1ae7-422e-aacc-b0eaecd70f80"/>
@@ -235,7 +237,7 @@
 				<text><![CDATA[DIRECCION:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="50" y="112" width="225" height="13" uuid="78cac04f-07fe-413f-b941-df3b7adc4565"/>
+				<reportElement x="69" y="112" width="206" height="13" uuid="78cac04f-07fe-413f-b941-df3b7adc4565"/>
 				<box>
 					<pen lineWidth="0.0" lineStyle="Dotted"/>
 					<topPen lineWidth="0.0" lineStyle="Dotted"/>
@@ -250,7 +252,7 @@
 				<textFieldExpression><![CDATA[$F{cliente_remision}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="53" y="138" width="222" height="13" uuid="5d7d92ab-b9de-401f-9713-d01b94645ce8"/>
+				<reportElement x="69" y="138" width="206" height="13" uuid="5d7d92ab-b9de-401f-9713-d01b94645ce8"/>
 				<box>
 					<pen lineWidth="0.0" lineStyle="Dotted"/>
 					<topPen lineWidth="0.0" lineStyle="Dotted"/>
@@ -365,7 +367,7 @@
 				<text><![CDATA[DATOS DEL TRANSPORTADOR:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="50" y="164" width="225" height="13" uuid="97dfba56-1d71-4a65-8948-47b231a5dfb6"/>
+				<reportElement x="69" y="164" width="206" height="13" uuid="97dfba56-1d71-4a65-8948-47b231a5dfb6"/>
 				<box>
 					<pen lineWidth="0.0" lineStyle="Dotted"/>
 					<topPen lineWidth="0.0" lineStyle="Dotted"/>
@@ -411,6 +413,30 @@
 					<font fontName="Ebrima" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{placa_remision}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="177" width="60" height="13" uuid="1eb973cc-de09-4822-93a0-ac760da0f09c">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Ebrima" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RESPONSABLE:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="69" y="177" width="206" height="13" uuid="6800a920-b412-4260-8285-b9cdfce63a02"/>
+				<box>
+					<pen lineWidth="0.0" lineStyle="Dotted"/>
+					<topPen lineWidth="0.0" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.0" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.0" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.0" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Ebrima" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{responsable}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>

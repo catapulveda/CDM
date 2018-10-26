@@ -79,10 +79,12 @@ public class Remision {
     public static void cargarRemisiones(DefaultTableModel modelo, String tipo, String empresa){
         modelo.ConexionBD con = new ConexionBD();        
             con.conectar();
-            String sql = " SELECT * FROM remision r LEFT JOIN despacho d USING (iddespacho) WHERE idremision>0  ";
+            String sql = " SELECT * FROM remision r "
+                    + "LEFT JOIN despacho d USING (iddespacho) "
+                    + "INNER JOIN cliente c ON c.idcliente=r.idcliente WHERE idremision>0  ";
             sql += (tipo.equals("TODAS"))?"":"AND tipo_remision='"+tipo+"' ";
             sql += (empresa.equals("TODAS"))?"":"AND empresa_remision='"+empresa+"' ";
-            sql += " ORDER BY idremision ";
+            sql += " ORDER BY fechacreacion DESC ";
             try {
                 ResultSet rs = con.CONSULTAR(sql);
                 while(rs.next()){
@@ -91,7 +93,7 @@ public class Remision {
                         rs.getString("nodespacho"),
                         rs.getString("numero_remision"),
                         new SimpleDateFormat("EEE, d MMM yyyy").format(rs.getDate("fecha_remision")),
-                        rs.getString("cliente_remision"),
+                        rs.getString("nombrecliente"),
                         rs.getString("ciudad_remision"),
                         rs.getString("destino_remision"),
                         rs.getString("conductor_remision"),

@@ -4,8 +4,10 @@ import CopyPasteJTable.ExcelAdapter;
 import JTableAutoResizeColumn.TableColumnAdjuster;
 import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +24,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import modelo.Cliente;
 import modelo.ConexionBD;
 import modelo.Despacho;
 import modelo.Metodos;
@@ -63,10 +66,14 @@ public class PrepararDespacho extends javax.swing.JFrame {
                 lblFilasSeleccionadas.setText("Columnas: " + tablaTrafos.getSelectedColumnCount() + " Filas: " + tablaTrafos.getSelectedRowCount()+" Total filas: "+tablaTrafos.getRowCount());
             }
         });
-                
+               
+        modelo.Cliente.cargarComboNombreClientes(comboClientes);
+        comboClientes.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
+        comboClientes.setUI(JComboBoxColor.JComboBoxColor.createUI(comboClientes));
     }
     
     public void cargarIntefazTabla(){
+        tablaTrafos.setRowSorter(null);
         modeloTabla =  new DefaultTableModel(new Object[][]{}, modelo.PrepararDespacho.getColumnNames()){
             @Override
             public Class<?> getColumnClass(int column){
@@ -304,7 +311,8 @@ public class PrepararDespacho extends javax.swing.JFrame {
      
     public void cargarComboDespachos(){
         conexion.conectar();
-        ResultSet rs = conexion.CONSULTAR(" SELECT * FROM despacho WHERE idcliente="+IDCLIENTE+" ORDER BY iddespacho DESC LIMIT 10 ");
+        ResultSet rs = conexion.CONSULTAR(" SELECT * FROM despacho WHERE idcliente="+IDCLIENTE+" "
+                + "ORDER BY iddespacho DESC LIMIT 10 ");
         try {
             comboListaDespachos.addItem(new Despacho(0, "NUEVO"));
             while(rs.next()){
@@ -328,8 +336,12 @@ public class PrepararDespacho extends javax.swing.JFrame {
         jSeparator3 = new javax.swing.JToolBar.Separator();
         jCheckBox1 = new javax.swing.JCheckBox();
         jSeparator2 = new javax.swing.JToolBar.Separator();
+        jLabel3 = new javax.swing.JLabel();
+        comboClientes = new javax.swing.JComboBox<>();
+        jSeparator6 = new javax.swing.JToolBar.Separator();
         jLabel2 = new javax.swing.JLabel();
         comboListaDespachos = new javax.swing.JComboBox<>();
+        jSeparator5 = new javax.swing.JToolBar.Separator();
         btnGuardarDespacho = new javax.swing.JButton();
         jSeparator4 = new javax.swing.JToolBar.Separator();
         btnRefrescar3 = new javax.swing.JButton();
@@ -385,12 +397,21 @@ public class PrepararDespacho extends javax.swing.JFrame {
         barra.add(jCheckBox1);
         barra.add(jSeparator2);
 
+        jLabel3.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
+        jLabel3.setText("Cliente:");
+        barra.add(jLabel3);
+
+        comboClientes.setMaximumRowCount(12);
+        barra.add(comboClientes);
+        barra.add(jSeparator6);
+
         jLabel2.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel2.setText("Seleccione despacho:");
         barra.add(jLabel2);
 
         comboListaDespachos.setMaximumRowCount(12);
         barra.add(comboListaDespachos);
+        barra.add(jSeparator5);
 
         btnGuardarDespacho.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         btnGuardarDespacho.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/Guardar.png"))); // NOI18N
@@ -437,7 +458,7 @@ public class PrepararDespacho extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(barra, javax.swing.GroupLayout.DEFAULT_SIZE, 594, Short.MAX_VALUE)
+            .addComponent(barra, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
             .addComponent(jScrollPane1)
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -456,7 +477,7 @@ public class PrepararDespacho extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cjBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjBuscarKeyReleased
-        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscar.getText().toUpperCase(), 5));
+        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscar.getText().toUpperCase()));
     }//GEN-LAST:event_cjBuscarKeyReleased
 
     private void btnGuardarDespachoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarDespachoActionPerformed
@@ -466,20 +487,29 @@ public class PrepararDespacho extends javax.swing.JFrame {
                 try{            
                     int IDDESPACHO = -1;
                     String NUMERO_DESPACHO = "";
+                    conexion = new ConexionBD();
+                    conexion.conectar();
                     if(comboListaDespachos.getSelectedIndex()==0){
                         if((null!= (NUMERO_DESPACHO=JOptionPane.showInputDialog(null, "Ingrese el numero del despacho:", "Ingrese un despacho:", JOptionPane.INFORMATION_MESSAGE)) )){
                             if(null != NUMERO_DESPACHO && !NUMERO_DESPACHO.isEmpty()){
+                                conexion.getConexion().setAutoCommit(false);
                                 String sql = " INSERT INTO despacho (nodespacho, fecha_despacho, idcliente, peso_despacho, ";
                                 sql += " estado_despacho, descripcion_despacho, idusuario) ";
-                                sql += " VALUES ( '"+NUMERO_DESPACHO+"', '"+new java.util.Date()+"' , '"+getIDCLIENTE()+"', "+PESO+", ";
-                                sql += " 'false' , '', "+sesion.getIdUsuario()+" ) ";                                
-                                if(conexion.GUARDAR(sql)){
-                                    conexion.conectar();
-                                    ResultSet rs = conexion.CONSULTAR("SELECT last_value FROM despacho_iddespacho_seq");
+                                sql += " VALUES ( '"+NUMERO_DESPACHO+"', '"+new java.util.Date()+"' , "+((Cliente)comboClientes.getModel().getSelectedItem()).getIdCliente()+", "+PESO+", ";
+                                sql += " 'false' , '', "+sesion.getIdUsuario()+" ) ";                                                                
+                                PreparedStatement pst = conexion.getConexion().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                                if(pst.executeUpdate()>0){
+                                    ResultSet rs = pst.getGeneratedKeys();
                                     rs.next();
-                                    IDDESPACHO = rs.getInt("last_value");
-                                    conexion.CERRAR();
+                                    IDDESPACHO = rs.getInt(1);
                                 }
+//                                if(conexion.GUARDAR(sql)){
+//                                    conexion.conectar();
+//                                    ResultSet rs = conexion.CONSULTAR("SELECT last_value FROM despacho_iddespacho_seq");
+//                                    rs.next();
+//                                    IDDESPACHO = rs.getInt("last_value");
+//                                    conexion.CERRAR();
+//                                }
                             }
                         }
                     }else if(comboListaDespachos.getSelectedIndex()>0){
@@ -488,19 +518,33 @@ public class PrepararDespacho extends javax.swing.JFrame {
 
                     if(IDDESPACHO>0){
                         if(JOptionPane.showConfirmDialog(null, "Desea continuar ? ", "Confirmar", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+                            String update = "";
                             for (int i = 0; i < tablaTrafos.getRowCount(); i++) {
                                 if(Boolean.parseBoolean(tablaTrafos.getValueAt(i, 4).toString())){
                                     tablaTrafos.setRowSelectionInterval(i, i);
 
-                                    String sql = " UPDATE transformador SET iddespacho="+IDDESPACHO+" , estado='A DESPACHAR' ";
-                                    sql += " WHERE identrada="+getIDENTRADA()+" AND item="+tablaTrafos.getValueAt(i, 0)+" ";
-                                    if(conexion.GUARDAR(sql)){
-                                        
-                                    }
+                                    update += "UPDATE transformador SET iddespacho="+IDDESPACHO+" , estado='A DESPACHAR'";
+                                    update += "WHERE identrada="+getIDENTRADA()+" AND item="+tablaTrafos.getValueAt(i, 0)+";\n";
+//                                    String sql = " UPDATE transformador SET iddespacho="+IDDESPACHO+" , estado='A DESPACHAR' ";
+//                                    sql += " WHERE identrada="+getIDENTRADA()+" AND item="+tablaTrafos.getValueAt(i, 0)+" ";
+//                                    if(conexion.GUARDAR(sql)){
+//                                        
+//                                    }
                                 }
-                                if(i==tablaTrafos.getRowCount()-1){
-                                    cargarIntefazTabla();
+//                                if(i==tablaTrafos.getRowCount()-1){
+//                                    cargarIntefazTabla();
+//                                }
+                            }
+                            if(update.isEmpty()){
+                               Metodos.M("NO SE HA SELECCIONADO NINGUN TRANSFORMADOR", "advertencia.png");
+                                return;
+                            }
+                            PreparedStatement pst = conexion.getConexion().prepareCall(update);
+                            if(pst.executeUpdate()>0){
+                                if(!conexion.getConexion().getAutoCommit()){
+                                    conexion.getConexion().commit();                                    
                                 }
+                                cargarIntefazTabla();
                             }
                         }
                     }            
@@ -565,16 +609,20 @@ public class PrepararDespacho extends javax.swing.JFrame {
     public javax.swing.JButton btnGuardarDespacho;
     public javax.swing.JButton btnRefrescar3;
     public CompuChiqui.JTextFieldPopup cjBuscar;
+    public javax.swing.JComboBox<modelo.Cliente> comboClientes;
     public javax.swing.JComboBox<modelo.Despacho> comboListaDespachos;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToolBar.Separator jSeparator4;
+    private javax.swing.JToolBar.Separator jSeparator5;
+    private javax.swing.JToolBar.Separator jSeparator6;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel lblFilasSeleccionadas;
     private javax.swing.JLabel lblPeso;
@@ -594,6 +642,6 @@ public class PrepararDespacho extends javax.swing.JFrame {
     }
 
     public void setIDCLIENTE(int IDCLIENTE) {
-        this.IDCLIENTE = IDCLIENTE;
+        this.IDCLIENTE = IDCLIENTE;        
     }
 }

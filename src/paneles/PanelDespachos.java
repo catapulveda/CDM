@@ -24,6 +24,7 @@ import javax.swing.table.TableRowSorter;
 import modelo.ConexionBD;
 import modelo.CustomTableModel;
 import view.DespachoARemision;
+import view2.DespachoARemision2;
 
 public final class PanelDespachos extends javax.swing.JPanel {
 
@@ -310,7 +311,7 @@ public final class PanelDespachos extends javax.swing.JPanel {
 
         if(evt.getClickCount()==2){
             int fila = tabla.getSelectedRow();
-            DespachoARemision dar = new DespachoARemision();
+            DespachoARemision2 dar = new DespachoARemision2();
             dar.setIDDESPACHO((int) tabla.getValueAt(fila, 0));            
             dar.cargarTabla();
             dar.cargarServicios();

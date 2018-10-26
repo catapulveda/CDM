@@ -137,18 +137,18 @@ public class InformesDeProduccion extends javax.swing.JFrame{
                 sql += (index>0)?"AND c.idcliente="+comboCliente.getItemAt(index).getIdCliente():"";
                 rs = conexion.CONSULTAR(sql);
                 try {
-                rs.next();
-                totalintervenidos = rs.getInt("count");
-                sql = " SELECT count(*), extract(year from fechalaboratorio) AS ano, extract(month from fechalaboratorio), to_char(fechalaboratorio, 'TMMonth') AS mes \n ";
-                sql += " FROM protocolos ";
-                sql += " INNER JOIN transformador t USING(idtransformador)\n" +
-                       " INNER JOIN entrada e USING(identrada)\n" +
-                       " INNER JOIN cliente c USING(idcliente) ";
-                sql += " WHERE fechalaboratorio BETWEEN '"+fechainicio+"' AND '"+fechafin+"' ";
-                sql += (index>0)?"AND c.idcliente="+comboCliente.getItemAt(index).getIdCliente():"";
-                sql += " GROUP BY extract(year from fechalaboratorio), extract(month from fechalaboratorio), to_char(fechalaboratorio, 'TMMonth')\n ";
-                sql += " ORDER BY extract(month from fechalaboratorio) ASC ";
-                rs = conexion.CONSULTAR(sql);                
+                    rs.next();
+                    totalintervenidos = rs.getInt("count");
+                    sql = " SELECT count(*), extract(year from fechalaboratorio) AS ano, extract(month from fechalaboratorio), to_char(fechalaboratorio, 'TMMonth') AS mes \n ";
+                    sql += " FROM protocolos ";
+                    sql += " INNER JOIN transformador t USING(idtransformador)\n" +
+                           " INNER JOIN entrada e USING(identrada)\n" +
+                           " INNER JOIN cliente c USING(idcliente) ";
+                    sql += " WHERE fechalaboratorio BETWEEN '"+fechainicio+"' AND '"+fechafin+"' ";
+                    sql += (index>0)?"AND c.idcliente="+comboCliente.getItemAt(index).getIdCliente():"";
+                    sql += " GROUP BY extract(year from fechalaboratorio), extract(month from fechalaboratorio), to_char(fechalaboratorio, 'TMMonth')\n ";
+                    sql += " ORDER BY extract(month from fechalaboratorio) ASC ";
+                    rs = conexion.CONSULTAR(sql);                
                     dataSetUnidades.clear();
                     while(rs.next()){
                         dataSetUnidades.addValue(rs.getInt("count"), "AÑO: "+rs.getString("ano"), rs.getString("mes"));
@@ -205,7 +205,7 @@ public class InformesDeProduccion extends javax.swing.JFrame{
                     while(rs.next()){
                         dataSetServicios.addValue(rs.getInt("count"), rs.getString("serviciosalida")+" - "+rs.getInt("date_part"), rs.getString("mes"));
                     }
-                    modelo.Metodos.generarGrafica(dataSetServicios, "SERVICIOS REALIZADOS", "MES", "TOTAL SERVICIOS", panelServicios);
+                    modelo.Metodos.generarGrafica(dataSetServicios, "SERVICIOS REALIZADOS", "MES", "CANTIDAD", panelServicios);
                     validate();
                 } catch (Exception ex) {
                     modelo.Metodos.ERROR(ex, "ERROR AL CARGAR LA GRAFICA DE SERVICIOS.");
@@ -264,7 +264,7 @@ public class InformesDeProduccion extends javax.swing.JFrame{
                     while(rs.next()){
                         dataSetServiciosTotales.addValue(rs.getInt("count"), rs.getString("serviciosalida"), rs.getString("serviciosalida"));
                     }
-                    modelo.Metodos.generarGrafica(dataSetServiciosTotales, "FASES", "MES", "FASE", jpanelServiciosTotales);
+                        modelo.Metodos.generarGrafica(dataSetServiciosTotales, "SERVICIOS", "SERVICIO", "CANTIDAD", jpanelServiciosTotales);
                     validate();
                     
                 } catch (Exception e) {
@@ -336,6 +336,7 @@ public class InformesDeProduccion extends javax.swing.JFrame{
             }
         ));
         tablaDatos.setGridColor(new java.awt.Color(227, 227, 227));
+        tablaDatos.setName("Informe de Produccion"); // NOI18N
         tablaDatos.setRowHeight(25);
         tablaDatos.getTableHeader().setReorderingAllowed(false);
         tablaDatos.addMouseListener(new java.awt.event.MouseAdapter() {

@@ -4,6 +4,12 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="ORDEN" class="java.lang.Boolean" isForPrompting="false">
+		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SQLORDEN" class="java.lang.String">
+		<defaultValueExpression><![CDATA[($P{ORDEN}.equals( true ))?"fase ASC, kvaentrada ASC, marca":"item"]]></defaultValueExpression>
+	</parameter>
 	<parameter name="IDENTRADA" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[201]]></defaultValueExpression>
 	</parameter>
@@ -13,7 +19,7 @@
 	<parameter name="FECHA" class="java.lang.String"/>
 	<parameter name="MUESTREADO" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECt * FROM transformador WHERE identrada=$P{IDENTRADA}]]>
+		<![CDATA[SELECt * FROM transformador WHERE identrada=$P{IDENTRADA} ORDER BY $P{SQLORDEN}]]>
 	</queryString>
 	<field name="idtransformador" class="java.lang.Integer"/>
 	<field name="item" class="java.lang.Integer"/>
@@ -49,6 +55,7 @@
 	<field name="identrada" class="java.lang.Integer"/>
 	<field name="iddespacho" class="java.lang.Integer"/>
 	<field name="idremision" class="java.lang.Integer"/>
+	<field name="causadefalla" class="java.lang.String"/>
 	<variable name="OTT" class="java.lang.Integer"/>
 	<detail>
 		<band height="95" splitType="Stretch">

@@ -42,6 +42,7 @@ public class DialogoImprimirAceite extends javax.swing.JDialog {
         cjot = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        checkOrdenar = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -56,7 +57,7 @@ public class DialogoImprimirAceite extends javax.swing.JDialog {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, -1, -1));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, -1, -1));
 
         jLabel4.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         jLabel4.setText("Muestreado por:");
@@ -78,6 +79,9 @@ public class DialogoImprimirAceite extends javax.swing.JDialog {
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 310, 160));
 
+        checkOrdenar.setText("Ordenar para EPM");
+        jPanel1.add(checkOrdenar, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 110, 160, -1));
+
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
@@ -94,6 +98,7 @@ public class DialogoImprimirAceite extends javax.swing.JDialog {
             p.put("OT", Integer.parseInt(cjot.getText())-1);
             p.put("FECHA", new SimpleDateFormat("dd-MMM-yyyy").format(cjfecha.getDate()));
             p.put("MUESTREADO", cjmuestreado.getText());
+            p.put("ORDEN", checkOrdenar.isSelected());
             
             jasperprint = JasperFillManager.fillReport(reporte, p, conexion.conectar());            
             
@@ -151,6 +156,7 @@ public class DialogoImprimirAceite extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox checkOrdenar;
     private com.toedter.calendar.JDateChooser cjfecha;
     private javax.swing.JTextField cjmuestreado;
     private javax.swing.JTextField cjot;

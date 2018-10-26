@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="INFORME ANUAL" language="groovy" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0d5dc2c6-f0be-49ba-a61a-6f7dbd9a52d9">
-	<property name="ireport.zoom" value="3.0"/>
-	<property name="ireport.x" value="1414"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="CDM"/>
 	<style name="COLUMNA" mode="Opaque" backcolor="#BFE1FF">
@@ -102,7 +102,7 @@ ORDER BY t.serviciosalida, fechalaboratorio, t.numeroserie ASC]]>
 											<property name="local_mesure_unitheight" value="pixel"/>
 											<property name="com.jaspersoft.studio.unit.height" value="px"/>
 										</reportElement>
-										<imageExpression><![CDATA["E:\\NetBeansProjects\\CDM_NUEVO\\IMAGENES\\LOGO CDM.png"]]></imageExpression>
+										<imageExpression><![CDATA[getClass().getResource("/recursos/images/logo.png")]]></imageExpression>
 									</image>
 								</jr:cell>
 							</jr:groupHeader>

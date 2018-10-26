@@ -390,7 +390,7 @@ WHERE identrada=$P{IDENTRADA}]]>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="13" rowSpan="1">
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement x="0" y="0" width="94" height="13" uuid="4e546680-fdc0-49ca-aefd-dedda48200ca"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri"/>

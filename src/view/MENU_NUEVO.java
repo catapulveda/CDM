@@ -112,7 +112,7 @@ public class MENU_NUEVO extends javax.swing.JFrame{
         menuRemisiones.add(menuRemisionCDM);
 
         menuRemisionConsorcio.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/mini logo.png"))); // NOI18N
-        menuRemisionConsorcio.setText("CONSORCIO");
+        menuRemisionConsorcio.setText("CDM SERVICIOS");
         menuRemisionConsorcio.setFont(new java.awt.Font("Franklin Gothic Medium", 0, 12)); // NOI18N
 
         conRetornoConsorcio.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/mini logo.png"))); // NOI18N
@@ -183,6 +183,7 @@ public class MENU_NUEVO extends javax.swing.JFrame{
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         (new Thread(){
+            @Override
             public void run(){
                 lotes.btnCargarLotes.doClick();
                 despachos.btnCargarDespachos.doClick();

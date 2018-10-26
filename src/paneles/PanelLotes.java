@@ -115,6 +115,7 @@ public class PanelLotes extends javax.swing.JPanel {
         sql += (comboBuscarLotePorTipoDeContrato.getSelectedIndex()==2)?" AND e.contrato='PARTICULAR' ":"";
         sql += " ORDER BY c.nombrecliente ASC ";
         conexion.conectar();
+        conexion.conectar();
         ResultSet rs = conexion.CONSULTAR(sql);
         comboBuscarLotePorCliente.removeAllItems();
         comboBuscarLotePorCliente.addItem(new Cliente(-1, "TODOS", "NIT CLIENTE"));
@@ -229,7 +230,7 @@ public class PanelLotes extends javax.swing.JPanel {
         jToolBar1.setRollover(true);
 
         jLabel1.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        jLabel1.setText("Tipo de contrato:");
+        jLabel1.setText("Tipo de cliente:");
         jToolBar1.add(jLabel1);
 
         comboBuscarLotePorTipoDeContrato.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
@@ -374,7 +375,7 @@ public class PanelLotes extends javax.swing.JPanel {
 
     private void subMenuDarPorTerminadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuDarPorTerminadoActionPerformed
         try {
-            if(Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("AUXPLANTA")){
+            if(Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("PROGRAMADOR")){
                 String idEntrada = tablaLotes.getValueAt(tablaLotes.getSelectedRow(), 0).toString();
                 boolean estado = Boolean.parseBoolean(tablaLotes.getValueAt(tablaLotes.getSelectedRow(), 13).toString());
                 if(estado){
@@ -407,11 +408,12 @@ public class PanelLotes extends javax.swing.JPanel {
                 pd.setIDCLIENTE(rs.getInt("idcliente"));
                 pd.cargarIntefazTabla();
                 pd.cargarComboDespachos();
+                pd.comboClientes.getModel().setSelectedItem(new Cliente(rs.getInt("idcliente"), rs.getString("nombrecliente"), rs.getString("nitcliente")));
                 pd.setVisible(true);
             }
         } catch (SQLException ex) {
             Logger.getLogger(PanelLotes.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }finally{conexion.CERRAR();}
     }//GEN-LAST:event_subMenuPrepararDespachoActionPerformed
 
     private void btnCargarLotesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarLotesActionPerformed

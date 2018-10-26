@@ -147,10 +147,11 @@ public class DialogoRegistrarHerramienta extends javax.swing.JDialog {
                             case 1:
                                 try {
                                     if(Integer.parseInt(model.getValueAt(e.getFirstRow(), 2).toString())>0){
+                                        //{"N°", "ID", "NOMBRE HERRAMIENTA", "CANTIDAD", "CODIGO"};
                                         ( (view.REMISIONESCDM)getOwner()).agregarFila(new Object[]{
                                             "",
                                             model.getValueAt(e.getFirstRow(), 0),//id
-                                            model.getValueAt(e.getFirstRow(), 4),
+                                            model.getValueAt(e.getFirstRow(), 5),
                                             model.getValueAt(e.getFirstRow(), 2),
                                             model.getValueAt(e.getFirstRow(), 3)
                                         });

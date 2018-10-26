@@ -16,7 +16,7 @@ public class Conexion2 {
     
     private static Connection conexion;
     private static Statement statement;
-    private static String url = "PRODUCCION";
+    private static String url = "PLANTA";
     private static String BD = "CDM";
     private static String user = "postgres";
     private static String pass = "cdm";

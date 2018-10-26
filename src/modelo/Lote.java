@@ -94,7 +94,11 @@ public class Lote {
         };
     }
     
-    public static void cargarLotes(DefaultTableModel modelo, int indiceComboTipoContrato, int idcliente, JComboBox comboBuscarLotePorContrato, JComboBox comboBuscarLotePorLote){
+    public static void cargarLotes(DefaultTableModel modelo, 
+            int indiceComboTipoContrato, 
+            int idcliente, 
+            JComboBox comboBuscarLotePorContrato, 
+            JComboBox comboBuscarLotePorLote){
         try {
             String sql = " SELECT e.identrada, e.idcliente, e.idciudad, e.idconductor, e.identradaAlmacen, e.lote, \n";
             sql += " e.contrato, e.op, e.centrodecostos, e.fecharecepcion, e.fecharegistrado, e.fechaactualizado, \n";
@@ -109,7 +113,7 @@ public class Lote {
             sql += (indiceComboTipoContrato==1)?"AND contrato!='PARTICULAR' \n":(indiceComboTipoContrato==2)?"AND contrato='PARTICULAR' \n":"";
             sql += (comboBuscarLotePorContrato.getSelectedIndex()>0)?"AND contrato='"+comboBuscarLotePorContrato.getSelectedItem()+"' ":"";
             sql += (comboBuscarLotePorLote.getSelectedIndex()>0)?" AND lote='"+comboBuscarLotePorLote.getSelectedItem()+"' ":"";
-            sql += " ORDER BY nombrecliente ASC, fecharecepcion ASC";
+            sql += " ORDER BY fecharecepcion DESC";
             
             conexion.conectar();
             ResultSet rs = conexion.CONSULTAR(sql);
