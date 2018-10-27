@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 public class NewMain {
 
     public static void main(String[] args) {
-        File miDir = new File("C:\\Users\\PROGRAMADOR\\Desktop\\NUevos");
+        File miDir = new File("H:\\RECUVA");
         verContenidoFolder(miDir);
     }
 
@@ -28,16 +28,11 @@ public class NewMain {
                     System.out.println("directorio:" + file.getCanonicalPath());
                     verContenidoFolder(file);
                 } else {
-                    if(file.getName().endsWith("txt")){
-                        FileReader fileR = new FileReader(file);
-                        BufferedReader file2 = new BufferedReader(fileR);
-                        //Files.copy(file.toPath(), new File("REC//"+file.getName()).toPath());
-                        String linea = null;
-                        while( (linea=file2.readLine())!=null ){
-                            if(linea.contains("www.transformadorescdm.com:")){
-                                JOptionPane.showMessageDialog(null, file.getAbsolutePath());
-                            }                            
-                        }
+                    if(file.getName().endsWith("java")){
+//                        FileReader fileR = new FileReader(file);
+//                        BufferedReader file2 = new BufferedReader(fileR);
+                        Files.move(file.toPath(), new File("REC//"+file.getName()).toPath());
+                        System.out.println(file.toPath());
                     }
                 }
             }

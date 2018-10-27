@@ -296,7 +296,9 @@ public class PROTOS extends javax.swing.JFrame{
         int ano = cjano.getInt();
         int vp = cjvp.getInt();
         int fase = Integer.parseInt(comboFase.getSelectedItem().toString());
-        if("NUEVO".equals(servicio)||"RECONSTRUIDO".equals(servicio) || cjcliente.getText().equals("EMPRESAS PUBLICAS DE MEDELLIN S.A E.S.P")){
+        if(comboAceite.getSelectedItem().equals("SECO")){
+            tabla = (vp<=15000)?"trifasicosecoserie1212":"trifasicosecoserie1512";
+        }else if("NUEVO".equals(servicio)||"RECONSTRUIDO".equals(servicio) || cjcliente.getText().equals("EMPRESAS PUBLICAS DE MEDELLIN S.A E.S.P")){
             tabla = (vp<=15000)?(fase==1)?"monofasiconuevo":"trifasiconuevo":(vp > 15000 && vp <= 35000)?(fase==1)?"monofasiconuevoserie35":"trifasiconuevoserie35":null;
         }else if(servicio.equals("REPARACION")){
             if(vp <= 15000){
@@ -320,7 +322,21 @@ public class PROTOS extends javax.swing.JFrame{
             if(rs.next()){
                 cjiogarantizado.setText(""+rs.getDouble("io"));
                 cjpogarantizado.setText(""+rs.getDouble("po"));
-                cjpcugarantizado.setText(""+rs.getInt("pc"));
+                switch(comboClaseAislamiento.getSelectedIndex()){
+                    case 0:cjpcugarantizado.setText(""+rs.getInt("pc"));
+                        break;
+                    case 1:cjpcugarantizado.setText(""+rs.getInt("pc75"));
+                        break;
+                    case 2:cjpcugarantizado.setText(""+rs.getInt("pc85"));
+                        break;
+                    case 3:cjpcugarantizado.setText(""+rs.getInt("pc100"));
+                        break;
+                    case 4:cjpcugarantizado.setText(""+rs.getInt("pc120"));
+                        break;
+                    case 5:cjpcugarantizado.setText(""+rs.getInt("pc145"));
+                        break;
+                }
+                
                 cjimpedanciagarantizado.setText(""+rs.getDouble("uz"));
             }
         }catch(SQLException ex){
@@ -1037,7 +1053,12 @@ public class PROTOS extends javax.swing.JFrame{
         jLabel15.setText("Clase Aislam.:");
         jPanel2.add(jLabel15);
 
-        comboClaseAislamiento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ao", "A:(75°C)", "A:(85°C)", "A:(100°C)", "A:(120°C)", "A:(145°C)" }));
+        comboClaseAislamiento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ao", "A:(75°C)", "E:(85°C)", "B:(100°C)", "F:(120°C)", "H:(145°C)" }));
+        comboClaseAislamiento.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                comboClaseAislamientoItemStateChanged(evt);
+            }
+        });
         jPanel2.add(comboClaseAislamiento);
 
         jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -1492,7 +1513,7 @@ public class PROTOS extends javax.swing.JFrame{
         jPanel9.add(cjvcc);
 
         jLabel60.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel60.setText("Pcu Medido(W):");
+        jLabel60.setText("Pcc Medido(W):");
         jPanel9.add(jLabel60);
 
         cjpcumedido.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1506,7 +1527,7 @@ public class PROTOS extends javax.swing.JFrame{
         jPanel9.add(cjpcumedido);
 
         jLabel61.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel61.setText("Pcu a 85°(W):");
+        jLabel61.setText("Pcc a 85°(W):");
         jPanel9.add(jLabel61);
 
         cjpcua85.setForeground(new java.awt.Color(0, 102, 255));
@@ -1515,7 +1536,7 @@ public class PROTOS extends javax.swing.JFrame{
         jPanel9.add(cjpcua85);
 
         jLabel62.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel62.setText("Pcu Garantizado:");
+        jLabel62.setText("Pcc Garantizado:");
         jPanel9.add(jLabel62);
 
         cjpcugarantizado.setForeground(new java.awt.Color(0, 102, 255));
@@ -2418,6 +2439,23 @@ public class PROTOS extends javax.swing.JFrame{
             buscarProtocolo();
         }        
     }//GEN-LAST:event_comboClienteItemStateChanged
+
+    private void comboClaseAislamientoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboClaseAislamientoItemStateChanged
+        switch(comboClaseAislamiento.getSelectedIndex()){
+            case 0:jLabel61.setText("Pcc A°(W):");
+                break;
+            case 1:jLabel61.setText("Pcc a 75°(W):");
+                break;
+            case 2:jLabel61.setText("Pcc a 85°(W):");
+                break;
+            case 3:jLabel61.setText("Pcc a 100°(W):");
+                break;
+            case 4:jLabel61.setText("Pcc a 120°(W):");
+                break;
+            case 5:jLabel61.setText("Pcc a 145°(W):");
+                break;
+        }
+    }//GEN-LAST:event_comboClaseAislamientoItemStateChanged
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

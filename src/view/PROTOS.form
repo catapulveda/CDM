@@ -552,13 +552,16 @@
                       <StringArray count="6">
                         <StringItem index="0" value="Ao"/>
                         <StringItem index="1" value="A:(75&#xb0;C)"/>
-                        <StringItem index="2" value="A:(85&#xb0;C)"/>
-                        <StringItem index="3" value="A:(100&#xb0;C)"/>
-                        <StringItem index="4" value="A:(120&#xb0;C)"/>
-                        <StringItem index="5" value="A:(145&#xb0;C)"/>
+                        <StringItem index="2" value="E:(85&#xb0;C)"/>
+                        <StringItem index="3" value="B:(100&#xb0;C)"/>
+                        <StringItem index="4" value="F:(120&#xb0;C)"/>
+                        <StringItem index="5" value="H:(145&#xb0;C)"/>
                       </StringArray>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="comboClaseAislamientoItemStateChanged"/>
+                  </Events>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
                   </AuxValues>
@@ -1522,7 +1525,7 @@
                 <Component class="javax.swing.JLabel" name="jLabel60">
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="4"/>
-                    <Property name="text" type="java.lang.String" value="Pcu Medido(W):"/>
+                    <Property name="text" type="java.lang.String" value="Pcc Medido(W):"/>
                   </Properties>
                 </Component>
                 <Component class="CompuChiqui.JTextFieldPopup" name="cjpcumedido">
@@ -1542,7 +1545,7 @@
                 <Component class="javax.swing.JLabel" name="jLabel61">
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="4"/>
-                    <Property name="text" type="java.lang.String" value="Pcu a 85&#xb0;(W):"/>
+                    <Property name="text" type="java.lang.String" value="Pcc a 85&#xb0;(W):"/>
                   </Properties>
                 </Component>
                 <Component class="CompuChiqui.JTextFieldPopup" name="cjpcua85">
@@ -1559,7 +1562,7 @@
                 <Component class="javax.swing.JLabel" name="jLabel62">
                   <Properties>
                     <Property name="horizontalAlignment" type="int" value="4"/>
-                    <Property name="text" type="java.lang.String" value="Pcu Garantizado:"/>
+                    <Property name="text" type="java.lang.String" value="Pcc Garantizado:"/>
                   </Properties>
                 </Component>
                 <Component class="CompuChiqui.JTextFieldPopup" name="cjpcugarantizado">
