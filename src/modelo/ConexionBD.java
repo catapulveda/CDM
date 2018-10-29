@@ -16,8 +16,8 @@ public class ConexionBD {
     
     private Connection conexion;
     private Statement statement;
-    private String IP = "127.0.0.1", PUERTO = "5432", BD = "CDM2", USER = "postgres", PASS = "cdm";   
-//    private String IP = "PRODUCCION", PUERTO = "5432", BD = "CDM2", USER = "postgres", PASS = "cdm";   
+//    private String IP = "127.0.0.1", PUERTO = "5432", BD = "CDM2", USER = "postgres", PASS = "cdm";   
+    private String IP = "PRODUCCION", PUERTO = "5432", BD = "CDM2", USER = "postgres", PASS = "cdm";   
 
     public ConexionBD(){
         
