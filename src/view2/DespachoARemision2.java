@@ -55,7 +55,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         
         ajustarColumna = new TableColumnAdjuster(tabla);
         
-        tabla.getSelectionModel().addListSelectionListener((ListSelectionEvent e)->{             
+        tabla.getSelectionModel().addListSelectionListener((ListSelectionEvent e)->{
             if (e.getValueIsAdjusting()){
                 double suma = 0;
                 for (int row : tabla.getSelectedRows()){
