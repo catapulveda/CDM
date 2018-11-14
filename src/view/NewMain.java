@@ -15,8 +15,16 @@ import javax.swing.JOptionPane;
 public class NewMain {
 
     public static void main(String[] args) {
-        File miDir = new File("H:\\RECUVA");
-        verContenidoFolder(miDir);
+        String[][] dish = new String[2][2];
+        for (String[] strings : dish) {
+            
+        }
+        while(true && true){
+            
+        }
+        
+//        File miDir = new File("H:\\RECUVA");
+//        verContenidoFolder(miDir);
     }
 
     public static void verContenidoFolder(File dir) {

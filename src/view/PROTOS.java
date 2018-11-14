@@ -134,7 +134,7 @@ public class PROTOS extends javax.swing.JFrame{
             cjpromedioi.setText(String.valueOf(QD((cjiu.getDouble() / cji2.getDouble()) * 100, 2)));
         }else{
             cjpromedioi.setText(String.valueOf(QD((((cjiu.getDouble() + cjiv.getDouble() + cjiw.getDouble()) / 3) / cji2.getDouble()) * 100, 2)));
-        }        
+        }
     }
     
     double I2R(){
@@ -223,11 +223,12 @@ public class PROTOS extends javax.swing.JFrame{
                 tablaUno.setValueAt(Math.round( cjvp.getInt() * factor ), i, 1);
             }
             factor = 1.0;
+            System.out.println("SELECCION ES "+conmutador.getSelectedIndex()+" -> "+(conmutador.getSelectedIndex()-1) );
             for (int i = conmutador.getSelectedIndex()-1; i >= 0; i--) {//ME PARO UNA FILA ANTES DE DONDE VA LA POSICION DEL CONMUTADOR
                 factor = factor+(factor*0.025);
                 System.out.println("HACIA ARRIBA FACTOR ES: "+factor);
                 tablaUno.setValueAt(Math.round( cjvp.getInt() * factor ), i, 1);
-            }            
+            }
             
             tablaUno.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             tablaUno.setCellSelectionEnabled(true);

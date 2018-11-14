@@ -3,10 +3,18 @@ package view2;
 import view.*;
 import Dialogos.BuscarEnDespacho;
 import JTableAutoResizeColumn.TableColumnAdjuster;
+import java.awt.Desktop;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +34,10 @@ import javax.swing.table.TableRowSorter;
 import modelo.ConexionBD;
 import modelo.CustomTableModel;
 import modelo.Metodos;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class DespachoARemision2 extends javax.swing.JFrame {
 
@@ -283,14 +295,12 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         jSeparator4 = new javax.swing.JToolBar.Separator();
         jLabel2 = new javax.swing.JLabel();
         comboServicio = new javax.swing.JComboBox<>();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
-        btnRefrescar3 = new javax.swing.JButton();
-        jSeparator2 = new javax.swing.JToolBar.Separator();
-        btnDevolver = new javax.swing.JButton();
-        jSeparator3 = new javax.swing.JToolBar.Separator();
         btnImprimirRemision = new javax.swing.JButton();
         jSeparator5 = new javax.swing.JToolBar.Separator();
         btnBuscar = new javax.swing.JButton();
+        btnRefrescar3 = new javax.swing.JButton();
+        btnDevolver = new javax.swing.JButton();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabla = new javax.swing.JTable();
         jToolBar2 = new javax.swing.JToolBar();
@@ -330,33 +340,6 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(comboServicio);
-        jToolBar1.add(jSeparator1);
-
-        btnRefrescar3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/excel.png"))); // NOI18N
-        btnRefrescar3.setToolTipText("Exportar a excel");
-        btnRefrescar3.setFocusable(false);
-        btnRefrescar3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnRefrescar3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnRefrescar3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRefrescar3ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnRefrescar3);
-        jToolBar1.add(jSeparator2);
-
-        btnDevolver.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/izquierda.png"))); // NOI18N
-        btnDevolver.setToolTipText("Devolver a planta");
-        btnDevolver.setFocusable(false);
-        btnDevolver.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnDevolver.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnDevolver.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDevolverActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnDevolver);
-        jToolBar1.add(jSeparator3);
 
         btnImprimirRemision.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/imprimir.png"))); // NOI18N
         btnImprimirRemision.setToolTipText("Imprimir Remision");
@@ -371,9 +354,8 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         jToolBar1.add(btnImprimirRemision);
         jToolBar1.add(jSeparator5);
 
-        btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/buscar.png"))); // NOI18N
-        btnBuscar.setToolTipText("Imprimir Remision");
-        btnBuscar.setEnabled(false);
+        btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/multiple.png"))); // NOI18N
+        btnBuscar.setToolTipText("Datos para placas");
         btnBuscar.setFocusable(false);
         btnBuscar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnBuscar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -383,6 +365,31 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(btnBuscar);
+
+        btnRefrescar3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/excel.png"))); // NOI18N
+        btnRefrescar3.setToolTipText("Exportar a excel");
+        btnRefrescar3.setFocusable(false);
+        btnRefrescar3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnRefrescar3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnRefrescar3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefrescar3ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnRefrescar3);
+
+        btnDevolver.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/izquierda.png"))); // NOI18N
+        btnDevolver.setToolTipText("Devolver a planta");
+        btnDevolver.setFocusable(false);
+        btnDevolver.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnDevolver.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDevolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDevolverActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnDevolver);
+        jToolBar1.add(jSeparator3);
 
         tabla.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         tabla.setModel(new javax.swing.table.DefaultTableModel(
@@ -415,7 +422,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -527,9 +534,100 @@ public class DespachoARemision2 extends javax.swing.JFrame {
     }//GEN-LAST:event_btnImprimirRemisionActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        BuscarEnDespacho buscar = new BuscarEnDespacho(this, false);
-        buscar.setTabla(tabla);
-        buscar.setVisible(true);
+//        BuscarEnDespacho buscar = new BuscarEnDespacho(this, false);
+//        buscar.setTabla(tabla);
+//        buscar.setVisible(true);
+        DecimalFormat df = new DecimalFormat("#.000");
+        XSSFWorkbook libro = new XSSFWorkbook();
+        XSSFSheet hoja = libro.createSheet("DATOS");        
+        XSSFRow fila = hoja.createRow(0);
+        
+        fila.createCell(0, XSSFCell.CELL_TYPE_STRING).setCellValue("LOTE----");fila.createCell(1, XSSFCell.CELL_TYPE_STRING).setCellValue("No EMPRESA");
+        fila.createCell(2, XSSFCell.CELL_TYPE_STRING).setCellValue("No SERIE--");;fila.createCell(3, XSSFCell.CELL_TYPE_STRING).setCellValue("FASE");
+        fila.createCell(4, XSSFCell.CELL_TYPE_STRING).setCellValue("KVA. SAL.");fila.createCell(5, XSSFCell.CELL_TYPE_STRING).setCellValue("TENS. SAL.");
+        fila.createCell(6, XSSFCell.CELL_TYPE_STRING).setCellValue("VPRIM");fila.createCell(7, XSSFCell.CELL_TYPE_STRING).setCellValue("VSECUND");
+        fila.createCell(8, XSSFCell.CELL_TYPE_STRING).setCellValue("SERV. SALIDA");fila.createCell(9, XSSFCell.CELL_TYPE_STRING).setCellValue("AÑO");
+        fila.createCell(10, XSSFCell.CELL_TYPE_STRING).setCellValue("PESO");fila.createCell(11, XSSFCell.CELL_TYPE_STRING).setCellValue("ACEITE");
+        fila.createCell(12, XSSFCell.CELL_TYPE_STRING).setCellValue("CONTRATO-----------------");fila.createCell(13, XSSFCell.CELL_TYPE_STRING).setCellValue("A PRIMARIO");
+        fila.createCell(14, XSSFCell.CELL_TYPE_STRING).setCellValue("A SECUNDARIO");fila.createCell(15, XSSFCell.CELL_TYPE_STRING).setCellValue("ICC");
+        fila.createCell(16, XSSFCell.CELL_TYPE_STRING).setCellValue("TCC");fila.createCell(17, XSSFCell.CELL_TYPE_STRING).setCellValue("UZ");
+        fila.createCell(18, XSSFCell.CELL_TYPE_STRING).setCellValue("IO");fila.createCell(19, XSSFCell.CELL_TYPE_STRING).setCellValue("P1");
+        fila.createCell(20, XSSFCell.CELL_TYPE_STRING).setCellValue("P2");fila.createCell(21, XSSFCell.CELL_TYPE_STRING).setCellValue("P3");
+        fila.createCell(22, XSSFCell.CELL_TYPE_STRING).setCellValue("P4");fila.createCell(23, XSSFCell.CELL_TYPE_STRING).setCellValue("P5");
+        fila.createCell(24, XSSFCell.CELL_TYPE_STRING).setCellValue("DERIVACIONES  1");fila.createCell(25, XSSFCell.CELL_TYPE_STRING).setCellValue("DERIVACIONES  2");
+        fila.createCell(26, XSSFCell.CELL_TYPE_STRING).setCellValue("AÑO");fila.createCell(27, XSSFCell.CELL_TYPE_STRING).setCellValue("MES");
+        
+        int celdas[] = {19,20,21,22,23};
+        
+        String sql = "SELECT e.contrato, e.lote, t.numeroempresa, t.numeroserie, t.fase, t.kvasalida, t.tps, t.tss, t.tts,\n" +
+        "t.serviciosalida, t.ano, t.peso, t.aceite, pt.conmutador, pt.vcc, pt.promedioi, pt.derivacionprimaria \n" +
+        "FROM entrada e\n" +
+        "INNER JOIN transformador t USING(identrada)\n" +
+        "INNER JOIN protocolos pt USING(idtransformador)\n" +
+        "LEFT JOIN remision r USING(idremision)\n" +
+        "INNER JOIN ciudad c USING(idciudad) WHERE\n" +
+        " t.iddespacho="+getIDDESPACHO()+" ORDER BY e.identrada ASC, fase ASC, kvasalida ASC, marca ASC, item ASC";    
+        conexion.conectar();
+        ResultSet rs = conexion.CONSULTAR(sql);
+        try {
+            while(rs.next()){
+                XSSFRow r = hoja.createRow(rs.getRow());
+                r.createCell(0, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("lote"));
+                r.createCell(1, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("numeroempresa"));
+                r.createCell(2, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("numeroserie"));
+                r.createCell(3, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("fase"));
+                r.createCell(4, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("kvasalida"));
+                r.createCell(5, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("tps")+"/"+rs.getString("tss")+"/"+rs.getString("tts"));
+                r.createCell(6, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("tps"));
+                r.createCell(7, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("tss")+"/"+rs.getString("tts"));
+                r.createCell(8, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("serviciosalida"));
+                r.createCell(9, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("ano"));
+                r.createCell(10, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("peso"));
+                r.createCell(11, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("aceite"));
+                r.createCell(12, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("contrato"));
+                                
+                int pos = rs.getInt("conmutador");                
+                
+                int veces_atras = (pos-1);                
+                double factor = 1.0;
+                if(veces_atras>0){
+                    factor = factor+(veces_atras*2.5/100);
+                }
+                
+                for (int celda : celdas) {                    
+                    r.createCell(celda, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(Math.round(rs.getInt("tps") * factor ));
+                    factor -= 0.025;                   
+                }
+                
+                double i1 = ((rs.getDouble("kvasalida") * 1000) / ((rs.getInt("fase")==1)?1:Math.sqrt(3)) ) / rs.getInt("tps");
+                double i2 = ((rs.getDouble("kvasalida") * 1000) / ((rs.getInt("fase")==1)?1:Math.sqrt(3)) ) / rs.getInt("tss");
+                r.createCell(13, XSSFCell.CELL_TYPE_NUMERIC).setCellValue((double)Math.round(i1 * 100d) / 100d);
+                r.createCell(14, XSSFCell.CELL_TYPE_NUMERIC).setCellValue((double)Math.round(i2 * 100d) / 100d);
+                
+                double uz = Math.round( ((rs.getDouble("vcc")/rs.getInt("tps"))*100)*100d ) / 100;
+                r.createCell(17, XSSFCell.CELL_TYPE_NUMERIC).setCellValue( uz );
+                
+                double icc = (1/uz)*i2;
+                r.createCell(15, XSSFCell.CELL_TYPE_NUMERIC).setCellValue( (double)Math.round(icc * 100d) / 100d );
+                
+                r.createCell(18, XSSFCell.CELL_TYPE_NUMERIC).setCellValue( (double)Math.round(rs.getDouble("promedioi") * 100d) / 100d );
+                
+                r.createCell(15, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getString("derivacionprimaria"));
+            }
+            for (int i = 0; i < 27; i++) {
+                libro.getSheetAt(0).autoSizeColumn(i);
+            }            
+        } catch (SQLException ex) {
+            Logger.getLogger(DespachoARemision2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            File f = File.createTempFile("DATOS", ".xlsx");
+            libro.write(new FileOutputStream(f));
+            Desktop.getDesktop().open(f);            
+        } catch (IOException ex) {
+            Logger.getLogger(DespachoARemision2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     /**
@@ -576,8 +674,6 @@ public class DespachoARemision2 extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JToolBar.Separator jSeparator1;
-    private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar.Separator jSeparator5;
