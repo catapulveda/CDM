@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 
 public class MENU_NUEVO extends javax.swing.JFrame{
     
-    paneles.PanelLotes lotes = new paneles.PanelLotes();
+    paneles.PanelLotes2 lotes = new paneles.PanelLotes2();
     paneles.PanelDespachos despachos = new PanelDespachos();
     paneles.PanelRemisiones remisiones = new PanelRemisiones();
     paneles.PanelControl control = new PanelControl();        

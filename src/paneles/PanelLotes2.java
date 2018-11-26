@@ -2,8 +2,6 @@ package paneles;
 
 import CopyPasteJTable.ExcelAdapter;
 import JTableAutoResizeColumn.TableColumnAdjuster;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.net.Inet4Address;
@@ -12,12 +10,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -33,44 +34,35 @@ import modelo.Metodos;
 import view.EntradaDeTrafos;
 import view.PrepararDespacho;
 
-public class PanelLotes extends javax.swing.JPanel {
+public class PanelLotes2 extends javax.swing.JPanel {
 
     CustomTableModel modeloTabla;
     
-    ArrayList<RowFilter<Object, Object>> filtros = new ArrayList<>();
-    TableRowSorter rowSorter;    
+    LinkedList<RowFilter<Object, Object>> filtros = new LinkedList<>();
+    List<String> nombreFiltros = new ArrayList<>();
+    TableRowSorter rowSorter;   
     
     TableColumnAdjuster ajustarColumna;
     
     ConexionBD conexion = new ConexionBD();
+    String[] cols = new String[]{"ITEM","ENTREGADOS","PENDIENTES",
+                    "CLIENTE","LOTE","CIUDAD","CONTRATO",
+                    "RECEPCION","REGISTRO"};
     
-    public PanelLotes() {
+    public PanelLotes2() {
         initComponents();
         
         //CREA UNA INSTANCIA DE LA CLASE QUE AJUSTA EL ANCHO DE LAS COLUMNAS.
         ajustarColumna = new TableColumnAdjuster(tablaLotes);
-        ExcelAdapter excelAdapter = new CopyPasteJTable.ExcelAdapter(tablaLotes);
-        
-        //CARGAR EL COMBO DE LOS NOMBRES DE LOS CLIENTES
-        cargarComboClientes();
-        
-        //CARGAR EL COMBO DE LOS CONTRATOS SEGUN EL CLIENTE SELECCIONADO
-        cargarComboContratos();
-        
-        //CREA EL MODODELO CON LAS COLUMNAS Y LO ASIGNA A LA TABLA
-//        cargarListaLotes();                                     
+        ExcelAdapter excelAdapter = new CopyPasteJTable.ExcelAdapter(tablaLotes);               
         
         //AGREGA LA PERSONALIZACION DEL COMBOBOX
-        comboBuscarLotePorCliente.setUI(JComboBoxColor.JComboBoxColor.createUI(comboBuscarLotePorCliente));
-        comboBuscarLotePorTipoDeContrato.setUI(JComboBoxColor.JComboBoxColor.createUI(comboBuscarLotePorTipoDeContrato));
-        comboBuscarLotePorContrato.setUI(JComboBoxColor.JComboBoxColor.createUI(comboBuscarLotePorContrato));
-        comboBuscarLotePorLote.setUI(JComboBoxColor.JComboBoxColor.createUI(comboBuscarLotePorLote));
+        comboColumnas.setUI(JComboBoxColor.JComboBoxColor.createUI(comboColumnas));
+        comboDistintos.setUI(JComboBoxColor.JComboBoxColor.createUI(comboDistintos));
         
         //MUESTRA EL CONTENIDO DEL COMBOBOX AL MAXIMO ANCHO DEL ITEM MAS LARGO
-        comboBuscarLotePorTipoDeContrato.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
-        comboBuscarLotePorCliente.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
-        comboBuscarLotePorContrato.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
-        comboBuscarLotePorLote.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
+        comboColumnas.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
+        comboDistintos.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
          
         tablaLotes.getSelectionModel().addListSelectionListener((ListSelectionEvent e)->{
             if (e.getValueIsAdjusting()){
@@ -82,18 +74,9 @@ public class PanelLotes extends javax.swing.JPanel {
     public void cargarListaLotes(){
         try{
             tablaLotes.setRowSorter(null);
-//            modeloTabla = new CustomTableModel(
-//                new String[][]{},                 
-//                modelo.Lote.getColumnNames(), 
-//                tablaLotes, 
-//                modelo.Lote.getColumnClass(),
-//                modelo.Lote.getColumnEditables()
-//            );
             modeloTabla = new CustomTableModel(
                 new String[][]{},                 
-                new String[]{"ITEM","ENTREGADOS","PENDIENTES",
-                    "CLIENTE","LOTE","CIUDAD","CONTRATO",
-                    "RECEPCION","REGISTRO"}, 
+                cols, 
                 tablaLotes, 
                 new Class[]{Integer.class,Integer.class,Integer.class,
                     String.class,String.class,String.class,String.class,
@@ -125,17 +108,9 @@ public class PanelLotes extends javax.swing.JPanel {
                     rs.getString("nombreciudad"),
                     rs.getString("contrato"),
                     rs.getDate("fecharecepcion").toLocalDate(),
-                    rs.getTimestamp("fecharegistrado").toLocalDateTime()
+                    rs.getTimestamp("fecharegistrado").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a"))
                 });
-            }
-//            modelo.Lote.cargarLotes(
-//                    modeloTabla, 
-//                    comboBuscarLotePorTipoDeContrato.getSelectedIndex(),
-//                    comboBuscarLotePorCliente.getItemAt(comboBuscarLotePorCliente.getSelectedIndex()).getIdCliente(),
-//                    comboBuscarLotePorContrato,
-//                    comboBuscarLotePorLote
-//            );
-            
+            }            
             tablaLotes.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             tablaLotes.setCellSelectionEnabled(true);
             tablaLotes.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");                        
@@ -151,67 +126,26 @@ public class PanelLotes extends javax.swing.JPanel {
             
         }catch(Exception ex){
             Metodos.ERROR(ex, "OCURRIO UN ERROR AL CARGAR LA TABLA CON LA LISTA DE LOS LOTES");
-            Logger.getLogger(PanelLotes.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PanelLotes2.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
             ajustarColumna.adjustColumns();
+            comboColumnas.addItem("TODOS");
+            for(String col : cols){
+                comboColumnas.addItem(col);
+            } 
         }
     }
     
-    public void cargarComboClientes(){
-        String sql = " SELECT DISTINCT(c.nombrecliente), c.idcliente, c.nitcliente FROM cliente c, entrada e WHERE e.idcliente=c.idcliente ";
-        sql += (comboBuscarLotePorTipoDeContrato.getSelectedIndex()==1)?" AND e.contrato!='PARTICULAR' ":"";
-        sql += (comboBuscarLotePorTipoDeContrato.getSelectedIndex()==2)?" AND e.contrato='PARTICULAR' ":"";
-        sql += " ORDER BY c.nombrecliente ASC ";
-        conexion.conectar();
-        conexion.conectar();
-        ResultSet rs = conexion.CONSULTAR(sql);
-        comboBuscarLotePorCliente.removeAllItems();
-        comboBuscarLotePorCliente.addItem(new Cliente(-1, "TODOS", "NIT CLIENTE"));
-        try {
-            while(rs.next()){
-                comboBuscarLotePorCliente.addItem(
-                        new Cliente(
-                                rs.getInt("idcliente"),
-                                rs.getString("nombrecliente"),
-                                rs.getString("nitcliente"))
-                );
-            }
-            conexion.CERRAR();
-        } catch (SQLException ex) {
-            Logger.getLogger(PanelLotes.class.getName()).log(Level.SEVERE, null, ex);
+    void distintos(int col){
+        List<String> datos = new ArrayList<>();
+        for(int i=0; i<tablaLotes.getRowCount(); i++){
+            datos.add(""+tablaLotes.getValueAt(i, col));
         }
+        datos = datos.stream().distinct().collect(Collectors.toList());
+        comboDistintos.removeAllItems();
+        Collections.sort(datos);
+        datos.stream().forEach(d->{comboDistintos.addItem(d);});
     }
-    
-    public void cargarComboContratos(){
-        final int index = comboBuscarLotePorCliente.getSelectedIndex();
-        conexion.conectar();
-        ResultSet rscontrato = conexion.CONSULTAR("SELECT DISTINCT (contrato) FROM entrada e, cliente c WHERE e.idcliente=c.idcliente AND c.idcliente='"+comboBuscarLotePorCliente.getItemAt(index).getIdCliente()+"' ");
-        try {
-            comboBuscarLotePorContrato.removeAllItems();
-            comboBuscarLotePorContrato.addItem("TODOS");
-            while(rscontrato.next()){
-                comboBuscarLotePorContrato.addItem(rscontrato.getString("contrato"));
-            }
-            conexion.CERRAR();
-        } catch (SQLException ex) {
-            Logger.getLogger(PanelLotes.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public void cargarComboLotes(){
-        conexion.conectar();
-        ResultSet rs = conexion.CONSULTAR(" SELECT lote FROM entrada WHERE contrato='"+comboBuscarLotePorContrato.getSelectedItem()+"' ");
-        try {
-            comboBuscarLotePorLote.removeAllItems();
-            comboBuscarLotePorLote.addItem("TODOS");
-            while(rs.next()){
-                comboBuscarLotePorLote.addItem(rs.getString("lote"));
-            }
-            conexion.CERRAR();
-        } catch (SQLException ex) {
-            Logger.getLogger(PanelLotes.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -222,21 +156,17 @@ public class PanelLotes extends javax.swing.JPanel {
         subMenuDarPorTerminado = new javax.swing.JMenuItem();
         subMenuPrepararDespacho = new javax.swing.JMenuItem();
         jToolBar1 = new javax.swing.JToolBar();
-        jLabel1 = new javax.swing.JLabel();
-        comboBuscarLotePorTipoDeContrato = new javax.swing.JComboBox<>();
-        jSeparator1 = new javax.swing.JToolBar.Separator();
         jLabel2 = new javax.swing.JLabel();
-        comboBuscarLotePorCliente = new javax.swing.JComboBox<>();
+        comboColumnas = new javax.swing.JComboBox<>();
         jSeparator2 = new javax.swing.JToolBar.Separator();
+        comboDistintos = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
-        comboBuscarLotePorContrato = new javax.swing.JComboBox<>();
+        cjBuscar = new javax.swing.JTextField();
+        btnFiltro = new javax.swing.JButton();
+        btnQuitarFiltro = new javax.swing.JButton();
         jSeparator3 = new javax.swing.JToolBar.Separator();
-        jLabel4 = new javax.swing.JLabel();
-        comboBuscarLotePorLote = new javax.swing.JComboBox<>();
-        jSeparator4 = new javax.swing.JToolBar.Separator();
-        btnCargarLotes = new javax.swing.JButton();
-        jSeparator5 = new javax.swing.JToolBar.Separator();
         btnGenerarExcel = new javax.swing.JButton();
+        btnCargarLotes = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaLotes = new javax.swing.JTable();
         jToolBar2 = new javax.swing.JToolBar();
@@ -277,74 +207,59 @@ public class PanelLotes extends javax.swing.JPanel {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        jLabel1.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        jLabel1.setText("Tipo de cliente:");
-        jToolBar1.add(jLabel1);
-
-        comboBuscarLotePorTipoDeContrato.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        comboBuscarLotePorTipoDeContrato.setForeground(new java.awt.Color(255, 255, 255));
-        comboBuscarLotePorTipoDeContrato.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TODOS", "CON CONTRATO", "PARTICULARES" }));
-        comboBuscarLotePorTipoDeContrato.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                comboBuscarLotePorTipoDeContratoItemStateChanged(evt);
-            }
-        });
-        jToolBar1.add(comboBuscarLotePorTipoDeContrato);
-        jToolBar1.add(jSeparator1);
-
         jLabel2.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        jLabel2.setText("Cliente:");
+        jLabel2.setText("Columna:");
         jToolBar1.add(jLabel2);
 
-        comboBuscarLotePorCliente.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        comboBuscarLotePorCliente.setMaximumRowCount(25);
-        comboBuscarLotePorCliente.addItemListener(new java.awt.event.ItemListener() {
+        comboColumnas.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
+        comboColumnas.setMaximumRowCount(25);
+        comboColumnas.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                comboBuscarLotePorClienteItemStateChanged(evt);
+                comboColumnasItemStateChanged(evt);
             }
         });
-        jToolBar1.add(comboBuscarLotePorCliente);
+        jToolBar1.add(comboColumnas);
         jToolBar1.add(jSeparator2);
 
+        comboDistintos.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
+        comboDistintos.setForeground(new java.awt.Color(255, 255, 255));
+        comboDistintos.setMaximumRowCount(15);
+        comboDistintos.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                comboDistintosItemStateChanged(evt);
+            }
+        });
+        jToolBar1.add(comboDistintos);
+
         jLabel3.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        jLabel3.setText("Contrato:");
+        jLabel3.setText("Buscar:");
         jToolBar1.add(jLabel3);
+        jToolBar1.add(cjBuscar);
 
-        comboBuscarLotePorContrato.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        comboBuscarLotePorContrato.setForeground(new java.awt.Color(255, 255, 255));
-        comboBuscarLotePorContrato.setMaximumRowCount(15);
-        comboBuscarLotePorContrato.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                comboBuscarLotePorContratoItemStateChanged(evt);
-            }
-        });
-        jToolBar1.add(comboBuscarLotePorContrato);
-        jToolBar1.add(jSeparator3);
-
-        jLabel4.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        jLabel4.setText("Lote:");
-        jToolBar1.add(jLabel4);
-
-        comboBuscarLotePorLote.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
-        comboBuscarLotePorLote.setForeground(new java.awt.Color(255, 255, 255));
-        comboBuscarLotePorLote.setMaximumRowCount(15);
-        comboBuscarLotePorLote.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                comboBuscarLotePorLoteItemStateChanged(evt);
-            }
-        });
-        jToolBar1.add(comboBuscarLotePorLote);
-        jToolBar1.add(jSeparator4);
-
-        btnCargarLotes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/actualizar.png"))); // NOI18N
-        btnCargarLotes.setToolTipText("Actualizar lista de lotes");
-        btnCargarLotes.addActionListener(new java.awt.event.ActionListener() {
+        btnFiltro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/filtro.png"))); // NOI18N
+        btnFiltro.setToolTipText("Exportar a excel");
+        btnFiltro.setFocusable(false);
+        btnFiltro.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnFiltro.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnFiltro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCargarLotesActionPerformed(evt);
+                btnFiltroActionPerformed(evt);
             }
         });
-        jToolBar1.add(btnCargarLotes);
-        jToolBar1.add(jSeparator5);
+        jToolBar1.add(btnFiltro);
+
+        btnQuitarFiltro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/filtromenos.png"))); // NOI18N
+        btnQuitarFiltro.setToolTipText("Exportar a excel");
+        btnQuitarFiltro.setFocusable(false);
+        btnQuitarFiltro.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnQuitarFiltro.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnQuitarFiltro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnQuitarFiltroActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnQuitarFiltro);
+        jToolBar1.add(jSeparator3);
 
         btnGenerarExcel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/excel.png"))); // NOI18N
         btnGenerarExcel.setToolTipText("Exportar a excel");
@@ -357,6 +272,15 @@ public class PanelLotes extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnGenerarExcel);
+
+        btnCargarLotes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/actualizar.png"))); // NOI18N
+        btnCargarLotes.setToolTipText("Actualizar lista de lotes");
+        btnCargarLotes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCargarLotesActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnCargarLotes);
 
         tablaLotes.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         tablaLotes.setForeground(new java.awt.Color(70, 70, 70));
@@ -439,7 +363,7 @@ public class PanelLotes extends javax.swing.JPanel {
                 modelo.Metodos.M("SOLO EL PERSONAL DE ALMACEN PUEDE DAR POR TERMINADO EL LOTE.","advertencia.png");
             }
         } catch (UnknownHostException ex) {
-            Logger.getLogger(PanelLotes.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PanelLotes2.class.getName()).log(Level.SEVERE, null, ex);
             modelo.Metodos.ERROR(ex, "ERROR AL VERIFICAR EL NOMBRE DEL EQUIPO.");
         }
     }//GEN-LAST:event_subMenuDarPorTerminadoActionPerformed
@@ -460,40 +384,13 @@ public class PanelLotes extends javax.swing.JPanel {
                 pd.setVisible(true);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(PanelLotes.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PanelLotes2.class.getName()).log(Level.SEVERE, null, ex);
         }finally{conexion.CERRAR();}
     }//GEN-LAST:event_subMenuPrepararDespachoActionPerformed
 
     private void btnCargarLotesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarLotesActionPerformed
         cargarListaLotes();
     }//GEN-LAST:event_btnCargarLotesActionPerformed
-
-    private void comboBuscarLotePorTipoDeContratoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBuscarLotePorTipoDeContratoItemStateChanged
-        if(evt.getStateChange() == ItemEvent.DESELECTED){
-//            cargarComboClientes();
-            cargarListaLotes();
-        }
-    }//GEN-LAST:event_comboBuscarLotePorTipoDeContratoItemStateChanged
-
-    private void comboBuscarLotePorClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBuscarLotePorClienteItemStateChanged
-        if(evt.getStateChange() == ItemEvent.DESELECTED){
-            cargarComboContratos();
-            cargarListaLotes();            
-        }
-    }//GEN-LAST:event_comboBuscarLotePorClienteItemStateChanged
-
-    private void comboBuscarLotePorContratoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBuscarLotePorContratoItemStateChanged
-        if(evt.getStateChange() == ItemEvent.DESELECTED){
-            cargarComboLotes();
-            cargarListaLotes();
-        }
-    }//GEN-LAST:event_comboBuscarLotePorContratoItemStateChanged
-
-    private void comboBuscarLotePorLoteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboBuscarLotePorLoteItemStateChanged
-        if(evt.getStateChange() == ItemEvent.DESELECTED){
-            cargarListaLotes();            
-        }
-    }//GEN-LAST:event_comboBuscarLotePorLoteItemStateChanged
 
     private void tablaLotesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaLotesMouseClicked
         if(SwingUtilities.isRightMouseButton(evt)){
@@ -511,25 +408,76 @@ public class PanelLotes extends javax.swing.JPanel {
         modelo.Metodos.JTableToExcel(tablaLotes, btnGenerarExcel);
     }//GEN-LAST:event_btnGenerarExcelActionPerformed
 
+    private void btnFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltroActionPerformed
+        if(comboColumnas.getSelectedIndex()>0){
+            filtros.add(RowFilter.regexFilter(cjBuscar.getText().toUpperCase(), (comboColumnas.getSelectedIndex()-1) ));
+            nombreFiltros.add(cjBuscar.getText().toUpperCase());
+            rowSorter.setRowFilter(RowFilter.andFilter(filtros));
+            btnFiltro.setText(""+filtros.size());
+        }else if(comboColumnas.getSelectedIndex()==0){
+            if(!cjBuscar.getText().isEmpty()){
+                rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscar.getText().toUpperCase()));
+                btnFiltro.setText(cjBuscar.getText());
+            }            
+        }
+    }//GEN-LAST:event_btnFiltroActionPerformed
+
+    private void btnQuitarFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitarFiltroActionPerformed
+        if(comboColumnas.getSelectedIndex()==0){
+            filtros.clear();
+            rowSorter.setRowFilter(RowFilter.regexFilter(""));
+            btnFiltro.setText("");
+            cjBuscar.setText("");
+        }else{
+            String[] buttons = new String[nombreFiltros.size()];
+            for(int i=0; i<nombreFiltros.size(); i++){
+                buttons[i] = nombreFiltros.get(i);
+            }
+            int r = JOptionPane.showOptionDialog(this, "Seleccione", "Mensaje", 1, 1, null, buttons, null);
+            if(r>-1){
+                filtros.remove(r);
+                nombreFiltros.remove(r);
+                btnFiltro.setText(""+filtros.size());
+                rowSorter.setRowFilter(RowFilter.andFilter(filtros));
+            }
+        }        
+    }//GEN-LAST:event_btnQuitarFiltroActionPerformed
+
+    private void comboColumnasItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboColumnasItemStateChanged
+        if(comboColumnas.getSelectedIndex()>0){
+            if(comboColumnas.getSelectedIndex()==0){
+                comboDistintos.removeAllItems();
+                filtros.clear();
+            }else{
+                distintos( (comboColumnas.getSelectedIndex()-1) );
+            }  
+        }else if(comboColumnas.getSelectedIndex()==0){
+            comboDistintos.removeAllItems();
+            cjBuscar.setText("");
+        }
+    }//GEN-LAST:event_comboColumnasItemStateChanged
+
+    private void comboDistintosItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboDistintosItemStateChanged
+        if(evt.getStateChange()==ItemEvent.SELECTED){
+            cjBuscar.setText(comboDistintos.getSelectedItem().toString());
+        }
+    }//GEN-LAST:event_comboDistintosItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JProgressBar barraProgreso;
     public javax.swing.JButton btnCargarLotes;
+    public javax.swing.JButton btnFiltro;
     public javax.swing.JButton btnGenerarExcel;
-    public javax.swing.JComboBox<Cliente> comboBuscarLotePorCliente;
-    public javax.swing.JComboBox<String> comboBuscarLotePorContrato;
-    public javax.swing.JComboBox<String> comboBuscarLotePorLote;
-    public javax.swing.JComboBox<String> comboBuscarLotePorTipoDeContrato;
-    private javax.swing.JLabel jLabel1;
+    public javax.swing.JButton btnQuitarFiltro;
+    private javax.swing.JTextField cjBuscar;
+    public javax.swing.JComboBox<String> comboColumnas;
+    public javax.swing.JComboBox<String> comboDistintos;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
-    private javax.swing.JToolBar.Separator jSeparator4;
-    private javax.swing.JToolBar.Separator jSeparator5;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
     private javax.swing.JLabel lblFilasSeleccionadas;

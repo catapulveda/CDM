@@ -50,9 +50,9 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jToolBar1" min="-2" pref="25" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="247" max="32767" attributes="0"/>
+              <Component id="jToolBar1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane1" pref="237" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jToolBar2" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -118,7 +118,7 @@
         <Component class="javax.swing.JButton" name="btnImprimirRemision">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/recursos/images/imprimir.png"/>
+              <Image iconType="3" name="/recursos/images/print.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Imprimir Remision"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -137,7 +137,7 @@
         <Component class="javax.swing.JButton" name="btnBuscar">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/recursos/images/multiple.png"/>
+              <Image iconType="3" name="/recursos/images/multiple2.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Datos para placas"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -154,7 +154,7 @@
         <Component class="javax.swing.JButton" name="btnRefrescar3">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/recursos/images/excel.png"/>
+              <Image iconType="3" name="/recursos/images/excel2.png"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value="Exportar a excel"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -167,6 +167,8 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
           </AuxValues>
+        </Component>
+        <Component class="javax.swing.JToolBar$Separator" name="jSeparator3">
         </Component>
         <Component class="javax.swing.JButton" name="btnDevolver">
           <Properties>
@@ -184,8 +186,6 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
           </AuxValues>
-        </Component>
-        <Component class="javax.swing.JToolBar$Separator" name="jSeparator3">
         </Component>
       </SubComponents>
     </Container>

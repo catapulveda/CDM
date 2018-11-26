@@ -40,6 +40,7 @@ import modelo.Conductor;
 import modelo.ConexionBD;
 import modelo.CustomTableModel;
 import modelo.Metodos;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JRPrintPage;
@@ -383,6 +384,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         subMenuImprimirOrdenDeProduccion = new javax.swing.JMenuItem();
         subMenuImprimirTodosLosFormatos = new javax.swing.JMenuItem();
         subMenuImprimirMuestrasDeAceite = new javax.swing.JMenuItem();
+        imprimirHojasDeRuta = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         panelTabla = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -513,6 +515,15 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             }
         });
         subMenuImprimirFormatos.add(subMenuImprimirMuestrasDeAceite);
+
+        imprimirHojasDeRuta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/hojasderuta2.png"))); // NOI18N
+        imprimirHojasDeRuta.setText("Hojas de Ruta");
+        imprimirHojasDeRuta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                imprimirHojasDeRutaActionPerformed(evt);
+            }
+        });
+        subMenuImprimirFormatos.add(imprimirHojasDeRuta);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Entrada de transformadores");
@@ -1444,6 +1455,34 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         }
     }//GEN-LAST:event_btnInsertarActionPerformed
 
+    private void imprimirHojasDeRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imprimirHojasDeRutaActionPerformed
+        try {
+            JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA.jasper").toString()));
+            Map<String, Object> p = new HashMap<>();            
+            p.put("IDENTRADA", getIDENTRADA());
+            JasperPrint jp = JasperFillManager.fillReport(reporte, p, conexion.conectar());
+            
+            int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
+            int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
+            
+            Rectangle Barra=GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();             
+            
+            JasperViewer jv1 = new JasperViewer(jp, false);
+            jv1.setSize(ancho/2, alto-(alto-Barra.height));
+            jv1.setLocation(0, 0);
+            jv1.setVisible(true);
+            
+            jv1 = new JasperViewer(JasperFillManager.fillReport(
+                    (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA_1.jasper").toString())), null, new JREmptyDataSource()), false);
+            jv1.setSize(ancho/2, alto-(alto-Barra.height));
+            jv1.setLocation(ancho/2, 0);
+            jv1.setVisible(true);
+                        
+        } catch (MalformedURLException | JRException ex) {
+            Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_imprimirHojasDeRutaActionPerformed
+
     private void unirPaginas(JasperPrint source, JasperPrint dst){
         List<JRPrintPage> pages = source.getPages();
         pages.stream().forEach((page) ->{
@@ -1508,6 +1547,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     public javax.swing.JComboBox<Ciudad> comboCiudad;
     public javax.swing.JComboBox<Cliente> comboCliente;
     public javax.swing.JComboBox<Conductor> comboConductor;
+    private javax.swing.JMenuItem imprimirHojasDeRuta;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

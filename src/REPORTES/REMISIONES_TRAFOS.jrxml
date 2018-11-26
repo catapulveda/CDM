@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Remisiones" pageWidth="612" pageHeight="792" whenNoDataType="NoDataSection" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6569b73d-ad90-4959-abb8-76b9832009dd">
 	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="259"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="288"/>
 	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF" radius="0">
 		<box>
@@ -38,7 +38,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 		<field name="op" class="java.lang.String"/>
 		<field name="numeroempresa" class="java.lang.String"/>
 		<field name="numeroserie" class="java.lang.String"/>
-		<field name="kvasalida" class="java.lang.Double"/>
+		<field name="kvasalida" class="java.lang.String"/>
 		<field name="fase" class="java.lang.Integer"/>
 		<field name="tps" class="java.lang.Integer"/>
 		<field name="tss" class="java.lang.Integer"/>

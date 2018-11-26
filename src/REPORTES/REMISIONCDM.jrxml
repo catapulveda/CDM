@@ -81,7 +81,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["N° "+$F{numero_remision}]]></textFieldExpression>
 			</textField>
-			<image vAlign="Middle">
+			<image hAlign="Center" vAlign="Middle">
 				<reportElement x="0" y="0" width="85" height="77" uuid="53c4dfab-bdc2-4362-88cb-1b37a0609574"/>
 				<imageExpression><![CDATA[getClass().getResource("/recursos/images/logo.png")]]></imageExpression>
 			</image>

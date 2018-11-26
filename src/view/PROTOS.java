@@ -195,7 +195,7 @@ public class PROTOS extends javax.swing.JFrame{
                     K = (getkc() + 100) / (getkc() + Double.parseDouble(cjtemperatura.getText()));
                     break;
                 case 4:
-                    K = (getkc() + 120) / (getkc() + Double.parseDouble(cjtemperatura.getText()));
+                    K = (+getkc() + 120) / (getkc() + Double.parseDouble(cjtemperatura.getText()));
                     break;
                 case 5:
                     K = (getkc() + 145) / (getkc() + Double.parseDouble(cjtemperatura.getText()));
@@ -294,6 +294,7 @@ public class PROTOS extends javax.swing.JFrame{
     
     void cargarValores(){
         String servicio = comboServicio.getSelectedItem().toString(), tabla = null;
+        System.out.println("***************SERVICIO ES: "+servicio+"*************");
         int ano = cjano.getInt();
         int vp = cjvp.getInt();
         int fase = Integer.parseInt(comboFase.getSelectedItem().toString());
@@ -316,6 +317,7 @@ public class PROTOS extends javax.swing.JFrame{
             tabla = (fase==3&&(vp > 1200 && vp <= 15000) )?"trifasicosecoserie1512":"trifasicosecoserie1212";
         }        
         double kva = getKva(tabla, cjkva.getDouble());
+        System.out.println("************BUSCANDO VALORES DE TABLA************");
         String sql = "SELECT * FROM " + tabla + " WHERE kva=" + kva;
         conex.conectar();
         ResultSet rs = conex.CONSULTAR(sql);
@@ -512,6 +514,8 @@ public class PROTOS extends javax.swing.JFrame{
         ResultSet rs = conex.CONSULTAR("SELECT * FROM protocolos INNER JOIN transformador t USING(idtransformador) INNER JOIN entrada e ON t.identrada=e.identrada INNER JOIN cliente c ON c.idcliente=e.idcliente WHERE idprotocolo="+IDPROTOCOLO);
         try {
             if(rs.next()){
+                ESTADO_TRAFO = rs.getString("estadoservicio");
+                comboServicio.setSelectedItem(rs.getString("serviciosalida"));
                 ACTUALIZANDO = true;
                 cjserie.setText(rs.getString("numeroserie"));
                 cjprotocolo.setText(rs.getString("codigo"));
@@ -525,9 +529,7 @@ public class PROTOS extends javax.swing.JFrame{
                 cjvp.setText(rs.getString("tps"));
                 cjvs.setText(rs.getString("tss"));
                 cjtensionBT.setText(String.valueOf(rs.getInt("tss")*2));
-                cjTensionBT2.setText(rs.getString("tss"));
-                comboServicio.setSelectedItem(rs.getString("serviciosalida"));
-                ESTADO_TRAFO = rs.getString("estadoservicio");
+                cjTensionBT2.setText(rs.getString("tss"));                
                 cjmasa.setText(rs.getString("peso"));
                 cjaceite.setText(rs.getString("aceite"));
                 CargarTablas();
@@ -608,7 +610,7 @@ public class PROTOS extends javax.swing.JFrame{
     }
     
     void limpiar(){
-        System.out.println(jTabbedPane1.getComponentCount());
+        ESTADO_TRAFO = null;
         Component c = jTabbedPane1.getComponentAt(0);
         JPanel p = (JPanel) c;
         for (Component com : p.getComponents()){
@@ -2260,7 +2262,7 @@ public class PROTOS extends javax.swing.JFrame{
 
     private void comboServicioItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboServicioItemStateChanged
         if(evt.getStateChange() == ItemEvent.DESELECTED){
-            if(!ACTUALIZANDO && "MANTENIMIENTO".equals(comboServicio.getSelectedItem().toString())){
+            if(!ACTUALIZANDO && "MANTENIMIENTO".equals(comboServicio.getSelectedItem().toString()) && ESTADO_TRAFO==null){
                 while(true){
                     int n = JOptionPane.showOptionDialog(this, "SELECCIONE EL ESTADO DEL TRANSFORMADOR", "Seleccione una opcion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, modelo.Metodos.getIcon("advertencia.png"), new Object[]{"ORIGINAL","REPARADO"}, "ORIGINAL");
                     if(n>=0){

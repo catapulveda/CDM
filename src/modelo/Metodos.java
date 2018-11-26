@@ -110,6 +110,9 @@ public class Metodos {
                         fileOut.close();
                     } catch (IOException ex) {
                         Logger.getLogger(Metodos.class.getName()).log(Level.SEVERE, null, ex);
+                    }finally{
+                        btn.setEnabled(true);
+                        btn.setIcon(new ImageIcon(getClass().getResource("/recursos/images/excel.png")));
                     }
                     btn.setEnabled(true);
                     btn.setIcon(new ImageIcon(getClass().getResource("/recursos/images/excel.png")));

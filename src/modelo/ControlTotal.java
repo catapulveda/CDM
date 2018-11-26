@@ -23,6 +23,7 @@ public class ControlTotal {
             "FASE",
             "MARCA",
             "KVA",
+            "TENSION",
             "ESTADO",
             "REMISION",
             "DESPACHO",
@@ -42,6 +43,7 @@ public class ControlTotal {
             false,//            
             false,//
             false,
+            false,//
             false,//
             false,//
             false,//
@@ -65,13 +67,14 @@ public class ControlTotal {
             Integer.class,//FASE
             String.class,//MARCA
             Double.class,//KVA
+            String.class,//TENSION
             String.class,//ESTADO
             String.class,//REMISION
             String.class,//DESPACHO
             String.class,//FECHA RECEPCION
             String.class,//CIUDAD
             String.class,//CONTRATO
-            String.class,//OP
+            Integer.class,//OP
             String.class//CENTRO DE COSTOS
         };
     }
@@ -86,7 +89,7 @@ public class ControlTotal {
             barra.setMaximum(rs.getInt("count"));
 
             rs = con.CONSULTAR("SELECT e.identrada, cli.nombrecliente, e.lote, t.numeroserie,\n" +
-                    "t.numeroempresa, t.fase, t.marca, t.kvasalida, t.estado, r.numero_remision,\n" +
+                    "t.numeroempresa, t.fase, t.marca, t.kvasalida, (t.tps || '-' || t.tss || '-' || t.tts) as tension, t.estado, r.numero_remision,\n" +
                     "d.nodespacho, e.fecharecepcion, ciu.nombreciudad, e.contrato, e.op, e.centrodecostos\n" +
                     "FROM entrada e INNER JOIN transformador t USING(identrada)\n" + 
                     "INNER JOIN cliente cli USING (idcliente)\n" +
@@ -107,13 +110,14 @@ public class ControlTotal {
                     rs.getInt("fase"),
                     rs.getString("marca"),
                     rs.getDouble("kvasalida"),
+                    rs.getString("tension"),
                     rs.getString("estado"),
                     rs.getString("numero_remision"),
                     rs.getString("nodespacho"),
                     new SimpleDateFormat("EEE, d MMM yyyy").format(rs.getDate("fecharecepcion")),
                     rs.getString("nombreciudad"),
                     rs.getString("contrato"),
-                    rs.getString("op"),
+                    rs.getInt("op"),
                     rs.getString("centrodecostos")
                 });
             }
