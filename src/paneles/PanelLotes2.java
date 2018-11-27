@@ -349,22 +349,25 @@ public class PanelLotes2 extends javax.swing.JPanel {
         try {
             if(Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("PROGRAMADOR")){
                 String idEntrada = tablaLotes.getValueAt(tablaLotes.getSelectedRow(), 0).toString();
-                boolean estado = Boolean.parseBoolean(tablaLotes.getValueAt(tablaLotes.getSelectedRow(), 13).toString());
-                if(estado){
-                    JOptionPane.showMessageDialog(this, "EL LOTE YA SE ENCUENTRA VERIFICADO.", "ITEM SIN NUMERO DE SERIE", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/recursos/images/advertencia.png")));
-                }else{
+//                boolean estado = Boolean.parseBoolean(tablaLotes.getValueAt(tablaLotes.getSelectedRow(), 13).toString());
+//                if(estado){
+//                    JOptionPane.showMessageDialog(this, "EL LOTE YA SE ENCUENTRA VERIFICADO.", "ITEM SIN NUMERO DE SERIE", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/recursos/images/advertencia.png")));
+//                }else{
                     if(JOptionPane.showConfirmDialog(this, "¿Confirma que desea dar por terminado el lote?")==JOptionPane.YES_OPTION){
                         if(new ConexionBD().GUARDAR("UPDATE entrada SET estado='TRUE' , fechaliberado='"+new java.util.Date()+"' WHERE identrada='"+idEntrada+"' ")){
                             btnCargarLotes.doClick();
                         }
                     }
-                }
+//                }
             }else{
                 modelo.Metodos.M("SOLO EL PERSONAL DE ALMACEN PUEDE DAR POR TERMINADO EL LOTE.","advertencia.png");
             }
         } catch (UnknownHostException ex) {
             Logger.getLogger(PanelLotes2.class.getName()).log(Level.SEVERE, null, ex);
             modelo.Metodos.ERROR(ex, "ERROR AL VERIFICAR EL NOMBRE DEL EQUIPO.");
+        }catch (Exception ex) {
+            Logger.getLogger(PanelLotes2.class.getName()).log(Level.SEVERE, null, ex);
+            modelo.Metodos.ERROR(ex, "ERROR");
         }
     }//GEN-LAST:event_subMenuDarPorTerminadoActionPerformed
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EntradaDeTransformadores" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="772" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="1e815148-a7a8-4fe7-bcd9-f939cce00a8d">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF" radius="0">
@@ -77,7 +77,9 @@
 		<field name="idremision" class="java.lang.Integer"/>
 		<field name="numero_remision" class="java.lang.String"/>
 	</subDataset>
-	<parameter name="IDENTRADA" class="java.lang.Integer"/>
+	<parameter name="IDENTRADA" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[572]]></defaultValueExpression>
+	</parameter>
 	<parameter name="ORDEN" class="java.lang.Boolean">
 		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
 	</parameter>
@@ -97,7 +99,7 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 	<field name="nombrepc" class="java.lang.String"/>
 	<field name="lote" class="java.lang.String"/>
 	<field name="contrato" class="java.lang.String"/>
-	<field name="op" class="java.lang.String"/>
+	<field name="op" class="java.lang.Integer"/>
 	<field name="centrodecostos" class="java.lang.String"/>
 	<field name="fecharecepcion" class="java.sql.Timestamp"/>
 	<field name="fecharegistrado" class="java.sql.Timestamp"/>
@@ -106,6 +108,7 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 	<field name="estado" class="java.lang.Boolean"/>
 	<field name="observacion" class="java.lang.String"/>
 	<field name="placavehiculo" class="java.lang.String"/>
+	<field name="nuevo" class="java.lang.Boolean"/>
 	<field name="nombrecliente" class="java.lang.String"/>
 	<field name="nitcliente" class="java.lang.String"/>
 	<field name="cedulaconductor" class="java.lang.String"/>
@@ -123,7 +126,7 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 			</rectangle>
 			<image hAlign="Center" vAlign="Middle">
 				<reportElement x="0" y="-1" width="89" height="74" uuid="f6a4e887-60b7-427d-a3f8-e70156a508e7"/>
-				<imageExpression><![CDATA["IMAGENES\\LOGO CDM.png"]]></imageExpression>
+				<imageExpression><![CDATA[getClass().getResource("/recursos/images/logo.png")]]></imageExpression>
 			</image>
 			<staticText>
 				<reportElement x="115" y="4" width="320" height="27" uuid="fc0ca16c-489f-47d6-a012-663511ba385c"/>
@@ -477,6 +480,15 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 					</jr:column>
 				</jr:table>
 			</componentElement>
+		</band>
+		<band height="17">
+			<textField>
+				<reportElement x="4" y="1" width="765" height="15" uuid="9351d3bf-7be2-4677-92fe-072f86bfd1b6"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Calibri" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{observacion}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<pageFooter>

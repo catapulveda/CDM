@@ -563,7 +563,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             "t.serviciosalida, t.ano, t.peso, t.aceite, t.tipotrafosalida, pt.conmutador, pt.vcc, pt.promedioi, pt.derivacionprimaria, pt.i1, pt.i2, \n" +
             "pt.fechalaboratorio, pt.frecuencia, pt.refrigeracion, pt.materialconductoralta, pt.liquidoaislante, pt.tensionserie, pt.nba, "+ 
             "pt.claseaislamiento, pt.liquidoaislante, pt.materialconductorbaja, pt.grupodeconexion, pt.derivacionprimaria, \n" +
-            "(pt.vcc/t.tps)*100 as uz, (cast((1/pt.impedanciagarantizada) as numeric)*pt.i2) as icc, \n" +
+            "(pt.vcc/t.tps)*100 as uz, ((cast((1/(pt.impedanciagarantizada/100)) as numeric)*pt.i2)/1000) as icc, \n" +
             "(1250/(POWER((1/(pt.impedanciagarantizada/100)), 2))) as tcc,\n" +
             "CASE \n" +
             "	WHEN pt.grupodeconexion='Ii0' THEN (SELECT 'U'::text) \n" +

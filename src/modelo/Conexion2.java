@@ -14,30 +14,28 @@ import java.util.logging.Logger;
  */
 public class Conexion2 {
     
-    private static Connection conexion;
-    private static Statement statement;
-    private static String url = "PLANTA";
-    private static String BD = "CDM";
-    private static String user = "postgres";
-    private static String pass = "cdm";
+    private Connection conexion;
+    private Statement statement;
+    private String url = "transformadorescdm.com:3306";
+    private String BD = "tcdm_prueba2";
+    private String user = "tcdm_CDMTransf";
+    private String pass = "7?MNcE;E&V2i";
 
-    public static Connection conectar(){
+    public Conexion2() {
         try {
-            Class.forName("org.postgresql.Driver");
-            conexion = DriverManager.getConnection("jdbc:postgresql://"+url+"/"+BD, user, pass);
+            Class.forName("com.mysql.jdbc.Driver");
+            conexion = DriverManager.getConnection("jdbc:mysql://"+url+"/"+BD, user, pass);
             statement = conexion.createStatement (ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);            
         } catch (Exception ex){
             Logger.getLogger(Conexion2.class.getName()).log(Level.SEVERE, null, ex);
             Metodos.ERROR(ex, "ERROR AL CONECTARSE A LA BASE DE DATOS");
             System.exit(0);
         }
-        return conexion;
-    }
+    }  
     
-    public static ResultSet CONSULTAR(String sql){
+    public ResultSet CONSULTAR(String sql){
         ResultSet rs = null;
         try {
-            conectar();            
             rs = statement.executeQuery(sql);
             System.out.println("CONSULTA EXITOSA: "+sql);
         }catch (SQLException ex) {
@@ -49,8 +47,7 @@ public class Conexion2 {
     }
     
     public boolean GUARDAR(String sql){
-        try {
-            conectar();            
+        try {       
             if(statement.executeUpdate(sql)>0){
                 System.out.println("SE EJECUTÓ EL QUERY -> "+sql);
                 return true;
