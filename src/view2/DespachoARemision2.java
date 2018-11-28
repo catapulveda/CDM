@@ -1,28 +1,16 @@
 package view2;
 
-import view.*;
-import Dialogos.BuscarEnDespacho;
 import JTableAutoResizeColumn.TableColumnAdjuster;
 import java.awt.Desktop;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultCellEditor;
@@ -39,14 +27,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import modelo.ConexionBD;
-import modelo.CustomTableModel;
 import modelo.Metodos;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.view.JasperViewer;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -664,120 +645,13 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                 }
             }catch(Exception e){
                 modelo.Metodos.M(e.getMessage(), "error.png");
-            }            
-
-//        XSSFWorkbook MONO = new XSSFWorkbook();
-//        XSSFWorkbook TRIFA = new XSSFWorkbook();
-//        
-//        XSSFSheet hojaMONO = MONO.createSheet("DATOS");
-//        XSSFSheet hojaTRIF = null;
-//        
-//        XSSFRow fila = hojaMONO.createRow(0);
-//        
-//        fila.createCell(0, XSSFCell.CELL_TYPE_STRING).setCellValue("LOTE----");fila.createCell(1, XSSFCell.CELL_TYPE_STRING).setCellValue("No EMPRESA");
-//        fila.createCell(2, XSSFCell.CELL_TYPE_STRING).setCellValue("No SERIE--");;fila.createCell(3, XSSFCell.CELL_TYPE_STRING).setCellValue("FASE");
-//        fila.createCell(4, XSSFCell.CELL_TYPE_STRING).setCellValue("KVA. SAL.");fila.createCell(5, XSSFCell.CELL_TYPE_STRING).setCellValue("TENS. SAL.");
-//        fila.createCell(6, XSSFCell.CELL_TYPE_STRING).setCellValue("VPRIM");fila.createCell(7, XSSFCell.CELL_TYPE_STRING).setCellValue("VSECUND");
-//        fila.createCell(8, XSSFCell.CELL_TYPE_STRING).setCellValue("SERV. SALIDA");fila.createCell(9, XSSFCell.CELL_TYPE_STRING).setCellValue("AÑO");
-//        fila.createCell(10, XSSFCell.CELL_TYPE_STRING).setCellValue("PESO");fila.createCell(11, XSSFCell.CELL_TYPE_STRING).setCellValue("ACEITE");
-//        fila.createCell(12, XSSFCell.CELL_TYPE_STRING).setCellValue("CONTRATO-----------------");fila.createCell(13, XSSFCell.CELL_TYPE_STRING).setCellValue("A PRIMARIO");
-//        fila.createCell(14, XSSFCell.CELL_TYPE_STRING).setCellValue("A SECUNDARIO");fila.createCell(15, XSSFCell.CELL_TYPE_STRING).setCellValue("ICC");
-//        fila.createCell(16, XSSFCell.CELL_TYPE_STRING).setCellValue("TCC");fila.createCell(17, XSSFCell.CELL_TYPE_STRING).setCellValue("UZ");
-//        fila.createCell(18, XSSFCell.CELL_TYPE_STRING).setCellValue("IO");fila.createCell(19, XSSFCell.CELL_TYPE_STRING).setCellValue("P1");
-//        fila.createCell(20, XSSFCell.CELL_TYPE_STRING).setCellValue("P2");fila.createCell(21, XSSFCell.CELL_TYPE_STRING).setCellValue("P3");
-//        fila.createCell(22, XSSFCell.CELL_TYPE_STRING).setCellValue("P4");fila.createCell(23, XSSFCell.CELL_TYPE_STRING).setCellValue("P5");
-//        fila.createCell(24, XSSFCell.CELL_TYPE_STRING).setCellValue("DERIVACIONES  1");fila.createCell(25, XSSFCell.CELL_TYPE_STRING).setCellValue("DERIVACIONES  2");
-//        fila.createCell(26, XSSFCell.CELL_TYPE_STRING).setCellValue("AÑO");fila.createCell(27, XSSFCell.CELL_TYPE_STRING).setCellValue("MES");        
-//        
-//        hojaTRIF = MONO.cloneSheet(0);
-//        
-//        int celdas[] = {19,20,21,22,23};
-//        
-//        String sql = "SELECT e.contrato, e.lote, t.numeroempresa, t.numeroserie, t.fase, t.kvasalida, t.tps, t.tss, t.tts,\n" +
-//        "t.serviciosalida, t.ano, t.peso, t.aceite, pt.conmutador, pt.vcc, pt.promedioi, pt.derivacionprimaria, pt.i1, pt.i2 \n" +
-//        "FROM entrada e\n" +
-//        "INNER JOIN transformador t USING(identrada)\n" +
-//        "INNER JOIN protocolos pt USING(idtransformador)\n" +
-//        "LEFT JOIN remision r USING(idremision)\n" +
-//        "INNER JOIN ciudad c USING(idciudad) WHERE\n" +
-//        " t.iddespacho="+getIDDESPACHO()+" ORDER BY fase ASC, e.identrada ASC, kvasalida ASC, marca ASC, item ASC";    
-//        conexion.conectar();
-//        ResultSet rs = conexion.CONSULTAR(sql);
-//        try {
-//            while(rs.next()){
-//                XSSFRow r = null;
-//                if(rs.getInt("fase")==1){
-//                    r = hojaMONO.createRow(rs.getRow());
-//                }else if(rs.getInt("fase")==3){
-//                    r = hojaTRIF.createRow(rs.getRow());
-//                }                 
-//                r.createCell(0, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("lote"));
-//                r.createCell(1, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("numeroempresa"));
-//                r.createCell(2, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("numeroserie"));
-//                r.createCell(3, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("fase"));
-//                r.createCell(4, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("kvasalida"));
-//                r.createCell(5, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("tps")+"/"+rs.getString("tss")+"/"+rs.getString("tts"));
-//                r.createCell(6, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("tps"));
-//                r.createCell(7, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("tss")+"/"+rs.getString("tts"));
-//                r.createCell(8, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("serviciosalida"));
-//                r.createCell(9, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("ano"));
-//                r.createCell(10, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("peso"));
-//                r.createCell(11, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt("aceite"));
-//                r.createCell(12, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("contrato"));
-//                                
-//                int pos = rs.getInt("conmutador");                
-//                
-//                int veces_atras = (pos-1);                
-//                if(veces_atras>0){
-//                    factor = factor+(veces_atras*2.5/100);
-//                }
-//                
-//                for (int celda : celdas) {
-//                    r.createCell(celda, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(Math.round(rs.getInt("tps") * factor ));
-//                    factor -= 0.025;                   
-//                }
-//                
-//                r.createCell(13, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getDouble("i1"));
-//                r.createCell(14, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getDouble("i2"));
-//                
-//                double uz = Math.round( ((rs.getDouble("vcc")/rs.getInt("tps"))*100)*100d ) / 100;
-//                r.createCell(17, XSSFCell.CELL_TYPE_NUMERIC).setCellValue( uz );
-//                
-//                double icc = (1/uz)*rs.getDouble("i2");
-//                r.createCell(15, XSSFCell.CELL_TYPE_NUMERIC).setCellValue( (double)Math.round(icc * 100d) / 100d );
-//                
-//                r.createCell(18, XSSFCell.CELL_TYPE_NUMERIC).setCellValue( (double)Math.round(rs.getDouble("promedioi") * 100d) / 100d );
-//                
-//                r.createCell(15, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getString("derivacionprimaria"));
-//            }
-//            for (int i = 0; i < 27; i++) {
-//                MONO.getSheetAt(0).autoSizeColumn(i);
-//            }            
-//        } catch (SQLException ex) {
-//            Logger.getLogger(DespachoARemision2.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        try {
-//            File f = File.createTempFile("DATOS", ".xlsx");
-//            MONO.write(new FileOutputStream(f));
-//            Desktop.getDesktop().open(f);            
-//        } catch (IOException ex) {
-//            Logger.getLogger(DespachoARemision2.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        
+            }        
     }//GEN-LAST:event_btnBuscarActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -785,16 +659,8 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(DespachoARemision2.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new DespachoARemision2().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new DespachoARemision2().setVisible(true);
         });
     }
 
