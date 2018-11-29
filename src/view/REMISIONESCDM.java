@@ -889,6 +889,12 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         jPanel3.add(jLabel17, gridBagConstraints);
 
+        comboCliente.setMaximumRowCount(16);
+        comboCliente.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                comboClienteItemStateChanged(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -1268,6 +1274,12 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
 //            cjcliente.setText(c.getNombreCliente());
         }
     }//GEN-LAST:event_btnAgregarClienteActionPerformed
+
+    private void comboClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboClienteItemStateChanged
+        if(evt.getStateChange()==ItemEvent.DESELECTED){
+            cjnitcedulacliente.setText(comboCliente.getModel().getElementAt(comboCliente.getSelectedIndex()).getNitCliente());
+        }
+    }//GEN-LAST:event_comboClienteItemStateChanged
 
     public void Enter(JTextField uno, final JTextField dos) {
         uno.addKeyListener(new KeyListener() {
