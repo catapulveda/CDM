@@ -26,6 +26,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableRowSorter;
 import modelo.Cliente;
 import modelo.ConexionBD;
@@ -46,7 +48,7 @@ public class PanelLotes2 extends javax.swing.JPanel {
     
     ConexionBD conexion = new ConexionBD();
     String[] cols = new String[]{"ITEM","ENTREGADOS","PENDIENTES",
-                    "CLIENTE","LOTE","CIUDAD","CONTRATO",
+                    "CLIENTE","REP.","LOTE","CIUDAD","CONTRATO",
                     "RECEPCION","REGISTRO"};
     
     public PanelLotes2() {
@@ -79,16 +81,16 @@ public class PanelLotes2 extends javax.swing.JPanel {
                 cols, 
                 tablaLotes, 
                 new Class[]{Integer.class,Integer.class,Integer.class,
-                    String.class,String.class,String.class,String.class,
+                    String.class,String.class,String.class,String.class,String.class,
                     LocalDate.class, LocalDateTime.class},
                 new Boolean[]{false,false,false,
-                    false,false,false,false,
+                    false,false,false,false,false,
                     false,false}
             );
             
             String sql = "SELECT count(t.idremision) as entregados, COUNT(*)-count(t.idremision) as pendientes, \n" +
             "e.identrada, c.nombrecliente, ciu.nombreciudad, e.lote, e.fecharecepcion::date, e.fecharegistrado,\n" +
-            "e.contrato FROM transformador t\n" +            
+            "e.contrato, e.representante FROM transformador t\n" +            
             "LEFT JOIN despacho d ON d.iddespacho=t.iddespacho\n" +
             "LEFT JOIN remision r ON r.idremision=t.idremision\n" +
             "INNER JOIN entrada e ON e.identrada=t.identrada\n" +
@@ -104,6 +106,7 @@ public class PanelLotes2 extends javax.swing.JPanel {
                     rs.getInt("entregados"),
                     rs.getInt("pendientes"),
                     rs.getString("nombrecliente"),
+                    rs.getString("representante"),
                     rs.getString("lote"),
                     rs.getString("nombreciudad"),
                     rs.getString("contrato"),
@@ -416,13 +419,14 @@ public class PanelLotes2 extends javax.swing.JPanel {
             filtros.add(RowFilter.regexFilter(cjBuscar.getText().toUpperCase(), (comboColumnas.getSelectedIndex()-1) ));
             nombreFiltros.add(cjBuscar.getText().toUpperCase());
             rowSorter.setRowFilter(RowFilter.andFilter(filtros));
-            btnFiltro.setText(""+filtros.size());
+            btnFiltro.setText(""+filtros.size());            
         }else if(comboColumnas.getSelectedIndex()==0){
             if(!cjBuscar.getText().isEmpty()){
                 rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscar.getText().toUpperCase()));
-                btnFiltro.setText(cjBuscar.getText());
+                btnFiltro.setText(cjBuscar.getText());                
             }            
         }
+        ajustarColumna.adjustColumns();
     }//GEN-LAST:event_btnFiltroActionPerformed
 
     private void btnQuitarFiltroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitarFiltroActionPerformed
@@ -443,7 +447,8 @@ public class PanelLotes2 extends javax.swing.JPanel {
                 btnFiltro.setText(""+filtros.size());
                 rowSorter.setRowFilter(RowFilter.andFilter(filtros));
             }
-        }        
+        }
+        ajustarColumna.adjustColumns();
     }//GEN-LAST:event_btnQuitarFiltroActionPerformed
 
     private void comboColumnasItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboColumnasItemStateChanged

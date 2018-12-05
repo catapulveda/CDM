@@ -88,6 +88,9 @@ public class PROTOS extends javax.swing.JFrame{
         comboCliente.addItem(new Cliente(-1, "Seleccione...", null));
         modelo.Cliente.cargarComboNombreClientes(comboCliente);
         comboCliente.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
+        
+        comboCliente.setUI(JComboBoxColor.JComboBoxColor.createUI(comboCliente));
+        comboCliente.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
     }
     
     void HallarTensionSerie(){
@@ -2368,13 +2371,14 @@ public class PROTOS extends javax.swing.JFrame{
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         ProgressMonitor pm = new ProgressMonitor(this, "Generando excel", "", 0, 0);
         int idcliente = comboCliente.getItemAt(comboCliente.getSelectedIndex()).getIdCliente();
+        
         String sql = " SELECT count(*)\n" +
         "FROM entrada e \n" +
         "INNER JOIN transformador t ON e.identrada=t.identrada\n" +
         "LEFT JOIN despacho d ON d.iddespacho=t.iddespacho\n" +
         "LEFT JOIN remision r ON r.idremision=t.idremision\n" +
         "LEFT JOIN protocolos p ON p.idtransformador=t.idtransformador\n" +
-        "WHERE e.idcliente="+idcliente+" ";
+        "WHERE e.idcliente="+idcliente+" "+((!cjBuscarPorLote.getText().isEmpty())?" AND e.lote='"+cjBuscarPorLote.getText().trim()+"' ":"");
         conex.conectar();
         ResultSet rs1 = conex.CONSULTAR(sql);
         
@@ -2400,11 +2404,12 @@ public class PROTOS extends javax.swing.JFrame{
                     "LEFT JOIN despacho d ON d.iddespacho=t.iddespacho\n" +
                     "LEFT JOIN remision r ON r.idremision=t.idremision\n" +
                     "LEFT JOIN protocolos p ON p.idtransformador=t.idtransformador\n" +
-                    "WHERE e.idcliente="+idcliente+"\n" +
-                    "ORDER BY e.identrada, fase, kvaentrada, marca ";
+                    "WHERE e.idcliente="+idcliente+"\n " +
+                    ((!cjBuscarPorLote.getText().isEmpty())?" AND e.lote='"+cjBuscarPorLote.getText().trim()+"' ":"")+
+                    "ORDER BY e.identrada, fase, kvasalida, marca, item ";
                     ResultSet rs = conex.CONSULTAR(sql1);
                     ResultSetMetaData rsmd = rs.getMetaData();
-                    XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(new File("CARACTERISTICAS DE PROTOCOLOS.xlsx")));
+                    XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(new File("PLANTILLAS EXCEL//CARACTERISTICAS DE PROTOCOLOS.xlsx")));
                     XSSFSheet hoja = wb.getSheetAt(0);
                     XSSFRow fila;
                     int filas = 4;
@@ -2425,10 +2430,11 @@ public class PROTOS extends javax.swing.JFrame{
                     for(int j = 0; j < rsmd.getColumnCount(); j++) {
                         wb.getSheetAt(0).autoSizeColumn(j);
                     }
-                    OutputStream out = new FileOutputStream(new File("PROTOCOLOS.xlsx"));
+                    File f = File.createTempFile("PROTOCOLOS",".xlsx");
+                    OutputStream out = new FileOutputStream(f);
                     wb.write(out);
                     out.close();
-                    Desktop.getDesktop().open(new File("PROTOCOLOS.xlsx"));
+                    Desktop.getDesktop().open(f);
                 } catch (Exception ex){
                     Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
                     modelo.Metodos.ERROR(ex, "ERROR AL GENERAR EL REPORTE");

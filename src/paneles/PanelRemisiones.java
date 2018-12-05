@@ -318,7 +318,9 @@ public class PanelRemisiones extends javax.swing.JPanel {
             int fila = tablaRemisiones.getSelectedRow();
             int idremision = (int)tablaRemisiones.getValueAt(fila, 0);
             conexion.conectar();
-            ResultSet rs = conexion.CONSULTAR("SELECT * FROM remision r INNER JOIN cliente c ON c.idcliente=r.idcliente WHERE idremision="+idremision);
+            ResultSet rs = conexion.CONSULTAR("SELECT r.*, c.idcliente, c.nombrecliente, c.nitcliente as nit FROM remision r "
+                    + "INNER JOIN cliente c ON c.idcliente=r.idcliente "
+                    + "WHERE idremision="+idremision);
             try {
                 rs.next();
                 if(rs.getInt("iddespacho")==0){

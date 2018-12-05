@@ -265,6 +265,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                     }   }
             });            
             
+        
+        
             String sql = " SELECT e.*, t.*, r.numero_remision FROM entrada e ";
             sql += " INNER JOIN transformador t ON t.identrada=e.identrada  ";
             sql += " LEFT JOIN remision r ON t.idremision=r.idremision ";
@@ -421,6 +423,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jScrollPane2 = new javax.swing.JScrollPane();
         cjObservaciones = new CompuChiqui.JCTextArea();
         checkNuevos = new javax.swing.JCheckBox();
+        jLabel9 = new javax.swing.JLabel();
+        cjrepresentante = new CompuChiqui.JTextFieldPopup();
         jToolBar1 = new javax.swing.JToolBar();
         btnAgregarFila = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
@@ -639,7 +643,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel4.setText("Ciudad:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jPanel3.add(jLabel4, gridBagConstraints);
@@ -648,7 +652,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         comboCiudad.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -658,7 +662,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel6.setText("Conductor:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jPanel3.add(jLabel6, gridBagConstraints);
@@ -667,7 +671,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         comboConductor.setAutoscrolls(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -677,7 +681,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel5.setText("ID Entrada:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jPanel3.add(jLabel5, gridBagConstraints);
@@ -685,7 +689,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjIdEntradaAlmacen.setPlaceholder("N° Entrada Almacen");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -695,7 +699,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel7.setText("Lote:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jPanel3.add(jLabel7, gridBagConstraints);
@@ -703,7 +707,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjLote.setPlaceholder("Lote");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -713,7 +717,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel8.setText("Contrato:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jPanel3.add(jLabel8, gridBagConstraints);
@@ -721,7 +725,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjContrato.setPlaceholder("Contrato");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -730,7 +734,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjOp.setPlaceholder("Orden De Produccion");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -740,7 +744,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel10.setText("Cent. costos:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridy = 16;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jPanel3.add(jLabel10, gridBagConstraints);
@@ -748,7 +752,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjCentroDeCostos.setPlaceholder("Centro de Costos");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 15;
+        gridBagConstraints.gridy = 17;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -758,13 +762,13 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel1.setText("Fecha Recepcion:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jPanel3.add(jLabel1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 19;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -774,7 +778,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel11.setText("Placa Vehiculo:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 20;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
         jPanel3.add(jLabel11, gridBagConstraints);
@@ -782,7 +786,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         cjPlacaVehiculo.setPlaceholder("Placa vehiculo");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridy = 21;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
@@ -792,7 +796,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         jLabel2.setText("Observaciones:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridy = 22;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 0, 4);
         jPanel3.add(jLabel2, gridBagConstraints);
@@ -804,7 +808,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 21;
+        gridBagConstraints.gridy = 23;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -815,9 +819,28 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         checkNuevos.setText("Orden de Produccion: ( Nuevos ? )");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         jPanel3.add(checkNuevos, gridBagConstraints);
+
+        jLabel9.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
+        jLabel9.setText("Representante:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
+        jPanel3.add(jLabel9, gridBagConstraints);
+
+        cjrepresentante.setPlaceholder("N° Entrada Almacen");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 100;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        jPanel3.add(cjrepresentante, gridBagConstraints);
 
         jScrollPane3.setViewportView(jPanel3);
 
@@ -1046,11 +1069,12 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                     ACTUALIZA_LOTE += " fechaactualizado='"+fechaRegistro+"' ,  ";
                     ACTUALIZA_LOTE += " observacion='"+observaciones+"' , ";
                     ACTUALIZA_LOTE += " placavehiculo='"+placa+"' , ";
-                    ACTUALIZA_LOTE += " nuevo='"+checkNuevos.isSelected()+"' ";
+                    ACTUALIZA_LOTE += " nuevo='"+checkNuevos.isSelected()+"' , ";
+                    ACTUALIZA_LOTE += " representante='"+cjrepresentante.getText().trim()+"' ";
                     ACTUALIZA_LOTE += " WHERE identrada='" + IDENTRADA + "' ";
                 }else{//DE LO CONTRARIO 
                     ACTUALIZA_LOTE = " INSERT INTO entrada (idcliente,idciudad,idconductor,idusuario,identradaalmacen,nombrepc,lote, ";
-                    ACTUALIZA_LOTE += " contrato,op,centrodecostos,fecharecepcion,fecharegistrado,estado,observacion,placavehiculo,nuevo) VALUES \n( ";
+                    ACTUALIZA_LOTE += " contrato,op,centrodecostos,fecharecepcion,fecharegistrado,estado,observacion,placavehiculo,nuevo,representante) VALUES \n( ";
                     ACTUALIZA_LOTE += " '" +idCliente+ "' , ";
                     ACTUALIZA_LOTE += " '" +idCiudad+ "' , ";
                     ACTUALIZA_LOTE += " '" +idConductor+ "' , ";
@@ -1066,7 +1090,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                     ACTUALIZA_LOTE += " '" +false+ "' , ";
                     ACTUALIZA_LOTE += " '" +observaciones+ "' , ";
                     ACTUALIZA_LOTE += " '" +placa+ "' , ";
-                    ACTUALIZA_LOTE += " '" +checkNuevos.isSelected()+ "' ";
+                    ACTUALIZA_LOTE += " '" +checkNuevos.isSelected()+ "' , ";
+                    ACTUALIZA_LOTE += " '" +cjrepresentante.getText().trim()+ "' ";
                     ACTUALIZA_LOTE += " ) ";
                 }
 
@@ -1544,6 +1569,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     public CompuChiqui.JCTextArea cjObservaciones;
     public CompuChiqui.JTextFieldPopup cjOp;
     public CompuChiqui.JTextFieldPopup cjPlacaVehiculo;
+    public CompuChiqui.JTextFieldPopup cjrepresentante;
     public javax.swing.JComboBox<Ciudad> comboCiudad;
     public javax.swing.JComboBox<Cliente> comboCliente;
     public javax.swing.JComboBox<Conductor> comboConductor;
@@ -1558,6 +1584,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel3;
