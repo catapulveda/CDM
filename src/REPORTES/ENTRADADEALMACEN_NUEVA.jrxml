@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ENTRADA" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="48678126-ee83-41a0-afad-52db457c7565">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="98"/>
+	<property name="ireport.y" value="242"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -450,10 +450,10 @@ WHERE e.identrada=$P{IDLOTE}]]>
 								</jr:cell>
 							</jr:groupHeader>
 							<jr:detailCell style="DETALLE" height="18" rowSpan="1">
-								<textField>
+								<textField pattern="###0.0">
 									<reportElement x="0" y="0" width="114" height="18" uuid="d13414d1-d789-4449-afb0-33aa2ed35043"/>
 									<textElement textAlignment="Center" verticalAlignment="Middle"/>
-									<textFieldExpression><![CDATA[$F{kvaentrada}]]></textFieldExpression>
+									<textFieldExpression><![CDATA[String.valueOf($F{kvaentrada}).replaceAll(",", ".")]]></textFieldExpression>
 								</textField>
 							</jr:detailCell>
 						</jr:column>

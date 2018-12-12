@@ -541,7 +541,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             int celdas[] = {24,25,26,27,28};
         
             String sql = "SELECT cl.nombrecliente, e.contrato, e.lote, t.numeroempresa, t.numeroserie, t.fase, t.kvasalida, t.tps, t.tss, t.tts,\n" +
-            "t.serviciosalida, t.ano, t.peso, t.aceite, t.tipotrafosalida, pt.conmutador, pt.vcc, pt.promedioi, pt.derivacionprimaria, pt.i1, pt.i2, \n" +
+            "t.serviciosalida, t.ano, t.peso, t.aceite, t.tipotrafosalida, pt.codigo, pt.conmutador, pt.vcc, pt.promedioi, pt.derivacionprimaria, pt.i1, pt.i2, \n" +
             "pt.fechalaboratorio, pt.frecuencia, pt.refrigeracion, pt.materialconductoralta, pt.liquidoaislante, pt.tensionserie, pt.nba, "+ 
             "pt.claseaislamiento, pt.liquidoaislante, pt.materialconductorbaja, pt.grupodeconexion, pt.derivacionprimaria, pt.fechaderegistro, \n" +
             "(pt.vcc/t.tps)*100 as uz, ((cast((1/(pt.impedanciagarantizada/100)) as numeric)*pt.i2)/1000) as icc, \n" +
@@ -622,7 +622,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                     r.createCell(33, XSSFCell.CELL_TYPE_STRING).setCellValue( (rs.getString("serviciosalida").equals("REPARACION"))?"REPARADO":rs.getString("serviciosalida") );
                     r.createCell(34, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("u"));
                     r.createCell(35, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("x"));
-                    r.createCell(36, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getTimestamp("fechaderegistro").toLocalDateTime().toLocalDate().toString());
+                    r.createCell(36, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString("codigo"));
                 }
                 
                 for (int i = 0; i < MONO.getSheetAt(0).getRow(0).getLastCellNum(); i++) {

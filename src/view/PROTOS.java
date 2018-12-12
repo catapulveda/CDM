@@ -301,6 +301,7 @@ public class PROTOS extends javax.swing.JFrame{
         int ano = cjano.getInt();
         int vp = cjvp.getInt();
         int fase = Integer.parseInt(comboFase.getSelectedItem().toString());
+        JOptionPane.showMessageDialog(null, comboAceite.getSelectedItem());
         if(comboAceite.getSelectedItem().equals("SECO")){
             tabla = (vp<=15000)?"trifasicosecoserie1212":"trifasicosecoserie1512";
         }else if("NUEVO".equals(servicio)||"RECONSTRUIDO".equals(servicio) || cjcliente.getText().equals("EMPRESAS PUBLICAS DE MEDELLIN S.A E.S.P")){
@@ -347,6 +348,7 @@ public class PROTOS extends javax.swing.JFrame{
             }
         }catch(SQLException ex){
             Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "ERROR EN LA BUSQUEDA DE LOS VALORES EN LA TABLA "+tabla+" CON EL KVA "+kva);
         }finally{
             conex.CERRAR();
         }

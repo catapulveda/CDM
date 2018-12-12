@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ENTRADA" pageWidth="612" pageHeight="792" columnWidth="582" leftMargin="15" rightMargin="15" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" uuid="48678126-ee83-41a0-afad-52db457c7565">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ORDEN" pageWidth="612" pageHeight="792" columnWidth="582" leftMargin="15" rightMargin="15" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" uuid="48678126-ee83-41a0-afad-52db457c7565">
 	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="305"/>
+	<property name="ireport.x" value="29"/>
 	<property name="ireport.y" value="43"/>
 	<style name="table">
 		<box>
@@ -42,7 +42,7 @@ ORDER BY servicioentrada DESC, fase, kvaentrada;]]>
 		</queryString>
 		<field name="count" class="java.lang.Long"/>
 		<field name="fase" class="java.lang.Integer"/>
-		<field name="kvaentrada" class="java.lang.String"/>
+		<field name="kvaentrada" class="java.lang.Double"/>
 		<field name="tpe" class="java.lang.Integer"/>
 		<field name="tse" class="java.lang.Integer"/>
 		<field name="tte" class="java.lang.Integer"/>
@@ -357,10 +357,10 @@ WHERE e.identrada=$P{IDLOTE}]]>
 								<jr:cell height="25" rowSpan="1"/>
 							</jr:groupFooter>
 							<jr:detailCell style="DETALLE" height="18" rowSpan="1">
-								<textField>
+								<textField pattern="###0.0" isBlankWhenNull="true">
 									<reportElement x="0" y="0" width="127" height="18" uuid="a8954033-5f97-4ecc-8e0b-09511f2abc2e"/>
 									<textElement textAlignment="Center" verticalAlignment="Middle"/>
-									<textFieldExpression><![CDATA[$F{kvaentrada}]]></textFieldExpression>
+									<textFieldExpression><![CDATA[String.valueOf($F{kvaentrada}).replaceAll(",", ".")]]></textFieldExpression>
 								</textField>
 							</jr:detailCell>
 						</jr:column>

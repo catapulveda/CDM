@@ -70,7 +70,6 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
     ArrayList<Integer> lista = new ArrayList();
     
     modelo.Sesion sesion = modelo.Sesion.getConfigurador(null, -1);
-    private boolean FINISH = false;
 
     public REMISIONESCDM() {
         initComponents();
@@ -118,7 +117,6 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                 cjfecha.setDate(rs.getDate("fecha_remision"));
                 cjnitcedulacliente.setText(rs.getString("nit"));
                 cjempresatransportadora.setText(rs.getString("empresatransportadora"));
-                FINISH = true;
 //            }
         } catch (Exception e) {
             Logger.getLogger(REMISIONESCDM.class.getName()).log(Level.SEVERE, null, e);
@@ -1279,9 +1277,9 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAgregarClienteActionPerformed
 
     private void comboClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboClienteItemStateChanged
-        if(evt.getStateChange()==ItemEvent.DESELECTED && FINISH){
+        try {
             cjnitcedulacliente.setText(comboCliente.getModel().getElementAt(comboCliente.getSelectedIndex()).getNitCliente());
-        }
+        } catch (java.lang.NullPointerException e) {}
     }//GEN-LAST:event_comboClienteItemStateChanged
 
     public void Enter(JTextField uno, final JTextField dos) {

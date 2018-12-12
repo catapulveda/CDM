@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EntradaDeTransformadores" pageWidth="792" pageHeight="612" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="772" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="1e815148-a7a8-4fe7-bcd9-f939cce00a8d">
-	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="403"/>
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF" radius="0">
 		<box>
@@ -394,12 +394,12 @@ WHERE e.identrada=$P{IDENTRADA}]]>
 								</staticText>
 							</jr:columnHeader>
 							<jr:detailCell style="table_CH" height="15" rowSpan="1">
-								<textField isStretchWithOverflow="true">
+								<textField isStretchWithOverflow="true" pattern="###0.0">
 									<reportElement x="0" y="0" width="30" height="15" uuid="4c3a8bc3-023e-4e21-8598-5b5c5c8f1b11"/>
 									<textElement textAlignment="Center" verticalAlignment="Middle">
 										<font fontName="Calibri"/>
 									</textElement>
-									<textFieldExpression><![CDATA[$F{kvaentrada}]]></textFieldExpression>
+									<textFieldExpression><![CDATA[String.valueOf($F{kvaentrada}).replaceAll(",", ".")]]></textFieldExpression>
 								</textField>
 							</jr:detailCell>
 						</jr:column>
