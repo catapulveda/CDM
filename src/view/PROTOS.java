@@ -122,6 +122,14 @@ public class PROTOS extends javax.swing.JFrame{
         }
     }
     
+    void HallarPromedioCorrientes(){
+        if(comboFase.getSelectedIndex()==0){
+            cjpromedioi.setText(String.valueOf(QD((cjiu.getDouble() / cji2.getDouble()) * 100, 2)));
+        }else{
+            cjpromedioi.setText(String.valueOf(QD((((cjiu.getDouble() + cjiv.getDouble() + cjiw.getDouble()) / 3) / cji2.getDouble()) * 100, 2)));
+        }
+    }
+    
     void HallarPromedioResistencias(){
         if(comboFase.getSelectedIndex()==0){
             cjproresalta.setText(""+cjuv.getDouble());
@@ -130,15 +138,7 @@ public class PROTOS extends javax.swing.JFrame{
             cjproresalta.setText(""+QD((cjuv.getDouble()+cjwu.getDouble()+cjvw.getDouble())/3, 2));
             cjproresbaja.setText(""+QD((cjxy.getDouble()+cjyz.getDouble()+cjzx.getDouble())/3, 2));
         }        
-    }
-    
-    void HallarPromedioCorrientes(){
-        if(comboFase.getSelectedIndex()==0){
-            cjpromedioi.setText(String.valueOf(QD((cjiu.getDouble() / cji2.getDouble()) * 100, 2)));
-        }else{
-            cjpromedioi.setText(String.valueOf(QD((((cjiu.getDouble() + cjiv.getDouble() + cjiw.getDouble()) / 3) / cji2.getDouble()) * 100, 2)));
-        }
-    }
+    }        
     
     double I2R(){
         if(comboFase.getSelectedIndex()==0){
@@ -175,11 +175,15 @@ public class PROTOS extends javax.swing.JFrame{
     }
     
     double X() {
-        return Math.sqrt((Math.pow(Z(), 2)) - (Math.pow(R(), 2)));        
+        return Math.sqrt((Math.pow(Z(), 2)) - (Math.pow(R(), 2)));
     }
     
     double getkc(){
-        return (comboMaterialAlta.getSelectedItem().toString().equalsIgnoreCase("COBRE")&& comboMaterialBaja.getSelectedItem().equals("COBRE"))?234.5:(comboMaterialAlta.getSelectedItem().toString().equalsIgnoreCase("ALUMINIO")&& comboMaterialBaja.getSelectedItem().equals("ALUMINIO"))?225:229;        
+        return (comboMaterialAlta.getSelectedItem().toString().equalsIgnoreCase("COBRE")&& comboMaterialBaja.getSelectedItem().equals("COBRE"))
+                ?234.5
+                :(comboMaterialAlta.getSelectedItem().toString().equalsIgnoreCase("ALUMINIO")&& comboMaterialBaja.getSelectedItem().equals("ALUMINIO"))
+                ?225
+                :229;        
     }
     
     double K(){
@@ -282,7 +286,7 @@ public class PROTOS extends javax.swing.JFrame{
         return QD( ((cjpcumedido.getDouble() - I2R()) / K()) + I2R85(), 1);
     }
     
-    public void HallarReg() {                                   
+    public void HallarReg() {                                  
         double REG = QD(Math.sqrt(R85() + Math.pow(X(), 2) + (200 * R85() * 0.8) + (200 * X() * 0.6) + 10000) - 100, 2);
         REG = Math.pow(R85(), 2) + Math.pow(X(), 2) + 200 * R85() * 0.8 + 200 * X() * 0.6 + 10000;
         REG = Math.sqrt(REG);
@@ -678,7 +682,6 @@ public class PROTOS extends javax.swing.JFrame{
         menuProtocolos = new javax.swing.JPopupMenu();
         subMenuAbrirProtocolo = new javax.swing.JMenuItem();
         subMenuEliminar = new javax.swing.JMenuItem();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -865,6 +868,7 @@ public class PROTOS extends javax.swing.JFrame{
         jButton2 = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         cjfechasalida = new com.toedter.calendar.JDateChooser();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel14 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         jLabel81 = new javax.swing.JLabel();
@@ -908,10 +912,6 @@ public class PROTOS extends javax.swing.JFrame{
             }
         });
         menuProtocolos.add(subMenuEliminar);
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jTabbedPane1.setFont(new java.awt.Font("Ebrima", 0, 12)); // NOI18N
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Informacion General", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Enter Sansman", 0, 10))); // NOI18N
         jPanel2.setLayout(new java.awt.GridLayout(22, 2, 0, 2));
@@ -1960,7 +1960,9 @@ public class PROTOS extends javax.swing.JFrame{
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Resultados y Ensayos", jPanel1);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jTabbedPane1.setFont(new java.awt.Font("Ebrima", 0, 12)); // NOI18N
 
         jToolBar1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jToolBar1.setFloatable(false);
@@ -2100,6 +2102,11 @@ public class PROTOS extends javax.swing.JFrame{
         mostrarProtocolo.setFont(new java.awt.Font("Ebrima", 0, 12)); // NOI18N
         mostrarProtocolo.setSelected(true);
         mostrarProtocolo.setText("Mostrar protocolo al imprimir");
+        mostrarProtocolo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mostrarProtocoloActionPerformed(evt);
+            }
+        });
         jMenu2.add(mostrarProtocolo);
 
         jMenuBar1.add(jMenu2);
@@ -2149,7 +2156,7 @@ public class PROTOS extends javax.swing.JFrame{
                     modelo.Metodos.M("NO SE ENCONTRÒ EL NUMERO DE SERIE DIGITADO", "advertencia.png");
                     return;
                 }
-                rs = conex.CONSULTAR("SELECT * FROM entrada e INNER JOIN transformador t USING(identrada) INNER JOIN cliente c USING (idcliente) WHERE t.numeroserie='"+cjserie.getText()+"'");
+                rs = conex.CONSULTAR("SELECT * FROM entrada e INNER JOIN transformador t USING(identrada) INNER JOIN cliente c USING (idcliente) WHERE t.numeroserie='"+cjserie.getText().trim()+"'");
                 if(total == 1){                    
                     mostrar = rs.next();
                 }else if(total > 1){
@@ -2397,7 +2404,7 @@ public class PROTOS extends javax.swing.JFrame{
             public void run(){
                 try {
                     String sql1 = " SELECT p.codigo, t.numeroserie, t.marca, t.kvasalida, t.fase, t.ano, t.tps, t.tss, p.i1, p.i2, p.proresuno, p.proresdos, p.pomedido, p.iu, p.iv, p.iw, \n" +
-                    "p.promedioi, p.iogarantizado, p.pcu, p.vcc, p.temperaturadeensayo, p.i2r, p.i2ra85, p.pcua85, p.impedancia85, p.impedanciagarantizada, p.reg, p.atcontrabt, \n" +
+                    "p.promedioi, p.pogarantizado, p.pcu, p.vcc, p.temperaturadeensayo, p.i2r, p.i2ra85, p.pcua85, p.impedancia85, p.pcugarantizado, p.reg, p.atcontrabt, \n" +
                     "p.atcontratierra, p.btcontratierra, p.grupodeconexion, punou, pdosu, ptresu, pcuatrou, pcincou, punov, pdosv, ptresv, pcuatrov, pcincov, punow, pdosw, ptresw, pcuatrow, pcincow,\n" +
                     "p.anchotanque, p.largotanque, altotanque, t.serviciosalida, to_char(p.fechaderegistro, 'DD Mon YYYY'), ('') as vencegarantia, p.liquidoaislante, t.aceite, p.color, t.peso, \n" +
                     "e.lote, e.op, t.numeroempresa\n" +
@@ -2467,6 +2474,10 @@ public class PROTOS extends javax.swing.JFrame{
                 break;
         }
     }//GEN-LAST:event_comboClaseAislamientoItemStateChanged
+
+    private void mostrarProtocoloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mostrarProtocoloActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_mostrarProtocoloActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

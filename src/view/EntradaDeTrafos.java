@@ -28,6 +28,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
@@ -168,7 +169,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
 //        tablaTrafos.getColumnModel().getColumn(21).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(TIPOS));                
         
         //COLUMNA MARCAS
-        tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getJTextFieldMarcas()));
+//        tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getJTextFieldMarcas()));
+        tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(new modelo.JTextFieldAutoComplete(modelo.Marca.getMarcas())));
 //        entradaDeTrafos.tablaTrafos.getColumnModel().getColumn(4).setCellRenderer(new JTextFieldIntoJTable.JTextField_TableCellRenderer());
         
         //COLUMNA HERRAJE
@@ -183,8 +185,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                 @Override
                 public void tableChanged(TableModelEvent e) {
                     if(e.getType() == TableModelEvent.UPDATE){
-                        System.out.println("NO ESTA ENL ARRAY "+listaSeries.contains(modeloTabla.getValueAt(e.getFirstRow(), 0)));
-                         listaSeries.forEach((a)->System.out.println(a));
+//                        System.out.println("NO ESTA ENL ARRAY "+listaSeries.contains(modeloTabla.getValueAt(e.getFirstRow(), 0)));
+//                         listaSeries.forEach((a)->System.out.println(a));
                         if(listaSeries.contains(modeloTabla.getValueAt(e.getFirstRow(), 0).toString())){
                             switch(e.getColumn()){
                                 case 1:
@@ -282,7 +284,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
 //                    System.out.println(rs.getString("idtransformador")+" AGREGADO");
                     listaSeries.add(rs.getString("idtransformador"));
                 }
-                modeloTabla.addRow(new Object[]{
+                System.out.println("*"+rs.getString("marca")+"*");
+                modeloTabla.addRow(new Object[]{                    
                     rs.getInt("idtransformador"),
                     rs.getInt("item"),//"N°",
                     rs.getString("numero_remision"),//"N° REMISION",
@@ -1127,7 +1130,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                             cantidadGuardar++;
                             GUARDAR += "( '"+modeloTabla.getValueAt(i, 1)+"' , ";//ITEM
                             GUARDAR += " '"+modeloTabla.getValueAt(i, 3)+"' , ";//EMPRESA
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 4)+"' , ";//SERIE
+                            GUARDAR += " '"+modeloTabla.getValueAt(i, 4).toString().trim()+"' , ";//SERIE
                             GUARDAR += " '"+modeloTabla.getValueAt(i, 5)+"' , ";//MARCA
                             GUARDAR += " '"+modeloTabla.getValueAt(i, 6)+"' , ";//KVA ENTRADA
                             GUARDAR += " '"+modeloTabla.getValueAt(i, 6)+"' , ";//KVA SALIDA

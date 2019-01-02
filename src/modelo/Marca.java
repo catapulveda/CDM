@@ -3,7 +3,10 @@ package modelo;
 import com.mxrck.autocompleter.AutoCompleterCallback;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -83,6 +86,24 @@ public class Marca {
         cjHerramienta.setCaseSensitive(true);
         cjHerramienta.setClearOnIncorrect(true);
         return txt;
+    }
+    
+    public static ArrayList<String> getMarcas(){
+        conexion.conectar();
+        ResultSet rs = conexion.CONSULTAR("SELECT * FROM marca");
+        ArrayList<String> marcas = new ArrayList<>();
+        try {
+            while(rs.next()){
+                marcas.add(rs.getString("nombremarca"));
+            }
+            Collections.sort(marcas);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "ERROR AL CARGAR LA LISTA DE MARCAS\n"+ex);
+            Logger.getLogger(Marca.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            conexion.CERRAR();
+        }
+        return marcas;
     }
     
 }
