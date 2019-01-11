@@ -682,6 +682,7 @@ public class PROTOS extends javax.swing.JFrame{
         menuProtocolos = new javax.swing.JPopupMenu();
         subMenuAbrirProtocolo = new javax.swing.JMenuItem();
         subMenuEliminar = new javax.swing.JMenuItem();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -868,7 +869,6 @@ public class PROTOS extends javax.swing.JFrame{
         jButton2 = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         cjfechasalida = new com.toedter.calendar.JDateChooser();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel14 = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         jLabel81 = new javax.swing.JLabel();
@@ -912,6 +912,10 @@ public class PROTOS extends javax.swing.JFrame{
             }
         });
         menuProtocolos.add(subMenuEliminar);
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jTabbedPane1.setFont(new java.awt.Font("Ebrima", 0, 12)); // NOI18N
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Informacion General", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Enter Sansman", 0, 10))); // NOI18N
         jPanel2.setLayout(new java.awt.GridLayout(22, 2, 0, 2));
@@ -1960,9 +1964,7 @@ public class PROTOS extends javax.swing.JFrame{
                 .addContainerGap())
         );
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jTabbedPane1.setFont(new java.awt.Font("Ebrima", 0, 12)); // NOI18N
+        jTabbedPane1.addTab("Datos", jPanel1);
 
         jToolBar1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jToolBar1.setFloatable(false);

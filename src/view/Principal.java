@@ -342,6 +342,8 @@ public class Principal extends javax.swing.JFrame {
         }).start(); 
     }//GEN-LAST:event_btnInformesActionPerformed
     
+    
+    
     public static void main(String args[]){     
         
         try {
