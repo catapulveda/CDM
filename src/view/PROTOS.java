@@ -116,7 +116,9 @@ public class PROTOS extends javax.swing.JFrame{
     void HallarCorrientes(){
         try{
             cji1.setText(String.valueOf(QD(((cjkva.getDouble() * 1000) / ((comboFase.getSelectedIndex()==0)?1:Math.sqrt(3)) ) / cjvp.getInt(), 2)));
-            cji2.setText(String.valueOf(QD(((cjkva.getDouble() * 1000) / ((comboFase.getSelectedIndex()==0)?1:Math.sqrt(3)) ) / cjvs.getInt(), 2)));
+            cji2.setText(String.valueOf
+        (QD(
+                ((cjkva.getDouble() * 1000) / ((comboFase.getSelectedIndex()==0)?1:Math.sqrt(3)) ) / cjvs.getInt(), 2)));
         }catch(Exception e){
             Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -305,7 +307,7 @@ public class PROTOS extends javax.swing.JFrame{
         int ano = cjano.getInt();
         int vp = cjvp.getInt();
         int fase = Integer.parseInt(comboFase.getSelectedItem().toString());
-        JOptionPane.showMessageDialog(null, comboAceite.getSelectedItem());
+        
         if(comboAceite.getSelectedItem().equals("SECO")){
             tabla = (vp<=15000)?"trifasicosecoserie1212":"trifasicosecoserie1512";
         }else if("NUEVO".equals(servicio)||"RECONSTRUIDO".equals(servicio) || cjcliente.getText().equals("EMPRESAS PUBLICAS DE MEDELLIN S.A E.S.P")){
@@ -489,7 +491,7 @@ public class PROTOS extends javax.swing.JFrame{
                         if(mostrarProtocolo.isSelected()){
                             JasperViewer.viewReport(jasperprint, false);
                         }
-                                                
+                                                //314 415 5422
                         String protocolo = cjprotocolo.getText();
                         String cliente = cjcliente.getText().replace("/", "");
                         limpiar();

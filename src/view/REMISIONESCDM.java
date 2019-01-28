@@ -1036,8 +1036,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                 GUARDA_REMISION += " descripcion_remision='" + areadeTexto.getText() + "' , ";
                 GUARDA_REMISION += " factura_numero='" + cjfactura.getText() + "' , ";
                 GUARDA_REMISION += " empresa_remision='"+comboempresa.getSelectedItem()+"' , ";
-                GUARDA_REMISION += " idusuario="+sesion.getIdUsuario()+" , ";
-                GUARDA_REMISION += " nitcliente='"+cjnitcedulacliente.getText().trim()+"' , ";
+                GUARDA_REMISION += " idusuario="+sesion.getIdUsuario()+" , ";                
                 GUARDA_REMISION += " empresatransportadora='"+cjempresatransportadora.getText().trim()+"' , ";
                 GUARDA_REMISION += " responsable='"+cjresponsable.getText().trim()+"'  ";
                 GUARDA_REMISION += " WHERE idremision='" + getIDREMISION() + "' ";
@@ -1047,7 +1046,7 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                 GUARDA_REMISION += " contrato_remision , centrodecostos_remision , conductor_remision , ";
                 GUARDA_REMISION += " cedula_remision , placa_remision,  ";
                 GUARDA_REMISION += " fecha_remision, tipo_remision, descripcion_remision, factura_numero, ";
-                GUARDA_REMISION += " empresa_remision, estado, fechacreacion, idusuario , nitcliente, ";
+                GUARDA_REMISION += " empresa_remision, estado, fechacreacion, idusuario , ";
                 GUARDA_REMISION += " empresatransportadora, idcliente, responsable, iddespacho ) VALUES ( ";
                 GUARDA_REMISION += " '" + cjnoremision.getText() + "' , '" + comboCliente.getSelectedItem().toString() + "' , ";
                 GUARDA_REMISION += " '" + cjciudad.getText() + "' , '" + cjdestino.getText() + "' , ";
@@ -1061,7 +1060,6 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                 GUARDA_REMISION += " '" + comboempresa.getSelectedItem() + "' , ";
                 GUARDA_REMISION += " 'TRUE' , '" + new java.util.Date() + "' , ";
                 GUARDA_REMISION += " "+sesion.getIdUsuario()+" , ";
-                GUARDA_REMISION += " '"+cjnitcedulacliente.getText().trim()+"' , ";
                 GUARDA_REMISION += " '"+cjempresatransportadora.getText().trim()+"' ,  ";
                 GUARDA_REMISION += " "+((Cliente)comboCliente.getModel().getSelectedItem()).getIdCliente()+" , ";
                 GUARDA_REMISION += " '"+cjresponsable.getText().trim()+"' , ";

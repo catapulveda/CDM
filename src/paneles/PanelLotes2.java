@@ -88,16 +88,14 @@ public class PanelLotes2 extends javax.swing.JPanel {
                     false,false}
             );
             
-            String sql = "SELECT count(t.idremision) as entregados, COUNT(*)-count(t.idremision) as pendientes, \n" +
+            String sql = "select count(t.idremision) as entregados, COUNT(t.*)-count(t.idremision) as pendientes, \n" +
             "e.identrada, c.nombrecliente, ciu.nombreciudad, e.lote, e.fecharecepcion::date, e.fecharegistrado,\n" +
-            "e.contrato, e.representante FROM transformador t\n" +            
-            "LEFT JOIN despacho d ON d.iddespacho=t.iddespacho\n" +
-            "LEFT JOIN remision r ON r.idremision=t.idremision\n" +
-            "INNER JOIN entrada e ON e.identrada=t.identrada\n" +
-            "INNER JOIN cliente c ON c.idcliente=e.idcliente\n" +
-            "INNER JOIN ciudad ciu ON e.idciudad = ciu.idciudad\n" +            
-            "GROUP BY c.idcliente, ciu.idciudad, e.identrada\n" +
-            "ORDER BY fecharecepcion DESC;";
+            "e.contrato, e.representante from entrada e\n" +
+            "inner join cliente c on c.idcliente=e.idcliente \n" +
+            "inner join ciudad ciu on ciu.idciudad=e.idciudad \n" +
+            "left join transformador t on t.identrada=e.identrada\n" +
+            "group by c.idcliente, ciu.idciudad, e.identrada \n" +
+            "ORDER BY fecharecepcion DESC, fecharegistrado DESC;";
             conexion.conectar();           
             ResultSet rs = conexion.CONSULTAR(sql);
             while(rs.next()){
