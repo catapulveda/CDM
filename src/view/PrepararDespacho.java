@@ -117,7 +117,7 @@ public class PrepararDespacho extends javax.swing.JFrame {
         tablaTrafos.getColumnModel().getColumn(15).setCellEditor(new DefaultCellEditor(comboServicios));
 //        tablaTrafos.getColumnModel().getColumn(15).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(TIPOS));
         
-        String sql = " SELECT d.nodespacho, r.numero_remision, t.item, t.numeroempresa, t.numeroserie, t.marca, t.fase, t.kvaentrada, t.kvasalida, t.tpe, t.tse, tte, t.tps, t.tss, tts, t.servicioentrada, t.serviciosalida, t.observacionentrada, t.observacionsalida, t.tipotrafoentrada, t.tipotrafosalida, t.peso, t.aceite FROM transformador t \n" +
+        String sql = " SELECT d.nodespacho, r.numero_remision, t.idtransformador, t.numeroempresa, t.numeroserie, t.marca, t.fase, t.kvaentrada, t.kvasalida, t.tpe, t.tse, tte, t.tps, t.tss, tts, t.servicioentrada, t.serviciosalida, t.observacionentrada, t.observacionsalida, t.tipotrafoentrada, t.tipotrafosalida, t.peso, t.aceite FROM transformador t \n" +
                     "LEFT JOIN despacho d USING(iddespacho)\n" +
                     "LEFT JOIN remision r USING(idremision)\n" +
                     "WHERE t.identrada="+getIDENTRADA()+" ORDER BY fase, kvaentrada, marca, item";
@@ -127,7 +127,7 @@ public class PrepararDespacho extends javax.swing.JFrame {
         try {
             while(rs.next()){
                 modeloTabla.addRow(new Object[]{
-                    rs.getInt("item"),//"ITEM°",
+                    rs.getInt("idtransformador"),//"ITEM°",
                     rs.getString("nodespacho"),
                     rs.getString("numero_remision"),
                     rs.getString("numeroempresa"),
@@ -519,12 +519,12 @@ public class PrepararDespacho extends javax.swing.JFrame {
                     if(IDDESPACHO>0){
                         if(JOptionPane.showConfirmDialog(null, "Desea continuar ? ", "Confirmar", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
                             String update = "";
-                            for (int i = 0; i < tablaTrafos.getRowCount(); i++) {
+                            for (int i = 0; i < tablaTrafos.getRowCount(); i++) {                                
                                 if(Boolean.parseBoolean(tablaTrafos.getValueAt(i, 4).toString())){
                                     tablaTrafos.setRowSelectionInterval(i, i);
 
                                     update += "UPDATE transformador SET iddespacho="+IDDESPACHO+" , estado='A DESPACHAR'";
-                                    update += "WHERE identrada="+getIDENTRADA()+" AND item="+tablaTrafos.getValueAt(i, 0)+";\n";
+                                    update += "WHERE identrada="+getIDENTRADA()+" AND idtransformador="+tablaTrafos.getValueAt(i, 0)+";\n";
 //                                    String sql = " UPDATE transformador SET iddespacho="+IDDESPACHO+" , estado='A DESPACHAR' ";
 //                                    sql += " WHERE identrada="+getIDENTRADA()+" AND item="+tablaTrafos.getValueAt(i, 0)+" ";
 //                                    if(conexion.GUARDAR(sql)){
@@ -537,7 +537,7 @@ public class PrepararDespacho extends javax.swing.JFrame {
                             }
                             if(update.isEmpty()){
                                Metodos.M("NO SE HA SELECCIONADO NINGUN TRANSFORMADOR", "advertencia.png");
-                                return;
+                               return;
                             }
                             PreparedStatement pst = conexion.getConexion().prepareCall(update);
                             if(pst.executeUpdate()>0){

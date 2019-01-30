@@ -159,7 +159,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         try{
             while(rs.next()){
                 modeloTabla.addRow(new Object[]{
-                    rs.getInt("item"),
+                    rs.getInt("idtransformador"),
                     rs.getString("lote"),
                     rs.getString("numero_remision"),
                     rs.getString("op"),                    
@@ -198,24 +198,24 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                     if(e.getType() == TableModelEvent.UPDATE){
                         try {
                             String val = modeloTabla.getValueAt(e.getFirstRow(), e.getColumn()).toString();
-                            String item = modeloTabla.getValueAt(e.getFirstRow(), 0).toString();
+                            String idtransformador = modeloTabla.getValueAt(e.getFirstRow(), 0).toString();
                             String serie = modeloTabla.getValueAt(e.getFirstRow(), 5).toString();
 
                             if(e.getColumn() == 4){
-                                actualizarSalidas("numeroempresa", val, item, serie);
+                                actualizarSalidas("numeroempresa", val, idtransformador, serie);
                             }
 
                             if(e.getColumn() == 9){
-                                actualizarSalidas("kvasalida", val, item, serie);
+                                actualizarSalidas("kvasalida", val, idtransformador, serie);
                             }
 
                             if(e.getColumn() == 11){
                                 String GUARDAR = "";
                                 String t[] = modeloTabla.getValueAt(e.getFirstRow(), 11).toString().split("/");
                                 if(t.length==3){
-                                    if(new ConexionBD().GUARDAR("UPDATE transformador SET tps='"+t[0]+"' , tss='"+t[1]+"' , tts='"+t[2]+"' WHERE item='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND iddespacho='"+getIDDESPACHO()+"' AND numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), 5)+"' ")){}
+                                    if(new ConexionBD().GUARDAR("UPDATE transformador SET tps='"+t[0]+"' , tss='"+t[1]+"' , tts='"+t[2]+"' WHERE idtransformador='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND iddespacho='"+getIDDESPACHO()+"' AND numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), 5)+"' ")){}
                                 }else{
-                                    if(new ConexionBD().GUARDAR("UPDATE transformador SET tps='0' , tss='0' , tts='0' WHERE item='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND identrada='"+getIDDESPACHO()+"' AND numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), 5)+"' ")){
+                                    if(new ConexionBD().GUARDAR("UPDATE transformador SET tps='0' , tss='0' , tts='0' WHERE idtransformador='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND iddespacho='"+getIDDESPACHO()+"' AND numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), 5)+"' ")){
                                         JOptionPane.showMessageDialog(null, "EL FORMATO DE LA TENSION DEBE COMPONERSE DE 3 TENSIONES SEPARADAS POR EL SIMBOLO /, RELLENAR CON 0(cero), EN CASO DE TENER LAS TRES.", "TENSION NO VÁLIDA", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/recursos/images/advertencia.png")));
                                         modeloTabla.setValueAt("0/0/0", e.getFirstRow(), 11);
                                     }                                
@@ -223,19 +223,19 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                             }
 
                             if(e.getColumn() == 13){
-                                actualizarSalidas("serviciosalida", val, item, serie);
+                                actualizarSalidas("serviciosalida", val, idtransformador, serie);
                             }
 
                             if(e.getColumn() == 15){
-                                actualizarSalidas("tipotrafosalida", val, item, serie);
+                                actualizarSalidas("tipotrafosalida", val, idtransformador, serie);
                             }
 
                             if(e.getColumn() == 17){
-                                actualizarSalidas("observacionsalida", val, item, serie);
+                                actualizarSalidas("observacionsalida", val, idtransformador, serie);
                             }
 
                             if(e.getColumn() == 23){
-                                actualizarSalidas("causadefalla", val, item, serie);
+                                actualizarSalidas("causadefalla", val, idtransformador, serie);
                             }
                         } catch (NullPointerException ex) {
                         }                                                
@@ -250,9 +250,9 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         }
     }
     
-    public void actualizarSalidas(String col, String val, String item, String serie){
+    public void actualizarSalidas(String col, String val, String idtransformador, String serie){
         conexion.conectar();
-        if(conexion.GUARDAR(" UPDATE transformador SET "+col+"='"+val+"' WHERE iddespacho="+getIDDESPACHO()+" AND item="+item+" AND numeroserie='"+serie+"' ")){
+        if(conexion.GUARDAR(" UPDATE transformador SET "+col+"='"+val+"' WHERE iddespacho="+getIDDESPACHO()+" AND idtransformador="+idtransformador+" AND numeroserie='"+serie+"' ")){
             
         }
     }
@@ -450,7 +450,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                     int filas[] = tabla.getSelectedRows();
                     for (int i = filas.length - 1; i >= 0; i--){
                         String sql = " UPDATE transformador SET iddespacho=null, idremision=null, estado='EN PLANTA' ";
-                        sql += " WHERE iddespacho="+getIDDESPACHO()+" AND item="+tabla.getValueAt(filas[i], 0)+" AND ";
+                        sql += " WHERE iddespacho="+getIDDESPACHO()+" AND idtransformador="+tabla.getValueAt(filas[i], 0)+" AND ";
                         sql += " numeroserie='"+tabla.getValueAt(filas[i], 5)+"' ";
                         if(new ConexionBD().GUARDAR(sql)){
         //                    modeloTabla.removeRow(filas[i]);
