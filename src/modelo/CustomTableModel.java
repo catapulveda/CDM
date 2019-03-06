@@ -92,8 +92,8 @@ public class CustomTableModel extends DefaultTableModel implements MouseListener
                 tabla.setRowSelectionInterval(row, row);
                 tabla.setColumnSelectionInterval(col, col);
             }
-            if(menuItemBuscar!=null){
-                menuItemBuscar.setText("Buscar por " + tabla.getColumnName(col));
+            if(menu!=null){
+//                menuItemBuscar.setText("Buscar por " + tabla.getColumnName(col));
                 menu.show(tabla, evt.getPoint().x, evt.getPoint().y);
             }
         }

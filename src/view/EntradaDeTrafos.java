@@ -3,13 +3,26 @@ package view;
 import CopyPasteJTable.ExcelAdapter;
 import Dialogos.DialogoImprimirAceite;
 import Dialogos.DialogoRegistrarDiferencias;
+import Dialogos.RegistrarDiferencia;
 import Dialogos.Tensiones;
 import JTableAutoResizeColumn.TableColumnAdjuster;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,6 +39,8 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
@@ -151,7 +166,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                 modelo.EntradaDeTrafo.getColumnEditables()
             );
         modeloTabla.setMenu(subMenuEntradaDeTrafos);
-        modeloTabla.setMenuItem(subMenuFiltrar);
+//        modeloTabla.setMenuItem(subMenuFiltrar);
         tablaTrafos.setSurrendersFocusOnKeystroke(true);
             
         rowSorter = new TableRowSorter(modeloTabla);
@@ -264,7 +279,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                                 default:    break;
                             }
                         }
-                    }   }
+                    }   
+                }
             });            
             
         
@@ -281,10 +297,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             ResultSet rs = conexion.CONSULTAR(sql);
             while(rs.next()){
                 if(!listaSeries.contains(rs.getString("idtransformador"))){
-//                    System.out.println(rs.getString("idtransformador")+" AGREGADO");
                     listaSeries.add(rs.getString("idtransformador"));
-                }
-                System.out.println("*"+rs.getString("marca")+"*");
+                }                
                 modeloTabla.addRow(new Object[]{                    
                     rs.getInt("idtransformador"),
                     rs.getInt("item"),//"N°",
@@ -313,6 +327,49 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             new TableColumnAdjuster(tablaTrafos).adjustColumns();
             lblFilasSeleccionadas.setText("Columnas: " + tablaTrafos.getSelectedColumnCount() + " Filas: " + tablaTrafos.getSelectedRowCount()+" Total filas: "+tablaTrafos.getRowCount());
             conexion.CERRAR();
+            
+            tablaTrafos.setDropTarget(new DropTarget(tablaTrafos, new DropTargetListener() {
+                @Override
+                public void dragEnter(DropTargetDragEvent dtde) {
+                    System.out.println("Enter");
+                }
+
+                @Override
+                public void dragOver(DropTargetDragEvent dtde) {
+                    tablaTrafos.setRowSelectionInterval(tablaTrafos.rowAtPoint(dtde.getLocation()), tablaTrafos.rowAtPoint(dtde.getLocation()));
+                    tablaTrafos.setColumnSelectionInterval(0, tablaTrafos.getColumnCount()-1);
+                }
+
+                @Override
+                public void dropActionChanged(DropTargetDragEvent dtde) {
+                    System.out.println("ActionChanged");
+                }
+
+                @Override
+                public void dragExit(DropTargetEvent dte) {
+                    System.out.println("Exit");
+                }
+
+                @Override
+                public void drop(DropTargetDropEvent dtde) {
+                    dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                    if(dtde.getDropAction()==DnDConstants.ACTION_MOVE){                        
+                        if(dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)){
+                            Transferable t = dtde.getTransferable();
+                            try {
+                                List fileList = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
+                                for(int i=0; i<fileList.size(); i++){
+                                    File f = (File) fileList.get(i);   
+                                    System.out.println(f.getName());
+                                }
+                            } catch (UnsupportedFlavorException | IOException ex) {
+                                Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                }
+            }));
+            
         }catch(SQLException ex){
             Metodos.ERROR(ex, "ERROR AL CARGAR EL LISTADO DE TRANSFORMADORES.");
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
@@ -382,7 +439,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         subMenuEntradaDeTrafos = new javax.swing.JPopupMenu();
         subMenuItemEliminarTrafo = new javax.swing.JMenuItem();
         subMenuExportarExcel = new javax.swing.JMenuItem();
-        subMenuFiltrar = new javax.swing.JMenuItem();
+        subMenuRegistrarObservacion = new javax.swing.JMenuItem();
         subMenuImprimirFormatos = new javax.swing.JPopupMenu();
         subMenuImprimirEntradaDeAlmacen = new javax.swing.JMenuItem();
         subMenuImprimirEntradaDeTrafos = new javax.swing.JMenuItem();
@@ -464,14 +521,15 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         });
         subMenuEntradaDeTrafos.add(subMenuExportarExcel);
 
-        subMenuFiltrar.setFont(new java.awt.Font("Ebrima", 1, 12)); // NOI18N
-        subMenuFiltrar.setText("jMenuItem1");
-        subMenuFiltrar.addActionListener(new java.awt.event.ActionListener() {
+        subMenuRegistrarObservacion.setFont(new java.awt.Font("Franklin Gothic Medium", 0, 12)); // NOI18N
+        subMenuRegistrarObservacion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/check.png"))); // NOI18N
+        subMenuRegistrarObservacion.setText("Registrar Observación");
+        subMenuRegistrarObservacion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                subMenuFiltrarActionPerformed(evt);
+                subMenuRegistrarObservacionActionPerformed(evt);
             }
         });
-        subMenuEntradaDeTrafos.add(subMenuFiltrar);
+        subMenuEntradaDeTrafos.add(subMenuRegistrarObservacion);
 
         subMenuImprimirEntradaDeAlmacen.setFont(new java.awt.Font("Franklin Gothic Medium", 0, 12)); // NOI18N
         subMenuImprimirEntradaDeAlmacen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/reporte2.png"))); // NOI18N
@@ -1259,7 +1317,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     }//GEN-LAST:event_tablaTrafosMouseClicked
 
     private void cjBuscarSerieKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjBuscarSerieKeyReleased
-        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscarSerie.getText().toUpperCase(), IDBUSQUEDA));
+        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscarSerie.getText().toUpperCase()));
     }//GEN-LAST:event_cjBuscarSerieKeyReleased
 
     private void comboClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboClienteItemStateChanged
@@ -1436,11 +1494,6 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         }
     }//GEN-LAST:event_subMenuImprimirTodosLosFormatosActionPerformed
 
-    private void subMenuFiltrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuFiltrarActionPerformed
-        IDBUSQUEDA = tablaTrafos.getSelectedColumn();
-        cjBuscarSerie.grabFocus();
-    }//GEN-LAST:event_subMenuFiltrarActionPerformed
-
     private void btnInsertarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertarActionPerformed
         try{
             if(tablaTrafos.getRowCount()==1){
@@ -1510,6 +1563,18 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_imprimirHojasDeRutaActionPerformed
+
+    private void subMenuRegistrarObservacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuRegistrarObservacionActionPerformed
+        
+        Dialogos.RegistrarDiferencia rd = new RegistrarDiferencia(this, true);        
+        try {
+            rd.setIdtransformador((int) modeloTabla.getValueAt(rowSorter.convertRowIndexToModel(tablaTrafos.getSelectedRow()), 0));
+            rd.cargarDiferencia();
+        } catch (SQLException ex) {
+            Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        rd.setVisible(true);
+    }//GEN-LAST:event_subMenuRegistrarObservacionActionPerformed
 
     private void unirPaginas(JasperPrint source, JasperPrint dst){
         List<JRPrintPage> pages = source.getPages();
@@ -1610,7 +1675,6 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     private javax.swing.JPanel panelTabla;
     public javax.swing.JPopupMenu subMenuEntradaDeTrafos;
     public javax.swing.JMenuItem subMenuExportarExcel;
-    private javax.swing.JMenuItem subMenuFiltrar;
     public javax.swing.JMenuItem subMenuImprimirEntradaDeAlmacen;
     public javax.swing.JMenuItem subMenuImprimirEntradaDeTrafos;
     public javax.swing.JPopupMenu subMenuImprimirFormatos;
@@ -1618,6 +1682,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     public javax.swing.JMenuItem subMenuImprimirOrdenDeProduccion;
     public javax.swing.JMenuItem subMenuImprimirTodosLosFormatos;
     public javax.swing.JMenuItem subMenuItemEliminarTrafo;
+    private javax.swing.JMenuItem subMenuRegistrarObservacion;
     public javax.swing.JTable tablaTrafos;
     // End of variables declaration//GEN-END:variables
 

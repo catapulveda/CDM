@@ -98,7 +98,7 @@
 ( ($P{ORDEN}.equals( true ))?"ORDER BY fase, kvaentrada, marca ":"ORDER BY item ")]]></defaultValueExpression>
 		</parameter>
 		<parameter name="ORDERBY" class="java.lang.String">
-			<defaultValueExpression><![CDATA[$P{ORDEN}.equals( true )?"fase, kvasalida, marca":"item"]]></defaultValueExpression>
+			<defaultValueExpression><![CDATA[$P{ORDEN}.equals( true )?"fase, kvaentrada, marca":"item"]]></defaultValueExpression>
 		</parameter>
 		<queryString>
 			<![CDATA[SELECT e.idcliente, t.numeroempresa, t.numeroserie, t.marca, t.kvasalida, t.fase, t.servicioentrada, t.serviciosalida, t.ano, t.observacionentrada, 
