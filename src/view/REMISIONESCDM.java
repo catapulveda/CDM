@@ -1205,10 +1205,11 @@ public final class REMISIONESCDM extends javax.swing.JFrame {
                     if (getIDREMISION() > 0) {
                         if (conexion.GUARDAR("DELETE FROM datosremision_consorcio WHERE idremision=" + getIDREMISION() + " "
                             + "AND idherramienta=" + tablaHerramientas.getValueAt(filas[i], 1) + " ")) {
-                        modeloHerramientas.removeRow(filas[i]);
+                            modeloHerramientas.removeRow(filas[i]);                        
                         }else{
                             modeloHerramientas.removeRow(filas[i]);
                         }
+                        System.out.println(lista.remove(tablaHerramientas.getValueAt(filas[i], 1)));
                     }
                 }
         } else {

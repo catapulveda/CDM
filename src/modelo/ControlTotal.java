@@ -22,8 +22,12 @@ public class ControlTotal {
             "N° EMPRESA",
             "FASE",
             "MARCA",
-            "KVA",
-            "TENSION",
+            "KVA ENT",
+            "KVA SAL",
+            "TENSION ENT",
+            "TENSION SAL",
+            "SERV ENT",
+            "SERV SAL",
             "ESTADO",
             "REMISION",
             "DESPACHO",
@@ -40,7 +44,11 @@ public class ControlTotal {
             false,//
             false,//
             false,//
-            false,//            
+            false,//
+            false,//
+            false,
+            false,//
+            false,//
             false,//
             false,
             false,//
@@ -66,8 +74,12 @@ public class ControlTotal {
             String.class,//"No EMPRESA
             Integer.class,//FASE
             String.class,//MARCA
-            Double.class,//KVA
-            String.class,//TENSION
+            Double.class,//KVA ENT
+            Double.class,//KVA SAL
+            String.class,//TENSION ENT
+            String.class,//TENSION SAL
+            String.class,//SERV ENT
+            String.class,//SERV SAL
             String.class,//ESTADO
             String.class,//REMISION
             String.class,//DESPACHO
@@ -89,7 +101,9 @@ public class ControlTotal {
             barra.setMaximum(rs.getInt("count"));
 
             rs = con.CONSULTAR("SELECT e.identrada, cli.nombrecliente, e.lote, t.numeroserie,\n" +
-                    "t.numeroempresa, t.fase, t.marca, t.kvasalida, (t.tps || '-' || t.tss || '-' || t.tts) as tension, t.estado, r.numero_remision,\n" +
+                    "t.numeroempresa, t.fase, t.marca, t.kvaentrada, t.kvasalida, t.servicioentrada, t.serviciosalida, "+ 
+                    "(t.tpe || '-' || t.tse || '-' || t.tte) as tensionentrada, \n" +
+                    "(t.tps || '-' || t.tss || '-' || t.tts) as tensionsalida, t.estado, r.numero_remision,\n" +
                     "d.nodespacho, e.fecharecepcion, ciu.nombreciudad, e.contrato, e.op, e.centrodecostos\n" +
                     "FROM entrada e INNER JOIN transformador t USING(identrada)\n" + 
                     "INNER JOIN cliente cli USING (idcliente)\n" +
@@ -109,8 +123,12 @@ public class ControlTotal {
                     rs.getString("numeroempresa"),
                     rs.getInt("fase"),
                     rs.getString("marca"),
+                    rs.getDouble("kvaentrada"),
                     rs.getDouble("kvasalida"),
-                    rs.getString("tension"),
+                    rs.getString("tensionentrada"),
+                    rs.getString("tensionsalida"),
+                    rs.getString("servicioentrada"),
+                    rs.getString("serviciosalida"),
                     rs.getString("estado"),
                     rs.getString("numero_remision"),
                     rs.getString("nodespacho"),

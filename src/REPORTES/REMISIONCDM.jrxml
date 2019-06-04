@@ -29,7 +29,7 @@
 		</box>
 	</style>
 	<parameter name="IDREMISION" class="java.lang.Integer">
-		<defaultValueExpression><![CDATA[13435]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA[13597]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[select * from remision r inner join cliente c using(idcliente) where r.idremision=$P{IDREMISION};]]>

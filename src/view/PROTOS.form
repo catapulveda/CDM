@@ -731,14 +731,15 @@
                 <Component class="javax.swing.JComboBox" name="comboReferenciaAceite">
                   <Properties>
                     <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="7">
+                      <StringArray count="8">
                         <StringItem index="0" value="HYVOLT"/>
                         <StringItem index="1" value="LUB TROIL TIPO II"/>
                         <StringItem index="2" value="FR3"/>
                         <StringItem index="3" value="EPM"/>
                         <StringItem index="4" value="INHIBIDO TIPO II"/>
                         <StringItem index="5" value="NYTRO IZAR II"/>
-                        <StringItem index="6" value="N/A"/>
+                        <StringItem index="6" value="ADV-1601"/>
+                        <StringItem index="7" value="N/A"/>
                       </StringArray>
                     </Property>
                   </Properties>
@@ -2241,6 +2242,31 @@
                   </AuxValues>
                 </Component>
                 <Component class="javax.swing.JToolBar$Separator" name="jSeparator3">
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabel85">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="SansSerif" size="11" style="1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Contrato:"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JComboBox" name="comboContrato">
+                  <Properties>
+                    <Property name="maximumRowCount" type="int" value="20"/>
+                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                      <StringArray count="0"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="comboContratoItemStateChanged"/>
+                  </Events>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Cliente&gt;"/>
+                    <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
+                  </AuxValues>
+                </Component>
+                <Component class="javax.swing.JToolBar$Separator" name="jSeparator7">
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel83">
                   <Properties>

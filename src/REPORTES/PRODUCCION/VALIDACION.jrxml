@@ -459,7 +459,7 @@ WHERE identrada=$P{IDENTRADA}]]>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri" size="8"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$F{po}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[($F{po}==null)?0:$F{po}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
@@ -499,7 +499,7 @@ WHERE identrada=$P{IDENTRADA}]]>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="Calibri" size="8"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$F{pc}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[($F{pc}==null)?0:$F{pc}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>

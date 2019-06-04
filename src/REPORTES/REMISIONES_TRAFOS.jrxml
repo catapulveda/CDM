@@ -420,7 +420,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 							<textField isStretchWithOverflow="true">
 								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="71" height="12" uuid="231815a8-a9d7-4987-a099-453cebe8e4eb"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Arial" size="9"/>
+									<font fontName="Arial" size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{marca}]]></textFieldExpression>
 							</textField>
@@ -440,7 +440,7 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 							<textField isStretchWithOverflow="true">
 								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="76" height="12" uuid="1746e341-930c-486e-b7a7-e936280a2baf"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font fontName="Arial" size="9"/>
+									<font fontName="Arial" size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{serviciosalida}]]></textFieldExpression>
 							</textField>
@@ -459,8 +459,8 @@ WHERE t.idremision=$P{IDREMISION_TABLA}  ORDER BY t.fase, t.kvasalida, e.op, t.m
 						<jr:detailCell style="table_CH" height="14" rowSpan="1">
 							<textField isStretchWithOverflow="true">
 								<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="1" width="75" height="12" uuid="75565d4b-268e-45a3-874b-2b931034e41c"/>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Arial" size="9"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Arial" size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{tipotrafosalida}]]></textFieldExpression>
 							</textField>

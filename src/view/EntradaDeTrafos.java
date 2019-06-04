@@ -27,6 +27,9 @@ import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -69,38 +72,39 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
-public class EntradaDeTrafos extends javax.swing.JFrame{
-    
+public class EntradaDeTrafos extends javax.swing.JFrame {
+
     CustomTableModel modeloTabla;
-    
-    String SERVICIOS[] = {"REPARACION", "FABRICACION", "MANTENIMIENTO", "DADO DE BAJA", "GARANTIA", "DEVOLUCION", "REVISION","RECONSTRUIDO", "NUEVO"};
-    String TIPOS[] = {"CONVENCIONAL", "CONV. - REPOT.", "AUTOPROTEGIDO", "SECO", "PAD MOUNTED", "POTENCIA"};   
-    
-    String secciones[] = {"ENCUBE","CONEXIONES","ENSAMBLE","BOBINADO","DESARME Y DESENCUBE","PINTURA","METALMECANICA","NUCLEO"};
-    
+
+    String SERVICIOS[] = {"REPARACION", "FABRICACION", "MANTENIMIENTO", "DADO DE BAJA", "GARANTIA", "DEVOLUCION", "REVISION", "RECONSTRUIDO", "NUEVO"};
+    String TIPOS[] = {"CONVENCIONAL", "CONV. - REPOT.", "AUTOPROTEGIDO", "SECO", "PAD MOUNTED", "POTENCIA"};
+
+//    String secciones[] = {"ENCUBE","CONEXIONES","ENSAMBLE","BOBINADO","DESARME Y DESENCUBE","PINTURA","METALMECANICA","NUCLEO"};
+    String secciones[] = {"CONEXIONES", "ENSAMBLE", "BOBINADO", "DESARME Y DESENCUBE", "PINTURA", "METALMECANICA", "NUCLEO"};
+
     TableColumnAdjuster ajustarColumna;
     boolean LOTE_ABIERTO = false;
     private int IDENTRADA;
     private String CLIENTE = "";
-    
+
     ArrayList<String> tensiones = new ArrayList<>();
     ArrayList<String> listaSeries = new ArrayList<>();
-    
-    TableRowSorter rowSorter; 
+
+    TableRowSorter rowSorter;
     private int IDBUSQUEDA = 4;
-    
+
     boolean YACARGO = false;
-    
+
     ConexionBD conexion = new ConexionBD();
-    
+
     modelo.Sesion sesion = modelo.Sesion.getConfigurador(null, -1);
     ExcelAdapter copypaste;
-    
+
     private int COL_PLACA = 4;
-    
-    public EntradaDeTrafos(){
-        initComponents();                
-        
+
+    public EntradaDeTrafos() {
+        initComponents();
+
 //        String sql = "SELECT kva, po, pc, io, uz FROM trifasiconuevoserie35";
 //        ResultSet rs = model.Conexion2.CONSULTAR(sql);
 //        try {
@@ -112,29 +116,27 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
 //        } catch (SQLException ex) {
 //            Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-        
 //        setIDENTRADA(322);
 //        setIDENTRADA(282);
-
         this.setIconImage(new ImageIcon(getClass().getResource("/recursos/images/trafo.jpg")).getImage());
-        
+
         ajustarColumna = new TableColumnAdjuster(tablaTrafos);
         ajustarColumna.adjustColumns();
-        
+
         //CARGAMOS LAS TENSIONES QUE SE AUTOCOMPLETARAN EN LA COLUMNA TENSION
         getTensiones();
-        
+
         //CARGAMOS EL MODELO DE LA TABLA ENTRADA DE TRANSFORMADORES
         cargarTablaDeTransformadores(checkOrdenar.isSelected());
         //ExcelAdapter excelAdapter = new CopyPasteJTable.ExcelAdapter(tablaTrafos);
         copypaste = new ExcelAdapter(tablaTrafos);
-        
-        tablaTrafos.getSelectionModel().addListSelectionListener((ListSelectionEvent e)->{
-            if (e.getValueIsAdjusting()){
-                lblFilasSeleccionadas.setText("Columnas: " + tablaTrafos.getSelectedColumnCount() + " Filas: " + tablaTrafos.getSelectedRowCount()+" Total filas: "+tablaTrafos.getRowCount());
+
+        tablaTrafos.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> {
+            if (e.getValueIsAdjusting()) {
+                lblFilasSeleccionadas.setText("Columnas: " + tablaTrafos.getSelectedColumnCount() + " Filas: " + tablaTrafos.getSelectedRowCount() + " Total filas: " + tablaTrafos.getRowCount());
             }
         });
-        
+
         //CARGAR Y LLENAR EL COMBOBOX DE LOS CLIENTES        
         modelo.Cliente.cargarComboNombreClientes(comboCliente);
         comboCliente.setUI(JComboBoxColor.JComboBoxColor.createUI(comboCliente));
@@ -143,163 +145,181 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         //CARGAR Y LLENAR EL COMBOBOX DE LOS CONDUCTORES
         modelo.Conductor.llenarComboConductores(comboConductor);
         comboConductor.setUI(JComboBoxColor.JComboBoxColor.createUI(comboConductor));
-        
+
         //MUESTRA EL CONTENIDO DEL COMBOBOX AL MAXIMO ANCHO DEL ITEM MAS LARGO
         comboCliente.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
         comboCiudad.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
         comboConductor.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
-        
+
 //        subMenuImprimirTodosLosFormatos.doClick();
     }
-    
+
     /*
     SELECT * FROM entrada e INNER JOIN transformador t ON e.identrada=t.identrada WHERE  e.identrada=$P{IDENTRADA_TRAFOS} ORDER BY fase ASC, kvaentrada ASC, marca ASC, item ASC
-    */
-    
-    public void cargarTablaDeTransformadores(boolean ordenar){
-        try {            
+     */
+    public void cargarTablaDeTransformadores(boolean ordenar) {
+        try {
             modeloTabla = new CustomTableModel(
-                new String[][]{}, 
-                modelo.EntradaDeTrafo.getColumnNames(), 
-                this.tablaTrafos, 
-                modelo.EntradaDeTrafo.getColumnClass(),
-                modelo.EntradaDeTrafo.getColumnEditables()
+                    new String[][]{},
+                    modelo.EntradaDeTrafo.getColumnNames(),
+                    this.tablaTrafos,
+                    modelo.EntradaDeTrafo.getColumnClass(),
+                    modelo.EntradaDeTrafo.getColumnEditables()
             );
-        modeloTabla.setMenu(subMenuEntradaDeTrafos);
+            modeloTabla.setMenu(subMenuEntradaDeTrafos);
 //        modeloTabla.setMenuItem(subMenuFiltrar);
-        tablaTrafos.setSurrendersFocusOnKeystroke(true);
-            
-        rowSorter = new TableRowSorter(modeloTabla);
-        tablaTrafos.setRowSorter(rowSorter);
-        rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscarSerie.getText().toUpperCase(), 3));
-        
-        tablaTrafos.getColumnModel().getColumn(0).setCellRenderer(new JButtonIntoJTable.BotonEnColumna());
-        
-        //COLUMNA SERVICIOS
-        tablaTrafos.getColumnModel().getColumn(20).setCellEditor(new DefaultCellEditor(new JComboBox(SERVICIOS)));
-        tablaTrafos.getColumnModel().getColumn(20).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(SERVICIOS));
-        
-        //COLUMNA TIPO DE TRANSFORMADOR
-        tablaTrafos.getColumnModel().getColumn(21).setCellEditor(new DefaultCellEditor(new JComboBox(TIPOS)));
+            tablaTrafos.setSurrendersFocusOnKeystroke(true);
+
+            rowSorter = new TableRowSorter(modeloTabla);
+            tablaTrafos.setRowSorter(rowSorter);
+            rowSorter.setRowFilter(RowFilter.regexFilter(cjBuscarSerie.getText().toUpperCase(), 3));
+
+            tablaTrafos.getColumnModel().getColumn(0).setCellRenderer(new JButtonIntoJTable.BotonEnColumna());
+
+            //COLUMNA SERVICIOS
+            tablaTrafos.getColumnModel().getColumn(20).setCellEditor(new DefaultCellEditor(new JComboBox(SERVICIOS)));
+            tablaTrafos.getColumnModel().getColumn(20).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(SERVICIOS));
+
+            //COLUMNA TIPO DE TRANSFORMADOR
+            tablaTrafos.getColumnModel().getColumn(21).setCellEditor(new DefaultCellEditor(new JComboBox(TIPOS)));
 //        tablaTrafos.getColumnModel().getColumn(21).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(TIPOS));                
-        
-        //COLUMNA MARCAS
+
+            //COLUMNA MARCAS
 //        tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getJTextFieldMarcas()));
-        tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(new modelo.JTextFieldAutoComplete(modelo.Marca.getMarcas())));
+            tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(new modelo.JTextFieldAutoComplete(modelo.Marca.getMarcas())));
 //        entradaDeTrafos.tablaTrafos.getColumnModel().getColumn(4).setCellRenderer(new JTextFieldIntoJTable.JTextField_TableCellRenderer());
-        
-        //COLUMNA HERRAJE
-        tablaTrafos.getColumnModel().getColumn(15).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getTextFieldHerrajes()));            
-        
-        //COLUMNA TENSIONES       
-        JTextComponent txt = new JTextField();
-        AutoCompleteDecorator.decorate(txt, tensiones, true);
-        tablaTrafos.getColumnModel().getColumn(8).setCellEditor(new DefaultCellEditor((JTextField) txt));                       
-        
-        modeloTabla.addTableModelListener(new TableModelListener() {
+
+            //COLUMNA HERRAJE
+            tablaTrafos.getColumnModel().getColumn(15).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getTextFieldHerrajes()));
+
+            //COLUMNA TENSIONES       
+            JTextComponent txt = new JTextField();
+            AutoCompleteDecorator.decorate(txt, tensiones, true);
+            tablaTrafos.getColumnModel().getColumn(8).setCellEditor(new DefaultCellEditor((JTextField) txt));
+
+            modeloTabla.addTableModelListener(new TableModelListener() {
                 @Override
                 public void tableChanged(TableModelEvent e) {
-                    if(e.getType() == TableModelEvent.UPDATE){
+                    if (e.getType() == TableModelEvent.UPDATE) {
 //                        System.out.println("NO ESTA ENL ARRAY "+listaSeries.contains(modeloTabla.getValueAt(e.getFirstRow(), 0)));
 //                         listaSeries.forEach((a)->System.out.println(a));
-                        if(listaSeries.contains(modeloTabla.getValueAt(e.getFirstRow(), 0).toString())){
-                            switch(e.getColumn()){
+                        if (listaSeries.contains(modeloTabla.getValueAt(e.getFirstRow(), 0).toString())) {
+                            switch (e.getColumn()) {
                                 case 1:
-                                    if(conexion.GUARDAR("UPDATE transformador SET item='"+modeloTabla.getValueAt(e.getFirstRow(), e.getColumn())+"' WHERE idtransformador="+modeloTabla.getValueAt(e.getFirstRow(), 0)+" AND identrada="+IDENTRADA+" ")){
-                                        
+                                    if (conexion.GUARDAR("UPDATE transformador SET item='" + modeloTabla.getValueAt(e.getFirstRow(), e.getColumn()) + "' WHERE idtransformador=" + modeloTabla.getValueAt(e.getFirstRow(), 0) + " AND identrada=" + IDENTRADA + " ")) {
+
                                     }
                                     break;
                                 case 3:
-                                    if(actualizaTrafo("numeroempresa", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("numeroempresa", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 4:
-                                    if(conexion.GUARDAR("UPDATE transformador SET numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), e.getColumn())+"' WHERE idtransformador="+modeloTabla.getValueAt(e.getFirstRow(), 0)+" AND identrada="+IDENTRADA+" ")){}
+                                    if (conexion.GUARDAR("UPDATE transformador SET numeroserie='" + modeloTabla.getValueAt(e.getFirstRow(), e.getColumn()) + "' WHERE idtransformador=" + modeloTabla.getValueAt(e.getFirstRow(), 0) + " AND identrada=" + IDENTRADA + " ")) {
+                                    }
                                     break;
                                 case 5:
-                                    if(actualizaTrafo("marca", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("marca", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 6:
-                                    if(actualizaTrafo("kvaentrada", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("kvaentrada", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 7:
-                                    if(actualizaTrafo("fase", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("fase", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 8:
                                     String GUARDAR = "";
                                     String t[] = modeloTabla.getValueAt(e.getFirstRow(), 8).toString().split("/");
-                                    if(t.length==3){
-                                        if(new ConexionBD().GUARDAR("UPDATE transformador SET tpe='"+t[0]+"' , tse='"+t[1]+"' , tte='"+t[2]+"' , tps='"+t[0]+"' , tss='"+t[1]+"' , tts='"+t[2]+"' WHERE idtransformador='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND identrada='"+IDENTRADA+"' ")){}
-                                    }else{
-                                        if(new ConexionBD().GUARDAR("UPDATE transformador SET tpe='0' , tse='0' , tte='0' , tps='0' , tss='0' , tts='0' WHERE idtransformador='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND identrada='"+IDENTRADA+"' ")){}
+                                    if (t.length == 3) {
+                                        if (new ConexionBD().GUARDAR("UPDATE transformador SET tpe='" + t[0] + "' , tse='" + t[1] + "' , tte='" + t[2] + "' , tps='" + t[0] + "' , tss='" + t[1] + "' , tts='" + t[2] + "' WHERE idtransformador='" + modeloTabla.getValueAt(e.getFirstRow(), 0) + "' AND identrada='" + IDENTRADA + "' ")) {
+                                        }
+                                    } else {
+                                        if (new ConexionBD().GUARDAR("UPDATE transformador SET tpe='0' , tse='0' , tte='0' , tps='0' , tss='0' , tts='0' WHERE idtransformador='" + modeloTabla.getValueAt(e.getFirstRow(), 0) + "' AND identrada='" + IDENTRADA + "' ")) {
+                                        }
                                     }
                                     break;
                                 case 9:
-                                    if(actualizaTrafo("aat", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("aat", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 10:
-                                    if(actualizaTrafo("abt", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("abt", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 11:
-                                    if(actualizaTrafo("hat", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("hat", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 12:
-                                    if(actualizaTrafo("hbt", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("hbt", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 13:
-                                    if(actualizaTrafo("ci", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("ci", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 14:
-                                    if(actualizaTrafo("ce", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("ce", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 15:
-                                    if(actualizaTrafo("herraje", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("herraje", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 16:
-                                    if(actualizaTrafo("ano", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("ano", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 17:
-                                    if(actualizaTrafo("peso", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("peso", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 18:
-                                    if(actualizaTrafo("aceite", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("aceite", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 19:
-                                    if(actualizaTrafo("observacionentrada", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("observacionentrada", e.getFirstRow(), e.getColumn())) {
+                                    }
                                     break;
                                 case 20:
-                                    if(actualizaTrafo("servicioentrada", e.getFirstRow(), e.getColumn())){
-                                        if(actualizaTrafo("serviciosalida", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("servicioentrada", e.getFirstRow(), e.getColumn())) {
+                                        if (actualizaTrafo("serviciosalida", e.getFirstRow(), e.getColumn())) {
+                                        }
                                     }
                                     break;
                                 case 21:
-                                    if(actualizaTrafo("tipotrafoentrada", e.getFirstRow(), e.getColumn())){
-                                        if(actualizaTrafo("tipotrafosalida", e.getFirstRow(), e.getColumn())){}
+                                    if (actualizaTrafo("tipotrafoentrada", e.getFirstRow(), e.getColumn())) {
+                                        if (actualizaTrafo("tipotrafosalida", e.getFirstRow(), e.getColumn())) {
+                                        }
                                     }
                                     break;
-                                default:    break;
+                                default:
+                                    break;
                             }
                         }
-                    }   
+                    }
                 }
-            });            
-            
-        
-        
+            });
+
             String sql = " SELECT e.*, t.*, r.numero_remision FROM entrada e ";
             sql += " INNER JOIN transformador t ON t.identrada=e.identrada  ";
             sql += " LEFT JOIN remision r ON t.idremision=r.idremision ";
             sql += " INNER JOIN cliente c ON c.idcliente=e.idcliente  ";
             sql += " INNER JOIN conductor co ON co.idconductor=e.idconductor  ";
-            sql += " WHERE e.identrada='"+IDENTRADA+"' ";
-            sql += " "+((ordenar)?"ORDER BY fase ASC, kvaentrada ASC, marca":"ORDER BY item" )+" ";
-            
+            sql += " WHERE e.identrada='" + IDENTRADA + "' ";
+            sql += " " + ((ordenar) ? "ORDER BY fase ASC, kvaentrada ASC, marca" : "ORDER BY item") + " ";
+
             conexion.conectar();
             ResultSet rs = conexion.CONSULTAR(sql);
-            while(rs.next()){
-                if(!listaSeries.contains(rs.getString("idtransformador"))){
+            while (rs.next()) {
+                if (!listaSeries.contains(rs.getString("idtransformador"))) {
                     listaSeries.add(rs.getString("idtransformador"));
-                }                
-                modeloTabla.addRow(new Object[]{                    
+                }
+                modeloTabla.addRow(new Object[]{
                     rs.getInt("idtransformador"),
                     rs.getInt("item"),//"N°",
                     rs.getString("numero_remision"),//"N° REMISION",
@@ -308,7 +328,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                     rs.getString("marca"),//"MARCA",
                     rs.getDouble("kvaentrada"),//"KVA",
                     rs.getInt("fase"),//"FASE",
-                    rs.getString("tpe")+"/"+rs.getString("tse")+"/"+rs.getString("tte"),//"TENSION P",
+                    rs.getString("tpe") + "/" + rs.getString("tse") + "/" + rs.getString("tte"),//"TENSION P",
                     rs.getString("aat"),//"A.T",
                     rs.getString("abt"),//"B.T",
                     rs.getString("hat"),//"H.A",
@@ -325,9 +345,9 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                 });
             }
             new TableColumnAdjuster(tablaTrafos).adjustColumns();
-            lblFilasSeleccionadas.setText("Columnas: " + tablaTrafos.getSelectedColumnCount() + " Filas: " + tablaTrafos.getSelectedRowCount()+" Total filas: "+tablaTrafos.getRowCount());
+            lblFilasSeleccionadas.setText("Columnas: " + tablaTrafos.getSelectedColumnCount() + " Filas: " + tablaTrafos.getSelectedRowCount() + " Total filas: " + tablaTrafos.getRowCount());
             conexion.CERRAR();
-            
+
             tablaTrafos.setDropTarget(new DropTarget(tablaTrafos, new DropTargetListener() {
                 @Override
                 public void dragEnter(DropTargetDragEvent dtde) {
@@ -337,7 +357,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                 @Override
                 public void dragOver(DropTargetDragEvent dtde) {
                     tablaTrafos.setRowSelectionInterval(tablaTrafos.rowAtPoint(dtde.getLocation()), tablaTrafos.rowAtPoint(dtde.getLocation()));
-                    tablaTrafos.setColumnSelectionInterval(0, tablaTrafos.getColumnCount()-1);
+                    tablaTrafos.setColumnSelectionInterval(0, tablaTrafos.getColumnCount() - 1);
                 }
 
                 @Override
@@ -353,14 +373,26 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                 @Override
                 public void drop(DropTargetDropEvent dtde) {
                     dtde.acceptDrop(DnDConstants.ACTION_COPY);
-                    if(dtde.getDropAction()==DnDConstants.ACTION_MOVE){                        
-                        if(dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)){
+                    if (dtde.getDropAction() == DnDConstants.ACTION_MOVE) {
+                        if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                             Transferable t = dtde.getTransferable();
                             try {
                                 List fileList = (List) t.getTransferData(DataFlavor.javaFileListFlavor);
-                                for(int i=0; i<fileList.size(); i++){
-                                    File f = (File) fileList.get(i);   
-                                    System.out.println(f.getName());
+                                if (cjLote.getText().isEmpty()) {
+                                    Metodos.M("EL NOMBRE DEL LOTE NO PUEDE ESTAR VACIO", "advertencia.png");
+                                    return;
+                                }
+                                String noserie = (String) tablaTrafos.getValueAt(tablaTrafos.rowAtPoint(dtde.getLocation()), 4);
+                                File rutaFotos = new File("FOTOS TRAFOS", ((Cliente) comboCliente.getModel().getSelectedItem()).getNombreCliente() + "/(" + getIDENTRADA() + ") " + cjLote.getText() + "/");
+                                rutaFotos.mkdirs();
+                                for (int i = 0; i < fileList.size(); i++) {
+                                    File f = (File) fileList.get(i);
+                                    String extension = f.getName().substring(f.getName().lastIndexOf("."), f.getName().length());
+                                    if (f.getName().endsWith("jpg") || f.getName().endsWith("png")) {
+                                        Files.copy(f.toPath(), new File(rutaFotos.toPath().toString() + "/" + noserie + "_" + f.getName() + extension).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                                    } else {
+                                        Metodos.M("FORMATO DE IMAGEN NO VALIDO PARA " + f.getName(), "advertencia.png");
+                                    }
                                 }
                             } catch (UnsupportedFlavorException | IOException ex) {
                                 Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
@@ -369,35 +401,32 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                     }
                 }
             }));
-            
-        }catch(SQLException ex){
+
+        } catch (SQLException ex) {
             Metodos.ERROR(ex, "ERROR AL CARGAR EL LISTADO DE TRANSFORMADORES.");
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public boolean actualizaTrafo(String columna, int fila, int col){
-        if(new ConexionBD().GUARDAR(" UPDATE transformador SET "+columna+"='"+modeloTabla.getValueAt(fila, col).toString().trim()+"' "
-                + " WHERE idtransformador='"+modeloTabla.getValueAt(fila, 0).toString().trim()+"' AND "
-                + " identrada='"+IDENTRADA+"' ")){
-            return true;
-        }
-        return false;
+
+    public boolean actualizaTrafo(String columna, int fila, int col) {
+        return new ConexionBD().GUARDAR(" UPDATE transformador SET " + columna + "='" + modeloTabla.getValueAt(fila, col).toString().trim() + "' "
+                + " WHERE idtransformador='" + modeloTabla.getValueAt(fila, 0).toString().trim() + "' AND "
+                + " identrada='" + IDENTRADA + "' ");
     }
-    
-    public void cargarEncabezadoEntrada(){
+
+    public void cargarEncabezadoEntrada() {
         conexion.conectar();
-        ResultSet rs = conexion.CONSULTAR("SELECT * FROM entrada e \n" +
-                                        "INNER JOIN cliente cli ON e.idcliente=cli.idcliente \n" +
-                                        "INNER JOIN conductor con ON e.idconductor=con.idconductor\n" +
-                                        "INNER JOIN ciudad ciu ON e.idciudad=ciu.idciudad\n" +
-                                        "WHERE e.identrada="+IDENTRADA+" ");
+        ResultSet rs = conexion.CONSULTAR("SELECT * FROM entrada e \n"
+                + "INNER JOIN cliente cli ON e.idcliente=cli.idcliente \n"
+                + "INNER JOIN conductor con ON e.idconductor=con.idconductor\n"
+                + "INNER JOIN ciudad ciu ON e.idciudad=ciu.idciudad\n"
+                + "WHERE e.identrada=" + IDENTRADA + " ");
         try {
-            if(rs.next()){
+            if (rs.next()) {
                 LOTE_ABIERTO = true;
                 CLIENTE = rs.getString("nombrecliente");
                 comboCliente.getModel().setSelectedItem(new Cliente(rs.getInt("idcliente"), rs.getString("nombrecliente"), rs.getString("nitcliente")));
-                comboCiudad.getModel().setSelectedItem(new Ciudad(rs.getInt("idciudad"),rs.getString("nombreciudad"),rs.getString("direccionciudad"),rs.getString("telefonociudad")));
+                comboCiudad.getModel().setSelectedItem(new Ciudad(rs.getInt("idciudad"), rs.getString("nombreciudad"), rs.getString("direccionciudad"), rs.getString("telefonociudad")));
                 comboConductor.getModel().setSelectedItem(new Conductor(rs.getInt("idconductor"), rs.getString("cedulaconductor"), rs.getString("nombreconductor")));
                 cjIdEntradaAlmacen.setText(rs.getString("identradaalmacen"));
                 cjLote.setText(rs.getString("lote"));
@@ -406,27 +435,27 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                 cjCentroDeCostos.setText(rs.getString("centrodecostos"));
                 cjFechaRecepcion.setDate(rs.getDate("fecharecepcion"));
                 cjPlacaVehiculo.setText(rs.getString("placavehiculo"));
-                cjObservaciones.setText(rs.getString("observacion"));                
+                cjObservaciones.setText(rs.getString("observacion"));
                 checkNuevos.setSelected(rs.getBoolean("nuevo"));
             }
             conexion.CERRAR();
-            YACARGO = true;                    
+            YACARGO = true;
         } catch (SQLException ex) {
             Metodos.ERROR(ex, "ERROR AL CARGAR EL ENCABEZADO DEL LOTE.");
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void getTensiones(){
+
+    public void getTensiones() {
         tensiones.clear();
         try {
             conexion.conectar();
             ResultSet rs = conexion.CONSULTAR("SELECT * FROM tensiones ORDER BY id ASC");
-            while(rs.next()){
-                tensiones.add(rs.getString("primario")+"/"+rs.getString("secundario")+"/"+rs.getString("terciario"));
+            while (rs.next()) {
+                tensiones.add(rs.getString("primario") + "/" + rs.getString("secundario") + "/" + rs.getString("terciario"));
             }
             conexion.CERRAR();
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -447,6 +476,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         subMenuImprimirTodosLosFormatos = new javax.swing.JMenuItem();
         subMenuImprimirMuestrasDeAceite = new javax.swing.JMenuItem();
         imprimirHojasDeRuta = new javax.swing.JMenuItem();
+        tarjetaDeAprobacion = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         panelTabla = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -589,6 +619,15 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             }
         });
         subMenuImprimirFormatos.add(imprimirHojasDeRuta);
+
+        tarjetaDeAprobacion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/hojasderuta2.png"))); // NOI18N
+        tarjetaDeAprobacion.setText("Tarjeta de Aprobación");
+        tarjetaDeAprobacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tarjetaDeAprobacionActionPerformed(evt);
+            }
+        });
+        subMenuImprimirFormatos.add(tarjetaDeAprobacion);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Entrada de transformadores");
@@ -1040,67 +1079,67 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void menuEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuEditarActionPerformed
-        try{
+        try {
             DialogoRegistrarDiferencias drd = new DialogoRegistrarDiferencias(this, true);
             drd.CargarDatos(IDENTRADA);
             drd.setTitle(comboCliente.getSelectedItem().toString());
             drd.setVisible(true);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             Metodos.ERROR(ex, "ERROR AL INTENTAR ABRIR LA VENTANA DE REGISTRO DE DIFERENCIAS.");
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_menuEditarActionPerformed
 
     private void btnImprimrFormatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimrFormatosActionPerformed
-        subMenuImprimirFormatos.show(btnImprimrFormatos, 
-            (int) (btnImprimrFormatos.getAlignmentX()+btnImprimrFormatos.getWidth()/2), 
-            (int) (btnImprimrFormatos.getAlignmentY()+btnImprimrFormatos.getHeight()) );
+        subMenuImprimirFormatos.show(btnImprimrFormatos,
+                (int) (btnImprimrFormatos.getAlignmentX() + btnImprimrFormatos.getWidth() / 2),
+                (int) (btnImprimrFormatos.getAlignmentY() + btnImprimrFormatos.getHeight()));
     }//GEN-LAST:event_btnImprimrFormatosActionPerformed
 
     private void btnAgregarFilaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarFilaActionPerformed
         modeloTabla.addRow(new Object[]{
-                "",
-                0,//"N°",
-                "",//"REMISION",
-                "",//"N° EMPRESA",
-                "",//"N° SEIRE",
-                "",//"MARCA",
-                0,//"KVA",
-                0,//"FASE",
-                "",//"TENSION P",
-                0,//"A.T",
-                0,//"B.T",
-                0,//"H.A",
-                0,//"H.B",
-                false,//"INT",
-                false,//"EXT",
-                "",//"HERRAJE",
-                0,//"AÑO",
-                0,//"PESO",
-                0,//"ACEITE",
-                "",//"OBSERVACION",
-                "REPARACION",//"SERVICIO",
-                "CONVENCIONAL",//"TIPO", 
-            });
-            modeloTabla.setValueAt(tablaTrafos.getRowCount(), tablaTrafos.getRowCount() - 1, 1);
-            ajustarColumna.adjustColumns();
+            "",
+            0,//"N°",
+            "",//"REMISION",
+            "",//"N° EMPRESA",
+            "",//"N° SEIRE",
+            "",//"MARCA",
+            0,//"KVA",
+            0,//"FASE",
+            "",//"TENSION P",
+            0,//"A.T",
+            0,//"B.T",
+            0,//"H.A",
+            0,//"H.B",
+            false,//"INT",
+            false,//"EXT",
+            "",//"HERRAJE",
+            0,//"AÑO",
+            0,//"PESO",
+            0,//"ACEITE",
+            "",//"OBSERVACION",
+            "REPARACION",//"SERVICIO",
+            "CONVENCIONAL",//"TIPO", 
+        });
+        modeloTabla.setValueAt(tablaTrafos.getRowCount(), tablaTrafos.getRowCount() - 1, 1);
+        ajustarColumna.adjustColumns();
     }//GEN-LAST:event_btnAgregarFilaActionPerformed
 
     private void btnBorrarFilaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarFilaActionPerformed
         int filas[] = tablaTrafos.getSelectedRows();
-        for(int i=filas.length-1; i>=0; i--){
+        for (int i = filas.length - 1; i >= 0; i--) {
             modeloTabla.removeRow(filas[i]);
         }
     }//GEN-LAST:event_btnBorrarFilaActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        try {                      
-            int idCliente = ((Cliente)comboCliente.getModel().getSelectedItem()).getIdCliente();
+        try {
+            int idCliente = ((Cliente) comboCliente.getModel().getSelectedItem()).getIdCliente();
             int idCiudad = 0;
             //int idConductor = entradaDeTrafos.comboConductor.getItemAt(entradaDeTrafos.comboConductor.getSelectedIndex()).getIdConductor();
-            int idConductor = ((Conductor)comboConductor.getModel().getSelectedItem()).getIdConductor();
+            int idConductor = ((Conductor) comboConductor.getModel().getSelectedItem()).getIdConductor();
             //idCiudad = entradaDeTrafos.comboCiudad.getItemAt(entradaDeTrafos.comboCiudad.getSelectedIndex()).getIdCiudad();
-            idCiudad = ((Ciudad)comboCiudad.getModel().getSelectedItem()).getIdCiudad();
+            idCiudad = ((Ciudad) comboCiudad.getModel().getSelectedItem()).getIdCiudad();
 
             String idEntradaAlmacen = cjIdEntradaAlmacen.getText().trim();
             String lote = cjLote.getText().trim();
@@ -1113,51 +1152,51 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
             boolean estado = false;
             String observaciones = cjObservaciones.getText();
 
-            if(Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("PROGRAMADOR")){
+            if (Inet4Address.getLocalHost().getHostName().equals("ALMACEN") || Inet4Address.getLocalHost().getHostName().equals("PROGRAMADOR")) {
                 String ACTUALIZA_LOTE = "";
-                if(LOTE_ABIERTO){//SI EL LOTE ESTA ABIERTO, ACTUALIZO.
+                if (LOTE_ABIERTO) {//SI EL LOTE ESTA ABIERTO, ACTUALIZO.
                     ACTUALIZA_LOTE = " UPDATE entrada SET ";
-                    ACTUALIZA_LOTE += " idcliente='"+idCliente+"' , ";
-                    ACTUALIZA_LOTE += " idciudad='"+idCiudad+"' , ";
-                    ACTUALIZA_LOTE += " idconductor='"+idConductor+"' , ";
-                    ACTUALIZA_LOTE += " idusuario='"+sesion.getIdUsuario()+"' , ";
-                    ACTUALIZA_LOTE += " identradaalmacen='"+idEntradaAlmacen+"' ,  ";                        
-                    ACTUALIZA_LOTE += " lote='"+lote+"' , ";
-                    ACTUALIZA_LOTE += " contrato='"+contrato+ "' , ";
-                    ACTUALIZA_LOTE += " op='" +op+ "' , ";
-                    ACTUALIZA_LOTE += " centrodecostos='"+centrodecostos+"' , ";
-                    ACTUALIZA_LOTE += " fecharecepcion='"+fecharecepcion+"' , ";
-                    ACTUALIZA_LOTE += " fechaactualizado='"+fechaRegistro+"' ,  ";
-                    ACTUALIZA_LOTE += " observacion='"+observaciones+"' , ";
-                    ACTUALIZA_LOTE += " placavehiculo='"+placa+"' , ";
-                    ACTUALIZA_LOTE += " nuevo='"+checkNuevos.isSelected()+"' , ";
-                    ACTUALIZA_LOTE += " representante='"+cjrepresentante.getText().trim()+"' ";
+                    ACTUALIZA_LOTE += " idcliente='" + idCliente + "' , ";
+                    ACTUALIZA_LOTE += " idciudad='" + idCiudad + "' , ";
+                    ACTUALIZA_LOTE += " idconductor='" + idConductor + "' , ";
+                    ACTUALIZA_LOTE += " idusuario='" + sesion.getIdUsuario() + "' , ";
+                    ACTUALIZA_LOTE += " identradaalmacen='" + idEntradaAlmacen + "' ,  ";
+                    ACTUALIZA_LOTE += " lote='" + lote + "' , ";
+                    ACTUALIZA_LOTE += " contrato='" + contrato + "' , ";
+                    ACTUALIZA_LOTE += " op='" + op + "' , ";
+                    ACTUALIZA_LOTE += " centrodecostos='" + centrodecostos + "' , ";
+                    ACTUALIZA_LOTE += " fecharecepcion='" + fecharecepcion + "' , ";
+                    ACTUALIZA_LOTE += " fechaactualizado='" + fechaRegistro + "' ,  ";
+                    ACTUALIZA_LOTE += " observacion='" + observaciones + "' , ";
+                    ACTUALIZA_LOTE += " placavehiculo='" + placa + "' , ";
+                    ACTUALIZA_LOTE += " nuevo='" + checkNuevos.isSelected() + "' , ";
+                    ACTUALIZA_LOTE += " representante='" + cjrepresentante.getText().trim() + "' ";
                     ACTUALIZA_LOTE += " WHERE identrada='" + IDENTRADA + "' ";
-                }else{//DE LO CONTRARIO 
+                } else {//DE LO CONTRARIO 
                     ACTUALIZA_LOTE = " INSERT INTO entrada (idcliente,idciudad,idconductor,idusuario,identradaalmacen,nombrepc,lote, ";
                     ACTUALIZA_LOTE += " contrato,op,centrodecostos,fecharecepcion,fecharegistrado,estado,observacion,placavehiculo,nuevo,representante) VALUES \n( ";
-                    ACTUALIZA_LOTE += " '" +idCliente+ "' , ";
-                    ACTUALIZA_LOTE += " '" +idCiudad+ "' , ";
-                    ACTUALIZA_LOTE += " '" +idConductor+ "' , ";
-                    ACTUALIZA_LOTE += " '" +sesion.getIdUsuario()+ "' , ";
-                    ACTUALIZA_LOTE += " '" +idEntradaAlmacen+ "' , ";
-                    ACTUALIZA_LOTE += " '" +Inet4Address.getLocalHost().getHostName()+ "' , ";
-                    ACTUALIZA_LOTE += " '" +lote+ "' , ";
-                    ACTUALIZA_LOTE += " '" +contrato+ "' , ";
-                    ACTUALIZA_LOTE += " '" +op+ "' , ";
-                    ACTUALIZA_LOTE += " '" +centrodecostos+ "' , ";
-                    ACTUALIZA_LOTE += " '" +fecharecepcion+ "' , ";
-                    ACTUALIZA_LOTE += " '" +fechaRegistro+ "' , ";
-                    ACTUALIZA_LOTE += " '" +false+ "' , ";
-                    ACTUALIZA_LOTE += " '" +observaciones+ "' , ";
-                    ACTUALIZA_LOTE += " '" +placa+ "' , ";
-                    ACTUALIZA_LOTE += " '" +checkNuevos.isSelected()+ "' , ";
-                    ACTUALIZA_LOTE += " '" +cjrepresentante.getText().trim()+ "' ";
+                    ACTUALIZA_LOTE += " '" + idCliente + "' , ";
+                    ACTUALIZA_LOTE += " '" + idCiudad + "' , ";
+                    ACTUALIZA_LOTE += " '" + idConductor + "' , ";
+                    ACTUALIZA_LOTE += " '" + sesion.getIdUsuario() + "' , ";
+                    ACTUALIZA_LOTE += " '" + idEntradaAlmacen + "' , ";
+                    ACTUALIZA_LOTE += " '" + Inet4Address.getLocalHost().getHostName() + "' , ";
+                    ACTUALIZA_LOTE += " '" + lote + "' , ";
+                    ACTUALIZA_LOTE += " '" + contrato + "' , ";
+                    ACTUALIZA_LOTE += " '" + op + "' , ";
+                    ACTUALIZA_LOTE += " '" + centrodecostos + "' , ";
+                    ACTUALIZA_LOTE += " '" + fecharecepcion + "' , ";
+                    ACTUALIZA_LOTE += " '" + fechaRegistro + "' , ";
+                    ACTUALIZA_LOTE += " '" + false + "' , ";
+                    ACTUALIZA_LOTE += " '" + observaciones + "' , ";
+                    ACTUALIZA_LOTE += " '" + placa + "' , ";
+                    ACTUALIZA_LOTE += " '" + checkNuevos.isSelected() + "' , ";
+                    ACTUALIZA_LOTE += " '" + cjrepresentante.getText().trim() + "' ";
                     ACTUALIZA_LOTE += " ) ";
                 }
 
-                if(new ConexionBD().GUARDAR(ACTUALIZA_LOTE)){
-                    if(!LOTE_ABIERTO){
+                if (new ConexionBD().GUARDAR(ACTUALIZA_LOTE)) {
+                    if (!LOTE_ABIERTO) {
                         conexion.conectar();
                         ResultSet rs = conexion.CONSULTAR("SELECT last_value FROM entrada_identrada_seq");
                         rs.next();
@@ -1166,44 +1205,44 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                         conexion.CERRAR();
                     }
                     String GUARDAR = " INSERT INTO transformador ( ";
-                        GUARDAR += " item, numeroempresa, numeroserie, marca, kvaentrada, kvasalida, fase, tpe, tse, ";
-                        GUARDAR += " tte, tps, tss, tts, aat, abt, hat, hbt, ci, ce, herraje, ano, ";
-                        GUARDAR += " peso, aceite, observacionentrada, servicioentrada, serviciosalida, ";
-                        GUARDAR += " tipotrafoentrada, tipotrafosalida, estado, identrada ";
-                        GUARDAR += " ) VALUES ";
+                    GUARDAR += " item, numeroempresa, numeroserie, marca, kvaentrada, kvasalida, fase, tpe, tse, ";
+                    GUARDAR += " tte, tps, tss, tts, aat, abt, hat, hbt, ci, ce, herraje, ano, ";
+                    GUARDAR += " peso, aceite, observacionentrada, servicioentrada, serviciosalida, ";
+                    GUARDAR += " tipotrafoentrada, tipotrafosalida, estado, identrada ";
+                    GUARDAR += " ) VALUES ";
                     int cantidadGuardar = 0;
 //                        barraProgresoEntrada.setMaximum(modelo.getRowCount());
-                    for (int i = 0; i < modeloTabla.getRowCount(); i++){
+                    for (int i = 0; i < modeloTabla.getRowCount(); i++) {
                         tablaTrafos.setRowSelectionInterval(i, i);
                         tablaTrafos.setColumnSelectionInterval(COL_PLACA, COL_PLACA);
-                        if(modeloTabla.getValueAt(i, COL_PLACA).equals("")){
-                            modeloTabla.setValueAt("SIN PLACA "+(i+1), i, COL_PLACA);
+                        if (modeloTabla.getValueAt(i, COL_PLACA).equals("")) {
+                            modeloTabla.setValueAt("SIN PLACA " + (i + 1), i, COL_PLACA);
                             //JOptionPane.showMessageDialog(this, "EL ITEM "+modeloTabla.getValueAt(i, 3)+" NO TIENE NUMERO DE SERIE, POR LO TANTO NO SE GUARDARA EN LA BASE DE DATOS.\nSI NO TIENE NUMERO DE SERIE ASIGENELO EL VALOR '0' Y HAGA CLICK NUEVAMENTE EN EL BOTON GUARDAR.", "ITEM SIN NUMERO DE SERIE", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/recursos/images/advertencia.png")));
                         }
-                        System.out.println("ID ES *"+modeloTabla.getValueAt(i, 0)==null+"*");
-                        if(modeloTabla.getValueAt(i, 0).toString().isEmpty()){
-                            System.out.println(" EL ID ES NULO "+modeloTabla.getValueAt(i, 0));
+                        System.out.println("ID ES *" + modeloTabla.getValueAt(i, 0) == null + "*");
+                        if (modeloTabla.getValueAt(i, 0).toString().isEmpty()) {
+                            System.out.println(" EL ID ES NULO " + modeloTabla.getValueAt(i, 0));
                             //System.out.println(modeloTabla.getValueAt(i, COL_PLACA)+" NO ESTA EN ");
 //                            listaSeries.add(modeloTabla.getValueAt(i, COL_PLACA).toString());
                             cantidadGuardar++;
-                            GUARDAR += "( '"+modeloTabla.getValueAt(i, 1)+"' , ";//ITEM
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 3)+"' , ";//EMPRESA
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 4).toString().trim()+"' , ";//SERIE
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 5)+"' , ";//MARCA
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 6)+"' , ";//KVA ENTRADA
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 6)+"' , ";//KVA SALIDA
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 7)+"' , ";//FASE
+                            GUARDAR += "( '" + modeloTabla.getValueAt(i, 1) + "' , ";//ITEM
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 3) + "' , ";//EMPRESA
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 4).toString().trim() + "' , ";//SERIE
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 5) + "' , ";//MARCA
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 6) + "' , ";//KVA ENTRADA
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 6) + "' , ";//KVA SALIDA
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 7) + "' , ";//FASE
 
                             String tension[] = modeloTabla.getValueAt(i, 8).toString().split("/");
-                            if(tension.length==3){
-                                GUARDAR += " '"+tension[0]+"' , ";//TENSION PRIMARIA ENTRADA
-                                GUARDAR += " '"+tension[1]+"' , ";//TENSION SECUNDARIA ENTRADA
-                                GUARDAR += " '"+tension[2]+"' , ";//TENSION TERCIARIA ENTRADA
+                            if (tension.length == 3) {
+                                GUARDAR += " '" + tension[0] + "' , ";//TENSION PRIMARIA ENTRADA
+                                GUARDAR += " '" + tension[1] + "' , ";//TENSION SECUNDARIA ENTRADA
+                                GUARDAR += " '" + tension[2] + "' , ";//TENSION TERCIARIA ENTRADA
                                 //**********************
-                                GUARDAR += " '"+tension[0]+"' , ";//TENSION PRIMARIA SALIDA
-                                GUARDAR += " '"+tension[1]+"' , ";//TENSION SECUNDARIA SALIDA
-                                GUARDAR += " '"+tension[2]+"' , ";//TENSION TERCIARIA SALIDA
-                            }else{
+                                GUARDAR += " '" + tension[0] + "' , ";//TENSION PRIMARIA SALIDA
+                                GUARDAR += " '" + tension[1] + "' , ";//TENSION SECUNDARIA SALIDA
+                                GUARDAR += " '" + tension[2] + "' , ";//TENSION TERCIARIA SALIDA
+                            } else {
                                 GUARDAR += " '0' , ";//TENSION PRIMARIA ENTRADA
                                 GUARDAR += " '0' , ";//TENSION SECUNDARIA ENTRADA
                                 GUARDAR += " '0' , ";//TENSION TERCIARIA ENTRADA
@@ -1213,47 +1252,47 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                                 GUARDAR += " '0' , ";//TENSION TERCIARIA SALIDA
                             }
 
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 9)+"' , ";//AAT
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 10)+"' , ";//ABT
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 11)+"' , ";//HAT
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 12)+"' , ";//HBT
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 13)+"' , ";//CI
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 14)+"' , ";//CE
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 15)+"' , ";//HERRAJE
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 16)+"' , ";//ANO
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 17)+"' , ";//PESO
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 18)+"' , ";//ACEITE
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 19)+"' , ";//OBSERV. ENTRA.
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 20)+"' , ";//SERV. ENTRA.
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 20)+"' , ";//SERV. SALI.
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 21)+"' , ";//TIPO. TRAFO. ENTRA.
-                            GUARDAR += " '"+modeloTabla.getValueAt(i, 21)+"' , ";//TIPO. TRAFO. SALI.
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 9) + "' , ";//AAT
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 10) + "' , ";//ABT
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 11) + "' , ";//HAT
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 12) + "' , ";//HBT
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 13) + "' , ";//CI
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 14) + "' , ";//CE
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 15) + "' , ";//HERRAJE
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 16) + "' , ";//ANO
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 17) + "' , ";//PESO
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 18) + "' , ";//ACEITE
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 19) + "' , ";//OBSERV. ENTRA.
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 20) + "' , ";//SERV. ENTRA.
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 20) + "' , ";//SERV. SALI.
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 21) + "' , ";//TIPO. TRAFO. ENTRA.
+                            GUARDAR += " '" + modeloTabla.getValueAt(i, 21) + "' , ";//TIPO. TRAFO. SALI.
                             GUARDAR += " 'EN PLANTA' , ";//ESTADO
-                            GUARDAR += " '"+IDENTRADA+"' ),\n";//ID ENTRADA
+                            GUARDAR += " '" + IDENTRADA + "' ),\n";//ID ENTRADA
 //                                GUARDAR += " '0' , ";//ID DESPACHO
 //                                GUARDAR += " '0' ) ,\n";//ID SALIDA
                         }
                     }
-                    GUARDAR = GUARDAR.substring(0, GUARDAR.length()-2);
-                    if(cantidadGuardar>0 && new ConexionBD().GUARDAR(GUARDAR)){
+                    GUARDAR = GUARDAR.substring(0, GUARDAR.length() - 2);
+                    if (cantidadGuardar > 0 && new ConexionBD().GUARDAR(GUARDAR)) {
                         cargarTablaDeTransformadores(checkOrdenar.isSelected());
                         LOTE_ABIERTO = true;
                     }
                 }
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(this, "SOLO EL PERSONAL DE ALMACEN PUEDE REALIZAR CAMBIOS", "Debe completar todos los campos", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/recursos/images/advertencia.png")));
             }
 
-        }catch (UnknownHostException | HeadlessException ex){
+        } catch (UnknownHostException | HeadlessException ex) {
             Metodos.ERROR(ex, "ERROR AL VERIFICAR EL NOMBRE DE EQUIPO(PC) QUE REALIZARA LOS CAMBIOS.");
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
             Metodos.ERROR(ex, "SELECCIONE UNA CIUDAD");
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Metodos.ERROR(ex, "ERROR AL EJECUTAR LA CONSULTA A LA BASE DE DATOS");
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
-        }catch(java.lang.ClassCastException ex){
+        } catch (java.lang.ClassCastException ex) {
             Metodos.ERROR(ex, "OCURRIO UN ERROR AL PARECER EN LA SELECCION DEL CLIENTE, CIUDAD O CONDUCTOR. SELECCIONELO NUEVAMENTE.");
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1266,32 +1305,32 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     }//GEN-LAST:event_menuItemTensionesActionPerformed
 
     private void subMenuImprimirEntradaDeAlmacenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuImprimirEntradaDeAlmacenActionPerformed
-        (new Thread(){
-                @Override
-                public void run(){
-                    try{
-                        btnImprimrFormatos.setEnabled(false);
-                        btnImprimrFormatos.setIcon(new ImageIcon(getClass().getResource("/recursos/images/gif.gif")));
-                        JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/ENTRADADEALMACEN_NUEVA.jasper").toString()));
-                        Map<String, Object> p = new HashMap<String, Object>();
-                        p.put("IDLOTE", IDENTRADA);
-                        JasperPrint jasperprint = JasperFillManager.fillReport(reporte, p, conexion.conectar());                        
-                        JasperViewer.viewReport(jasperprint, false);                        
-                        JasperViewer visor = new JasperViewer(jasperprint, false);                        
-                    }catch(JRException | MalformedURLException ex){
-                        Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
-                    }finally{
-                        btnImprimrFormatos.setIcon(new ImageIcon(getClass().getResource("/recursos/images/imprimir.png")));
-                        btnImprimrFormatos.setEnabled(true);
-                    }
+        (new Thread() {
+            @Override
+            public void run() {
+                try {
+                    btnImprimrFormatos.setEnabled(false);
+                    btnImprimrFormatos.setIcon(new ImageIcon(getClass().getResource("/recursos/images/gif.gif")));
+                    JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/ENTRADADEALMACEN_NUEVA.jasper").toString()));
+                    Map<String, Object> p = new HashMap<String, Object>();
+                    p.put("IDLOTE", IDENTRADA);
+                    JasperPrint jasperprint = JasperFillManager.fillReport(reporte, p, conexion.conectar());
+                    JasperViewer.viewReport(jasperprint, false);
+                    JasperViewer visor = new JasperViewer(jasperprint, false);
+                } catch (JRException | MalformedURLException ex) {
+                    Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    btnImprimrFormatos.setIcon(new ImageIcon(getClass().getResource("/recursos/images/imprimir.png")));
+                    btnImprimrFormatos.setEnabled(true);
                 }
-            }).start();
+            }
+        }).start();
     }//GEN-LAST:event_subMenuImprimirEntradaDeAlmacenActionPerformed
 
     private void subMenuItemEliminarTrafoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuItemEliminarTrafoActionPerformed
         int filas[] = tablaTrafos.getSelectedRows();
-        for(int i=filas.length-1; i>=0; i--){
-            if(new ConexionBD().GUARDAR("DELETE FROM transformador WHERE idtransformador='"+tablaTrafos.getValueAt(filas[i], 0)+"' AND identrada='"+IDENTRADA+"' ")){
+        for (int i = filas.length - 1; i >= 0; i--) {
+            if (new ConexionBD().GUARDAR("DELETE FROM transformador WHERE idtransformador='" + tablaTrafos.getValueAt(filas[i], 0) + "' AND identrada='" + IDENTRADA + "' ")) {
                 listaSeries.remove(tablaTrafos.getValueAt(filas[i], 4).toString());
                 modeloTabla.removeRow(filas[i]);
             }
@@ -1321,50 +1360,50 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     }//GEN-LAST:event_cjBuscarSerieKeyReleased
 
     private void comboClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboClienteItemStateChanged
-        if(YACARGO || !LOTE_ABIERTO){
-            if(evt.getStateChange() == ItemEvent.SELECTED){            
-                modelo.Ciudad.cargarComboCiudadesPorCliente(((Cliente)comboCliente.getModel().getSelectedItem()).getIdCliente(),comboCiudad);                
+        if (YACARGO || !LOTE_ABIERTO) {
+            if (evt.getStateChange() == ItemEvent.SELECTED) {
+                modelo.Ciudad.cargarComboCiudadesPorCliente(((Cliente) comboCliente.getModel().getSelectedItem()).getIdCliente(), comboCiudad);
             }
-        }        
+        }
     }//GEN-LAST:event_comboClienteItemStateChanged
 
     private void menuItemRegistrarDiferenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemRegistrarDiferenciasActionPerformed
-        try{
-            DialogoRegistrarDiferencias drd = new DialogoRegistrarDiferencias(this, rootPaneCheckingEnabled);            
+        try {
+            DialogoRegistrarDiferencias drd = new DialogoRegistrarDiferencias(this, rootPaneCheckingEnabled);
             drd.CargarDatos(IDENTRADA);
-            drd.setTitle("Diferencias "+CLIENTE+" Lote "+cjLote.getText());
+            drd.setTitle("Diferencias " + CLIENTE + " Lote " + cjLote.getText());
             drd.setVisible(true);
-        }catch(Exception e){
+        } catch (Exception e) {
             Metodos.ERROR(e, "ERROR");
         }
     }//GEN-LAST:event_menuItemRegistrarDiferenciasActionPerformed
 
     private void subMenuImprimirEntradaDeTrafosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuImprimirEntradaDeTrafosActionPerformed
-        try{            
-            if(LOTE_ABIERTO){
+        try {
+            if (LOTE_ABIERTO) {
                 conexion.conectar();
-                ResultSet rs = conexion.CONSULTAR("SELECT estado FROM entrada WHERE identrada="+IDENTRADA+"  ");
-                if(rs.next()){
-                    if(!rs.getBoolean("estado")){
+                ResultSet rs = conexion.CONSULTAR("SELECT estado FROM entrada WHERE identrada=" + IDENTRADA + "  ");
+                if (rs.next()) {
+                    if (!rs.getBoolean("estado")) {
                         modelo.Metodos.M("EL PERSONAL DE ALMACEN AUN NO A TERMINADO DE VERIFICAR ESTE LOTE\n", "advertencia.png");
                         return;
                     }
-                    String reporte = "ENTRADADETRAFOS";                    
-                    if(checkNuevos.isSelected()){
+                    String reporte = "ENTRADADETRAFOS";
+                    if (checkNuevos.isSelected()) {
                         reporte = "ENTRADADETRAFOS_NUEVOS";
                     }
-                    JasperReport jasper = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/"+reporte+".jasper").toString()));
+                    JasperReport jasper = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/" + reporte + ".jasper").toString()));
                     Map<String, Object> p = new HashMap<String, Object>();
                     JasperPrint jasperprint = null;
                     p.put("IDENTRADA", IDENTRADA);
-                    p.put("ORDEN", checkOrdenar.isSelected());                   
-                    jasperprint = JasperFillManager.fillReport(jasper, p, conexion.conectar());                    
+                    p.put("ORDEN", checkOrdenar.isSelected());
+                    jasperprint = JasperFillManager.fillReport(jasper, p, conexion.conectar());
                     JasperViewer.viewReport(jasperprint, false);
                 }
-            }else{
+            } else {
                 modelo.Metodos.M("NO HAY NINGUN LOTE ABIERTO PARA GENERAR LOS FORMATOS\n", "advertencia.png");
-            }                        
-        }catch(Exception ex){
+            }
+        } catch (Exception ex) {
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
             Metodos.ERROR(ex, "ERROR");
         }
@@ -1375,13 +1414,13 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     }//GEN-LAST:event_subMenuExportarExcelActionPerformed
 
     private void subMenuImprimirMuestrasDeAceiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuImprimirMuestrasDeAceiteActionPerformed
-        try{            
+        try {
             DialogoImprimirAceite dia = new DialogoImprimirAceite(this, rootPaneCheckingEnabled);
-            dia.setIdentrada(getIDENTRADA());            
+            dia.setIdentrada(getIDENTRADA());
             this.setExtendedState(ICONIFIED);
             dia.setVisible(true);
         } catch (Exception e) {
-            Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, e);            
+            Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, e);
             Metodos.ERROR(e, "ERROR");
         }
     }//GEN-LAST:event_subMenuImprimirMuestrasDeAceiteActionPerformed
@@ -1390,87 +1429,92 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         try {
             JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/ORDENDEPRODUCCION.jasper").toString()));
             Map<String, Object> p = new HashMap<>();
-            
-            p.put("IDLOTE", IDENTRADA);                        
-            
+
+            p.put("IDLOTE", IDENTRADA);
+
             ArrayList lista = new ArrayList();
-            
-            lista = modelo.Metodos.getFirma("GERENTE TECNICO");                        
-            p.put("FIRMA_GERENTE", modelo.Metodos.byteToBufferedImage((byte[])lista.get(0)));
+
+            lista = modelo.Metodos.getFirma("GERENTE TECNICO");
+            p.put("FIRMA_GERENTE", modelo.Metodos.byteToBufferedImage((byte[]) lista.get(0)));
             p.put("NOMBRE_GERENTE", lista.get(1));
-            
+
             lista = modelo.Metodos.getFirma("DIRECTOR DE PRODUCCION");
-            p.put("FIRMA_PRODUCCION", modelo.Metodos.byteToBufferedImage((byte[])lista.get(0)));
+            p.put("FIRMA_PRODUCCION", modelo.Metodos.byteToBufferedImage((byte[]) lista.get(0)));
             p.put("NOMBRE_PRODUCCION", lista.get(1));
-            
+
             lista = modelo.Metodos.getFirma("COORDINADORA ADMINISTRATIVA");
-            p.put("FIRMA_ADMINISTRATIVA", modelo.Metodos.byteToBufferedImage((byte[])lista.get(0)));
+            p.put("FIRMA_ADMINISTRATIVA", modelo.Metodos.byteToBufferedImage((byte[]) lista.get(0)));
             p.put("NOMBRE_ADMINISTRATIVA", lista.get(1));
-            
+
             lista = modelo.Metodos.getFirma("ALMACEN");
             p.put("NOMBRE_ALMACEN", lista.get(1));
-            
+
             lista = modelo.Metodos.getFirma("COORDINADORA DEL SIG");
-            p.put("FIRMA_SIG", modelo.Metodos.byteToBufferedImage((byte[])lista.get(0)));
+            p.put("FIRMA_SIG", modelo.Metodos.byteToBufferedImage((byte[]) lista.get(0)));
             p.put("NOMBRE_SIG", lista.get(1));
-               
+
             JasperPrint jasperprint = null;
             jasperprint = JasperFillManager.fillReport(reporte, p, conexion.conectar());
             JasperViewer.viewReport(jasperprint, false);
         } catch (JRException | MalformedURLException ex) {
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
-            modelo.Metodos.M("ERROR AL GENERAR LA ORDEN DE PRODUCCION\n"+ex, "error.png");
+            modelo.Metodos.M("ERROR AL GENERAR LA ORDEN DE PRODUCCION\n" + ex, "error.png");
         }
     }//GEN-LAST:event_subMenuImprimirOrdenDeProduccionActionPerformed
 
     private void subMenuImprimirTodosLosFormatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuImprimirTodosLosFormatosActionPerformed
-        try{
+        try {
             JasperReport VALIDACION = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/VALIDACION.jasper").toString()));
             JasperReport VERIFICACION = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/VERIFICACION.jasper").toString()));
             JasperReport NUCLEOS = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/PRUEBA DE NUCLEO.jasper").toString()));
             JasperReport BOBINA = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/CALCULO DE BOBINA.jasper").toString()));
+            JasperReport ENCUBE = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/ENCUBE.jasper").toString()));
             JasperReport SECCIONES = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/SECCIONES.jasper").toString()));
             JasperReport SEGUIMIENTO = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/SEGUIMIENTO.jasper").toString()));
             JasperReport HERMETICIDAD = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/HERMETICIDAD.jasper").toString()));
             JasperReport PINTURA = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PRODUCCION/PINTURA.jasper").toString()));
-            
+
             Map<String, Object> p = new HashMap<>();
             p.put("IDENTRADA", getIDENTRADA());
-            p.put("ORDEN", checkOrdenar.isSelected());            
-            
-            JasperPrint jp = JasperFillManager.fillReport(VALIDACION, p, conexion.conectar());
-            
-            unirPaginas(JasperFillManager.fillReport(VERIFICACION, p, conexion.conectar()), jp);
-            
-            unirPaginas(JasperFillManager.fillReport(NUCLEOS, p, conexion.conectar()), jp);
-            
-            unirPaginas(JasperFillManager.fillReport(BOBINA, p, conexion.conectar()), jp);
-            
-            for (String seccione : secciones){
+            p.put("ORDEN", checkOrdenar.isSelected());
+
+            Connection con = conexion.conectar();
+
+            JasperPrint jp = JasperFillManager.fillReport(VALIDACION, p, con);
+
+            unirPaginas(JasperFillManager.fillReport(VERIFICACION, p, con), jp);
+
+            unirPaginas(JasperFillManager.fillReport(NUCLEOS, p, con), jp);
+
+            unirPaginas(JasperFillManager.fillReport(BOBINA, p, con), jp);
+
+            for (String seccione : secciones) {
                 p.put("SECCION", seccione);
-                unirPaginas(JasperFillManager.fillReport(SECCIONES, p, conexion.conectar()), jp);
+                unirPaginas(JasperFillManager.fillReport(SECCIONES, p, con), jp);
             }
-            
-            unirPaginas(JasperFillManager.fillReport(HERMETICIDAD, p, conexion.conectar()), jp);
-            unirPaginas(JasperFillManager.fillReport(PINTURA, p, conexion.conectar()), jp);                        
-            
+
+            unirPaginas(JasperFillManager.fillReport(HERMETICIDAD, p, con), jp);
+            unirPaginas(JasperFillManager.fillReport(PINTURA, p, con), jp);
+
             int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
             int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
-            
-            Rectangle Barra=GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();             
-            
+
+            Rectangle Barra = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
             JasperViewer jv1 = new JasperViewer(jp, false);
-            jv1.setSize(ancho/2, alto-(alto-Barra.height));
+            jv1.setSize(ancho / 2, alto - (alto - Barra.height));
             jv1.setLocation(0, 0);
             jv1.setVisible(true);
-            
-            jv1 = new JasperViewer(JasperFillManager.fillReport(SEGUIMIENTO, p, conexion.conectar()), false);
-            jv1.setSize(ancho/2, alto-(alto-Barra.height));
-            jv1.setLocation(ancho/2, 0);
+
+            JasperPrint jp2 = JasperFillManager.fillReport(SEGUIMIENTO, p, con);
+            unirPaginas(JasperFillManager.fillReport(ENCUBE, p, con), jp2);
+            jv1 = new JasperViewer(jp2, false);
+            jv1.setSize(ancho / 2, alto - (alto - Barra.height));
+            jv1.setLocation(ancho / 2, 0);
             jv1.setVisible(true);
 //            JasperViewer.viewReport(jp, false);
 //            JasperViewer.viewReport(JasperFillManager.fillReport(SEGUIMIENTO, p, conexion.conectar()), false);
-            
+
 //            FileOutputStream fileOut = new FileOutputStream("MergeReportTemplate.pdf");
 //            JRExporter exporter = new JRPdfExporter();
 //            exporter.setParameter(JRPdfExporterParameter.FORCE_LINEBREAK_POLICY, Boolean.TRUE);
@@ -1479,7 +1523,6 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
 //            exporter.exportReport();
 //            fileOut.flush();
 //            fileOut.close();
-            
             //JRSaver.saveObject(dst, new java.io.File("hola.jasper"));
 //            JasperExportManager.
 //            byte[] pdf = generateReport(jasperPrintList);
@@ -1487,27 +1530,26 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
 //            out.write(pdf);
 //            out.close();
 //            Desktop.getDesktop ().open(new java.io.File("SECCIONES.pdf"));
-            
-        }catch(Exception ex){
+        } catch (Exception ex) {
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
-            modelo.Metodos.M("ERROR AL GENERAR EL REPORTE\n"+ex, "error.png");
+            modelo.Metodos.M("ERROR AL GENERAR EL REPORTE\n" + ex, "error.png");
         }
     }//GEN-LAST:event_subMenuImprimirTodosLosFormatosActionPerformed
 
     private void btnInsertarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInsertarActionPerformed
-        try{
-            if(tablaTrafos.getRowCount()==1){
+        try {
+            if (tablaTrafos.getRowCount() == 1) {
                 String serie = modeloTabla.getValueAt(0, 4).toString();
                 int veces = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el numero de item a insertar:", 0));
-                if(veces>0 && !serie.isEmpty()){
+                if (veces > 0 && !serie.isEmpty()) {
                     int serien = Integer.parseInt(serie);
-                    for (int i = 2; i <= veces; i++) {                        
+                    for (int i = 2; i <= veces; i++) {
                         modeloTabla.addRow(new Object[]{
                             "",
                             (i),//"N°",
                             "",//"REMISION",
                             "",//"N° EMPRESA",
-                            (serien+=1),//"N° SEIRE",
+                            (serien += 1),//"N° SEIRE",
                             modeloTabla.getValueAt(0, 5),//"MARCA",
                             modeloTabla.getValueAt(0, 6),//"KVA",
                             modeloTabla.getValueAt(0, 7),//"FASE",
@@ -1528,45 +1570,45 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
                         });
                     }
                 }
-            }else{
+            } else {
                 modelo.Metodos.M("Inserte sólo una fila con los datos principales del transformador.", "advertencia.png");
             }
-        }catch (Exception e){
-            modelo.Metodos.M("ERROR\n"+e, "error.png");
+        } catch (Exception e) {
+            modelo.Metodos.M("ERROR\n" + e, "error.png");
         }
     }//GEN-LAST:event_btnInsertarActionPerformed
 
     private void imprimirHojasDeRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imprimirHojasDeRutaActionPerformed
         try {
             JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA.jasper").toString()));
-            Map<String, Object> p = new HashMap<>();            
+            Map<String, Object> p = new HashMap<>();
             p.put("IDENTRADA", getIDENTRADA());
             JasperPrint jp = JasperFillManager.fillReport(reporte, p, conexion.conectar());
-            
+
             int ancho = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
             int alto = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
-            
-            Rectangle Barra=GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();             
-            
+
+            Rectangle Barra = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
             JasperViewer jv1 = new JasperViewer(jp, false);
-            jv1.setSize(ancho/2, alto-(alto-Barra.height));
+            jv1.setSize(ancho / 2, alto - (alto - Barra.height));
             jv1.setLocation(0, 0);
             jv1.setVisible(true);
-            
+
             jv1 = new JasperViewer(JasperFillManager.fillReport(
                     (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA_1.jasper").toString())), null, new JREmptyDataSource()), false);
-            jv1.setSize(ancho/2, alto-(alto-Barra.height));
-            jv1.setLocation(ancho/2, 0);
+            jv1.setSize(ancho / 2, alto - (alto - Barra.height));
+            jv1.setLocation(ancho / 2, 0);
             jv1.setVisible(true);
-                        
+
         } catch (MalformedURLException | JRException ex) {
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_imprimirHojasDeRutaActionPerformed
 
     private void subMenuRegistrarObservacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuRegistrarObservacionActionPerformed
-        
-        Dialogos.RegistrarDiferencia rd = new RegistrarDiferencia(this, true);        
+
+        Dialogos.RegistrarDiferencia rd = new RegistrarDiferencia(this, true);
         try {
             rd.setIdtransformador((int) modeloTabla.getValueAt(rowSorter.convertRowIndexToModel(tablaTrafos.getSelectedRow()), 0));
             rd.cargarDiferencia();
@@ -1576,36 +1618,50 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         rd.setVisible(true);
     }//GEN-LAST:event_subMenuRegistrarObservacionActionPerformed
 
-    private void unirPaginas(JasperPrint source, JasperPrint dst){
+    private void tarjetaDeAprobacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tarjetaDeAprobacionActionPerformed
+        try {
+            JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/TARJETA_ALMACEN.jasper").toString()));
+            Map<String, Object> p = new HashMap<>();
+            p.put("IDENTRADA", getIDENTRADA());
+            JasperPrint jp = JasperFillManager.fillReport(reporte, p, conexion.conectar());
+            
+            JasperViewer jv1 = new JasperViewer(jp, false);
+            jv1.setVisible(true);
+        } catch (Exception ex) {
+            Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_tarjetaDeAprobacionActionPerformed
+
+    private void unirPaginas(JasperPrint source, JasperPrint dst) {
         List<JRPrintPage> pages = source.getPages();
-        pages.stream().forEach((page) ->{
+        pages.stream().forEach((page) -> {
             dst.addPage(page);
-        });        
+        });
     }
-    
-    public byte[] generateReport(List<JasperPrint> jasperPrintList){
-      //throw the JasperPrint Objects in a list
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();     
-      JRPdfExporter exporter = new JRPdfExporter();
-      //Add the list as a Parameter
-      exporter.setParameter(JRExporterParameter.JASPER_PRINT_LIST, jasperPrintList);
-      //this will make a bookmark in the exported PDF for each of the reports
-      exporter.setParameter(JRPdfExporterParameter.IS_CREATING_BATCH_MODE_BOOKMARKS, Boolean.TRUE);
+
+    public byte[] generateReport(List<JasperPrint> jasperPrintList) {
+        //throw the JasperPrint Objects in a list
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        JRPdfExporter exporter = new JRPdfExporter();
+        //Add the list as a Parameter
+        exporter.setParameter(JRExporterParameter.JASPER_PRINT_LIST, jasperPrintList);
+        //this will make a bookmark in the exported PDF for each of the reports
+        exporter.setParameter(JRPdfExporterParameter.IS_CREATING_BATCH_MODE_BOOKMARKS, Boolean.TRUE);
 //      exporter.setParameter(JRPdfExporterParameter.IS_COMPRESSED, Boolean.TRUE);      
-      exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
-      exporter.setParameter(JRExporterParameter.OUTPUT_FILE, new java.io.File("ya.jasper"));
-        try {      
-            exporter.exportReport();            
+        exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+        exporter.setParameter(JRExporterParameter.OUTPUT_FILE, new java.io.File("ya.jasper"));
+        try {
+            exporter.exportReport();
         } catch (JRException ex) {
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
-      return baos.toByteArray();
+        return baos.toByteArray();
     }
-    
-    public static void main(String args[]){
+
+    public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if("Windows".equals(info.getName())){
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -1613,11 +1669,11 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(EntradaDeTrafos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        java.awt.EventQueue.invokeLater(()->{
+        java.awt.EventQueue.invokeLater(() -> {
             new EntradaDeTrafos().setVisible(true);
         });
     }
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JProgressBar barra;
@@ -1684,8 +1740,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     public javax.swing.JMenuItem subMenuItemEliminarTrafo;
     private javax.swing.JMenuItem subMenuRegistrarObservacion;
     public javax.swing.JTable tablaTrafos;
+    private javax.swing.JMenuItem tarjetaDeAprobacion;
     // End of variables declaration//GEN-END:variables
-
 
     public int getIDENTRADA() {
         return IDENTRADA;
@@ -1694,5 +1750,5 @@ public class EntradaDeTrafos extends javax.swing.JFrame{
     public void setIDENTRADA(int IDENTRADA) {
         this.IDENTRADA = IDENTRADA;
     }
-    
+
 }

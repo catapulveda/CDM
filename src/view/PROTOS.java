@@ -879,6 +879,9 @@ public class PROTOS extends javax.swing.JFrame{
         jLabel82 = new javax.swing.JLabel();
         comboCliente = new javax.swing.JComboBox<>();
         jSeparator3 = new javax.swing.JToolBar.Separator();
+        jLabel85 = new javax.swing.JLabel();
+        comboContrato = new javax.swing.JComboBox<>();
+        jSeparator7 = new javax.swing.JToolBar.Separator();
         jLabel83 = new javax.swing.JLabel();
         cjBuscarPorLote = new CompuChiqui.JTextFieldPopup();
         jSeparator4 = new javax.swing.JToolBar.Separator();
@@ -1148,7 +1151,7 @@ public class PROTOS extends javax.swing.JFrame{
         jLabel21.setText("Referencia:");
         jPanel3.add(jLabel21);
 
-        comboReferenciaAceite.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HYVOLT", "LUB TROIL TIPO II", "FR3", "EPM", "INHIBIDO TIPO II", "NYTRO IZAR II", "N/A" }));
+        comboReferenciaAceite.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "HYVOLT", "LUB TROIL TIPO II", "FR3", "EPM", "INHIBIDO TIPO II", "NYTRO IZAR II", "ADV-1601", "N/A" }));
         jPanel3.add(comboReferenciaAceite);
 
         jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -1996,6 +1999,19 @@ public class PROTOS extends javax.swing.JFrame{
         jToolBar1.add(comboCliente);
         jToolBar1.add(jSeparator3);
 
+        jLabel85.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
+        jLabel85.setText("Contrato:");
+        jToolBar1.add(jLabel85);
+
+        comboContrato.setMaximumRowCount(20);
+        comboContrato.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                comboContratoItemStateChanged(evt);
+            }
+        });
+        jToolBar1.add(comboContrato);
+        jToolBar1.add(jSeparator7);
+
         jLabel83.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel83.setText("Lote:");
         jToolBar1.add(jLabel83);
@@ -2483,6 +2499,10 @@ public class PROTOS extends javax.swing.JFrame{
         // TODO add your handling code here:
     }//GEN-LAST:event_mostrarProtocoloActionPerformed
 
+    private void comboContratoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboContratoItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboContratoItemStateChanged
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -2589,6 +2609,7 @@ public class PROTOS extends javax.swing.JFrame{
     private javax.swing.JComboBox<String> comboAceite;
     private javax.swing.JComboBox<String> comboClaseAislamiento;
     public javax.swing.JComboBox<Cliente> comboCliente;
+    public javax.swing.JComboBox<Cliente> comboContrato;
     private javax.swing.JComboBox<String> comboDerivacion;
     private javax.swing.JComboBox<String> comboFase;
     private javax.swing.JComboBox<String> comboFrecuencia;
@@ -2685,6 +2706,7 @@ public class PROTOS extends javax.swing.JFrame{
     private javax.swing.JLabel jLabel82;
     private javax.swing.JLabel jLabel83;
     private javax.swing.JLabel jLabel84;
+    private javax.swing.JLabel jLabel85;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -2716,6 +2738,7 @@ public class PROTOS extends javax.swing.JFrame{
     private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar.Separator jSeparator5;
     private javax.swing.JToolBar.Separator jSeparator6;
+    private javax.swing.JToolBar.Separator jSeparator7;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;

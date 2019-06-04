@@ -35,11 +35,11 @@ t.kvasalida, t.tps, t.tss, t.tts, t.serviciosalida, t.numeroserie, t.fase
 FROM entrada e
 INNER JOIN transformador t ON t.identrada=e.identrada
 INNER JOIN cliente c ON e.idcliente=c.idcliente
-WHERE e.identrada=$P{IDENTRADA} AND t.serviciosalida!='DADO DE BAJA';]]>
+WHERE e.identrada=$P{IDENTRADA} AND t.serviciosalida='REPARACION';]]>
 	</queryString>
 	<field name="nombrecliente" class="java.lang.String"/>
 	<field name="lote" class="java.lang.String"/>
-	<field name="op" class="java.lang.String"/>
+	<field name="op" class="java.lang.Integer"/>
 	<field name="ano" class="java.lang.Integer"/>
 	<field name="marca" class="java.lang.String"/>
 	<field name="kvasalida" class="java.lang.Double"/>
