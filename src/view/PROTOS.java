@@ -434,7 +434,7 @@ public class PROTOS extends javax.swing.JFrame{
             "            i2ra85, impedancia, impedancia85, impedanciagarantizada, reg, \n" +
             "            ef, largotanque, anchotanque, altotanque, color, espesor, radiadores, \n" +
             "            largoradiador, altoradiador, observaciones, fechalaboratorio, \n" +
-            "            fechaderegistro, estadoservicio, garantia, idusuario)\n" +
+            "            fechaderegistro, estadoservicio, garantia, idusuario, btcontraatytierra, atcontrabtytierra)\n" +
             "    VALUES ("+IDTRAFO+", '"+cjprotocolo.getText()+"', '"+comboFrecuencia.getSelectedItem()+"', '"+comboRefrigeracion.getSelectedItem()+"', \n" +
             "            '"+cjtensionSerie.getText()+"', '"+cjnba.getText()+"', '"+cjcalentamientodevanado.getText()+"', '"+comboClaseAislamiento.getSelectedItem()+"', '"+cjaltdiseno.getText()+"', \n" +
             "            '"+comboDerivacion.getSelectedItem()+"', '"+cji1.getText()+"', '"+cji2.getText()+"', '"+cjtemperatura.getText()+"', '"+conmutador.getSelectedItem()+"', \n" +
@@ -453,7 +453,7 @@ public class PROTOS extends javax.swing.JFrame{
                      + " '"+cjimpedancia85.getText()+"', '"+cjimpedanciagarantizado.getText()+"', '"+cjreg.getText()+"', \n" +
             "            '"+cjef.getText()+"', '"+cjlargo.getText()+"', '"+cjancho.getText()+"', '"+cjalto.getText()+"', '"+cjcolor.getText()+"', '"+cjespesor.getText()+"', '"+cjelementos.getText()+"', \n" +
             "            '"+cjlargoelemento.getText()+"', '"+cjaltoelemento.getText()+"', '"+cjobservaciones.getText()+"', '"+cjfechasalida.getDate()+"', \n" +
-            "            '"+new java.util.Date()+"', '"+ESTADO_TRAFO+"' , '"+checkGarantia.isSelected()+"' , "+sesion.getIdUsuario()+")";
+            "            '"+new java.util.Date()+"', '"+ESTADO_TRAFO+"' , '"+checkGarantia.isSelected()+"' , "+sesion.getIdUsuario()+", "+cjBTcontraATyTierra.getText()+", "+cjATcontraBTyTierra.getText()+")";
                 }else{
                     GUARDAR = "UPDATE public.protocolos SET\n" +
             "            frecuencia='"+comboFrecuencia.getSelectedItem()+"', refrigeracion='"+comboRefrigeracion.getSelectedItem()+"', \n" +
@@ -470,11 +470,11 @@ public class PROTOS extends javax.swing.JFrame{
             "            i2ra85='"+cji2ra85.getText()+"', impedancia='"+cjimpedancia.getText()+"', impedancia85='"+cjimpedancia85.getText()+"', impedanciagarantizada='"+cjimpedanciagarantizado.getText()+"', reg='"+cjreg.getText()+"', \n" +
             "            ef='"+cjef.getText()+"', largotanque='"+cjlargo.getText()+"', anchotanque='"+cjancho.getText()+"', altotanque='"+cjalto.getText()+"', color='"+cjcolor.getText()+"', espesor='"+cjespesor.getText()+"', radiadores='"+cjelementos.getText()+"', \n" +
             "            largoradiador='"+cjlargoelemento.getText()+"', altoradiador='"+cjaltoelemento.getText()+"', observaciones='"+cjobservaciones.getText()+"', fechalaboratorio='"+cjfechasalida.getDate()+"', \n" +
-            "            estadoservicio='"+ESTADO_TRAFO+"' , garantia='"+checkGarantia.isSelected()+"' , idusuario="+sesion.getIdUsuario()+" WHERE idprotocolo="+IDPROTOCOLO+" ";
+            "            estadoservicio='"+ESTADO_TRAFO+"' , garantia='"+checkGarantia.isSelected()+"' , idusuario="+sesion.getIdUsuario()+", btcontraatytierra="+cjBTcontraATyTierra.getText()+" , atcontrabtytierra="+cjATcontraBTyTierra.getText()+" WHERE idprotocolo="+IDPROTOCOLO+" ";
                 }
                 if(conex.GUARDAR(GUARDAR)){
                     modelo.Metodos.M("PROTOCOLO "+((ACTUALIZANDO)?"ACTUALIZADO":"REGISTRADO"), "bien.png");                    
-                    try{                        
+                    try{
                         btnGuardar.setEnabled(false);
                         btnGuardar.setIcon(new ImageIcon(getClass().getResource("/recursos/images/gif.gif")));
                         JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PROTOCOLO.jasper").toString()));
