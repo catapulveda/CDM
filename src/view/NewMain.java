@@ -36,13 +36,13 @@ public class NewMain {
 //        String postal = response.getPostal().getCode();
 //        String state = response.getLeastSpecificSubdivision().getName();        
 
-        File epm = new File("cdm.png");
+        File epm = new File("caribe.png");
         BufferedImage bImage = ImageIO.read(epm);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ImageIO.write(bImage, "png", bos);
         byte[] data = bos.toByteArray();
         
-        String sql = "UPDATE cliente SET logo=? WHERE idcliente=60";
+        String sql = "UPDATE cliente SET logo=? WHERE idcliente=2";
         ConexionBD con = new ConexionBD();
         con.conectar();
         PreparedStatement ps = con.getConexion().prepareStatement(sql);
