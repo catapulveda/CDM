@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PRODUCCION" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5eddb234-9a72-47fc-a18b-8bb1971b6e2f">
 	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="1032"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
