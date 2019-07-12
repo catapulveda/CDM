@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PROTOCOLO" pageWidth="595" pageHeight="842" columnWidth="575" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="eb75b2e1-959a-4fb9-b1e1-471136a585b3">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="96"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF">
 		<box>
@@ -20,14 +20,9 @@
 			<style backcolor="#F0F8FF"/>
 		</conditionalStyle>
 	</style>
-	<parameter name="IDPROTOCOLO" class="java.lang.Integer"/>
-	<parameter name="BTcontraAT" class="java.lang.String"/>
-	<parameter name="ATcontraBT" class="java.lang.String"/>
-	<parameter name="tension1" class="java.lang.Integer"/>
-	<parameter name="tension2" class="java.lang.Integer"/>
-	<parameter name="tension3" class="java.lang.Integer"/>
-	<parameter name="tension4" class="java.lang.Integer"/>
-	<parameter name="tension5" class="java.lang.Integer"/>
+	<parameter name="IDPROTOCOLO" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[28818]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT * FROM protocolos 
 INNER JOIN transformador t USING(idtransformador)
@@ -116,7 +111,10 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 	<field name="fechalaboratorio" class="java.sql.Timestamp"/>
 	<field name="fechaderegistro" class="java.sql.Timestamp"/>
 	<field name="estadoservicio" class="java.lang.String"/>
+	<field name="garantia" class="java.lang.Boolean"/>
 	<field name="idusuario" class="java.lang.Integer"/>
+	<field name="btcontraatytierra" class="java.lang.Double"/>
+	<field name="atcontrabtytierra" class="java.lang.Double"/>
 	<field name="item" class="java.lang.Integer"/>
 	<field name="numeroempresa" class="java.lang.String"/>
 	<field name="numeroserie" class="java.lang.String"/>
@@ -150,6 +148,8 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 	<field name="identrada" class="java.lang.Integer"/>
 	<field name="iddespacho" class="java.lang.Integer"/>
 	<field name="idremision" class="java.lang.Integer"/>
+	<field name="causadefalla" class="java.lang.String"/>
+	<field name="diferencia" class="java.lang.String"/>
 	<field name="idcliente" class="java.lang.Integer"/>
 	<field name="idciudad" class="java.lang.Integer"/>
 	<field name="idconductor" class="java.lang.Integer"/>
@@ -157,7 +157,7 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 	<field name="nombrepc" class="java.lang.String"/>
 	<field name="lote" class="java.lang.String"/>
 	<field name="contrato" class="java.lang.String"/>
-	<field name="op" class="java.lang.String"/>
+	<field name="op" class="java.lang.Integer"/>
 	<field name="centrodecostos" class="java.lang.String"/>
 	<field name="fecharecepcion" class="java.sql.Timestamp"/>
 	<field name="fecharegistrado" class="java.sql.Timestamp"/>
@@ -165,30 +165,57 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 	<field name="fechaliberado" class="java.sql.Timestamp"/>
 	<field name="observacion" class="java.lang.String"/>
 	<field name="placavehiculo" class="java.lang.String"/>
+	<field name="nuevo" class="java.lang.Boolean"/>
+	<field name="representante" class="java.lang.String"/>
 	<field name="nombrecliente" class="java.lang.String"/>
 	<field name="nitcliente" class="java.lang.String"/>
-	<variable name="variable1" class="java.lang.Integer">
-		<variableExpression><![CDATA[]]></variableExpression>
+	<field name="username" class="java.lang.String"/>
+	<field name="password" class="java.lang.String"/>
+	<field name="logo" class="java.lang.Object"/>
+	<variable name="factor" class="java.lang.Double">
+		<variableExpression><![CDATA[(($F{conmutador}-1)>0)?1+(($F{conmutador}-1)*2.5/100):1]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
-	<variable name="variable2" class="java.lang.Integer">
-		<variableExpression><![CDATA[$P{tension2}]]></variableExpression>
+	<variable name="tension1" class="java.lang.Long">
+		<variableExpression><![CDATA[java.lang.Math.round($F{tps}*($V{factor}))]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
-	<variable name="variable3" class="java.lang.Integer">
-		<variableExpression><![CDATA[$P{tension3}]]></variableExpression>
+	<variable name="tension2" class="java.lang.Long">
+		<variableExpression><![CDATA[java.lang.Math.round($F{tps}*($V{factor}-0.025))]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
-	<variable name="variable4" class="java.lang.Integer">
-		<variableExpression><![CDATA[$P{tension4}]]></variableExpression>
+	<variable name="tension3" class="java.lang.Long">
+		<variableExpression><![CDATA[java.lang.Math.round($F{tps}*($V{factor}-0.025*2))]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
-	<variable name="variable5" class="java.lang.Integer">
-		<variableExpression><![CDATA[$P{tension5}]]></variableExpression>
+	<variable name="tension4" class="java.lang.Long">
+		<variableExpression><![CDATA[java.lang.Math.round($F{tps}*($V{factor}-0.025*3))]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="tension5" class="java.lang.Long">
+		<variableExpression><![CDATA[java.lang.Math.round($F{tps}*($V{factor}-0.025*4))]]></variableExpression>
+		<initialValueExpression><![CDATA[]]></initialValueExpression>
+	</variable>
+	<variable name="multiplicador" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{fase}==1?1:Math.sqrt(3)]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
 	</variable>
 	<detail>
 		<band height="770" splitType="Stretch">
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="250" y="688" width="105" height="51" uuid="0ef697c0-4e55-4ae7-ad71-b4765bfe3225"/>
+				<imageExpression><![CDATA["IMAGENES\\FRANCISCO.png"]]></imageExpression>
+			</image>
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="54" y="686" width="105" height="51" uuid="c0dff157-2cb8-49dc-a230-e73ce621bc71"/>
+				<imageExpression><![CDATA["IMAGENES\\ALEX.png"]]></imageExpression>
+			</image>
+			<rectangle radius="5">
+				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="3" y="690" width="567" height="55" isPrintWhenDetailOverflows="true" uuid="5a9fcaee-a30d-44fb-88a7-74df5230288e"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
 			<rectangle radius="5">
 				<reportElement x="3" y="230" width="568" height="15" uuid="7c1f790c-e44a-4dc2-8b7e-d83e815c6e01"/>
 				<graphicElement>
@@ -477,21 +504,21 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{tension4}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{tension4}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="74" y="337" width="74" height="11" uuid="ef2b7a61-1042-4fb8-8cf4-34c64a4a2ce8"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{tension3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{tension3}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="74" y="359" width="74" height="11" uuid="d615cbfe-19fb-4360-ab9d-1876e06a18e5"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{tension5}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{tension5}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="13" y="315" width="40" height="11" uuid="b9f12310-7e17-4985-a86d-2b92eaba43c8"/>
@@ -785,14 +812,14 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{ATcontraBT}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{atcontrabtytierra}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="200" y="438" width="58" height="12" uuid="5bc76cf4-fbd4-418b-aa2c-4e7d8a8c4a13"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{BTcontraAT}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{btcontraatytierra}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="14" y="427" width="59" height="24" uuid="ddd40df6-9769-4fa6-96a1-5360ffb09d6a"/>
@@ -1688,20 +1715,6 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 				</textElement>
 				<text><![CDATA[Oferta No:]]></text>
 			</staticText>
-			<image hAlign="Center" vAlign="Middle">
-				<reportElement x="250" y="688" width="105" height="51" uuid="0ef697c0-4e55-4ae7-ad71-b4765bfe3225"/>
-				<imageExpression><![CDATA["IMAGENES\\FRANCISCO.png"]]></imageExpression>
-			</image>
-			<image hAlign="Center" vAlign="Middle">
-				<reportElement x="54" y="686" width="105" height="51" uuid="c0dff157-2cb8-49dc-a230-e73ce621bc71"/>
-				<imageExpression><![CDATA["IMAGENES\\ALEX.png"]]></imageExpression>
-			</image>
-			<rectangle radius="5">
-				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="3" y="690" width="567" height="55" isPrintWhenDetailOverflows="true" uuid="5a9fcaee-a30d-44fb-88a7-74df5230288e"/>
-				<graphicElement>
-					<pen lineWidth="0.5"/>
-				</graphicElement>
-			</rectangle>
 			<textField>
 				<reportElement x="0" y="758" width="575" height="12" isPrintWhenDetailOverflows="true" uuid="833e9137-fdfc-40ef-b5a9-961b1ff28966"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
@@ -1899,26 +1912,19 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 				</textElement>
 				<text><![CDATA[U - V:]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="74" y="315" width="74" height="11" uuid="ae3f1959-08bd-43b6-8923-9b3d6d28ae62"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial" size="8" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{tension1}]]></textFieldExpression>
-			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="381" y="315" width="40" height="11" uuid="fadd88f2-e058-496e-8361-bffa003764a2"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{fase}==1)?($P{tension1}/$F{tss}.doubleValue()):($P{tension1}*Math.sqrt(3))/$F{tss}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($V{tension1}*$V{multiplicador})/$F{tss}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="74" y="326" width="74" height="11" uuid="a6cb981b-320e-470e-8a0f-b82e0cb13375"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{tension2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{tension2}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="3" y="212" width="568" height="14" uuid="37b71290-fb7a-4d08-8c12-35e1ce9d1d22"/>
@@ -1964,98 +1970,98 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{fase}==1)?($V{variable2}/$F{tss}.doubleValue()):($V{variable2}*Math.sqrt(3))/$F{tss}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($V{tension2}*$V{multiplicador})/$F{tss}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="381" y="337" width="40" height="11" uuid="212b356d-2908-4f60-a9ac-584fdac0dfbd"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{fase}==1)?($V{variable3}/$F{tss}.doubleValue()):($V{variable3}*Math.sqrt(3))/$F{tss}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($V{tension3}*$V{multiplicador})/$F{tss}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="381" y="348" width="40" height="11" uuid="636919ab-a623-4197-82bb-264531fef913"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{fase}==1)?($V{variable4}/$F{tss}.doubleValue()):($V{variable4}*Math.sqrt(3))/$F{tss}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($V{tension4}*$V{multiplicador})/$F{tss}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="381" y="359" width="40" height="11" uuid="fbe15998-323a-48a1-bf16-de20a0b091c2"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($F{fase}==1)?($V{variable5}/$F{tss}.doubleValue()):($V{variable5}*Math.sqrt(3))/$F{tss}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($V{tension5}*$V{multiplicador})/$F{tss}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="448" y="359" width="40" height="11" uuid="f4373889-be56-47f3-a1b5-99c49b1e1c7c"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($V{variable5}/$F{tss}.doubleValue()):($V{variable5}*Math.sqrt(3))/$F{tss})*0.995]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension5}*$V{multiplicador})/$F{tss})*0.995]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="448" y="337" width="40" height="11" uuid="6370c0be-06c4-40ac-b342-40e6ab768e1e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($V{variable3}/$F{tss}.doubleValue()):($V{variable3}*Math.sqrt(3))/$F{tss})*0.995]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension3}*$V{multiplicador})/$F{tss})*0.995]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="448" y="348" width="40" height="11" uuid="0c6deb44-337a-477d-83a9-872f9f80eb1e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($V{variable4}/$F{tss}.doubleValue()):($V{variable4}*Math.sqrt(3))/$F{tss})*0.995]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension4}*$V{multiplicador})/$F{tss})*0.995]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="448" y="315" width="40" height="11" uuid="8bc03561-4ce9-48b3-b801-a6f8c68e7d7c"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($P{tension1}/$F{tss}.doubleValue()):($P{tension1}*Math.sqrt(3))/$F{tss})*0.995]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension1}*$V{multiplicador})/$F{tss})*0.995]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="448" y="326" width="40" height="11" uuid="f338defc-637e-4c47-a8a2-eea64186cee8"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($V{variable2}/$F{tss}.doubleValue()):($V{variable2}*Math.sqrt(3))/$F{tss})*0.995]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension2}*$V{multiplicador})/$F{tss})*0.995]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="517" y="359" width="40" height="11" uuid="54445cde-59fd-4fe7-9bc6-22dd87d4e04f"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($V{variable5}/$F{tss}.doubleValue()):($V{variable5}*Math.sqrt(3))/$F{tss})*1.005]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension5}*$V{multiplicador})/$F{tss})*1.005]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="517" y="337" width="40" height="11" uuid="a7a87d55-4aa8-43ee-8a20-93d0733e822b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($V{variable3}/$F{tss}.doubleValue()):($V{variable3}*Math.sqrt(3))/$F{tss})*1.005]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension3}*$V{multiplicador})/$F{tss})*1.005]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="517" y="348" width="40" height="11" uuid="e0fba3ed-b14d-46ea-89d7-33b87ac097b0"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($V{variable4}/$F{tss}.doubleValue()):($V{variable4}*Math.sqrt(3))/$F{tss})*1.005]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension4}*$V{multiplicador})/$F{tss})*1.005]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="517" y="315" width="40" height="11" uuid="46aa037d-cadf-49d1-91ac-07c6b4a1fd08"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($P{tension1}/$F{tss}.doubleValue()):($P{tension1}*Math.sqrt(3))/$F{tss})*1.005]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension1}*$V{multiplicador})/$F{tss})*1.005]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.000">
 				<reportElement x="517" y="326" width="40" height="11" uuid="5a256d08-0b45-408d-9636-8d60b492e7e7"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{fase}==1)?($V{variable2}/$F{tss}.doubleValue()):($V{variable2}*Math.sqrt(3))/$F{tss})*1.005]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(($V{tension2}*$V{multiplicador})/$F{tss})*1.005]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="495" y="196" width="68" height="12" uuid="43e6ba88-1491-44e1-b780-00f6ca0982f9"/>
@@ -2070,6 +2076,13 @@ WHERE idprotocolo=$P{IDPROTOCOLO}]]>
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{i1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="74" y="315" width="74" height="11" uuid="6c19a3c1-8f87-43df-97b9-f1b55db6ab00"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{tension1}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

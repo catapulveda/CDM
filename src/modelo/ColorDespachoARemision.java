@@ -10,7 +10,7 @@ import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
-public class ColorPrepararDespacho extends DefaultTableCellRenderer{
+public class ColorDespachoARemision extends DefaultTableCellRenderer{
 
     Color celda_error = new Color(185,63,51);
     Color vigente = new Color(138,224,132);
@@ -46,8 +46,8 @@ public class ColorPrepararDespacho extends DefaultTableCellRenderer{
             c.setForeground(Color.black);
         }
 
-        if(column==9 || column == 10){
-            if(Double.parseDouble(""+table.getModel().getValueAt(row, 9)) != Double.parseDouble(""+table.getModel().getValueAt(row, 10))){
+        if(column==8 || column == 9){
+            if(Double.parseDouble(""+table.getModel().getValueAt(row, 8)) != Double.parseDouble(""+table.getModel().getValueAt(row, 9))){
                 c.setOpaque(true);
                 c.setBackground(new Color(210, 71, 38));
                 c.setForeground(Color.white);
@@ -56,24 +56,24 @@ public class ColorPrepararDespacho extends DefaultTableCellRenderer{
             }
         }
 
-        if(column == 11 || column == 12){
-            if( !(table.getModel().getValueAt(row, 11).toString().equals(table.getModel().getValueAt(row, 12).toString()))){
+        if(column == 10 || column == 11){
+            if( !(table.getModel().getValueAt(row, 10).toString().equals(table.getModel().getValueAt(row, 11).toString()))){
                 c.setOpaque(true);
                 c.setBackground(new Color(210, 71, 38));
                 c.setForeground(Color.white);
             }            
         }        
 
-        if(column == 13 || column == 14){
-            if( !(table.getModel().getValueAt(row, 13).toString().equals(table.getModel().getValueAt(row, 14).toString()))){
+        if(column == 12 || column == 13){
+            if( !(table.getModel().getValueAt(row, 12).toString().equals(table.getModel().getValueAt(row, 13).toString()))){
                 c.setOpaque(true);
                 c.setBackground(new Color(210, 71, 38));
                 c.setForeground(Color.white);
             } 
         }
 
-        if(column == 15 || column == 16){
-            if( !(table.getModel().getValueAt(row, 15).toString().equals(table.getModel().getValueAt(row, 16).toString()))){
+        if(column == 14 || column == 15){
+            if( !(table.getModel().getValueAt(row, 14).toString().equals(table.getModel().getValueAt(row, 15).toString()))){
                 c.setOpaque(true);
                 c.setBackground(new Color(210, 71, 38));
                 c.setForeground(Color.white);
@@ -93,30 +93,30 @@ public class ColorPrepararDespacho extends DefaultTableCellRenderer{
 
                 if(column==0){c.setOpaque(true);c.setBackground(new Color(210, 105, 30));}
 
-                if(column==9||column==10){
-                    if(Double.parseDouble(""+table.getModel().getValueAt(row, 9)) != Double.parseDouble(""+table.getModel().getValueAt(row, 10))){
+                if(column==8||column==9){
+                    if(Double.parseDouble(""+table.getModel().getValueAt(row, 8)) != Double.parseDouble(""+table.getModel().getValueAt(row, 9))){
                         c.setOpaque(true);
                         c.setBackground(new Color(210, 71, 38));
                     }
                 }
 
-                if( !(table.getModel().getValueAt(row, 11).toString().equals(table.getModel().getValueAt(row, 12).toString()))){
+                if( !(table.getModel().getValueAt(row, 10).toString().equals(table.getModel().getValueAt(row, 11).toString()))){
                     c.setOpaque(true);
-                    if(column == 11 || column == 12){
+                    if(column == 10 || column == 11){
                         c.setBackground(new Color(210, 71, 38));
                         c.setForeground(Color.white);
                     }
                 }
-                if( !(table.getModel().getValueAt(row, 13).toString().equals(table.getModel().getValueAt(row, 14).toString()))){
+                if( !(table.getModel().getValueAt(row, 12).toString().equals(table.getModel().getValueAt(row, 13).toString()))){
                     c.setOpaque(true);
-                    if(column == 13 || column == 14){
+                    if(column == 12 || column == 13){
                         c.setBackground(new Color(210, 71, 38));
                         c.setForeground(Color.white);
                     }
                 }
-                if( !(table.getModel().getValueAt(row, 15).toString().equals(table.getModel().getValueAt(row, 16).toString()))){
+                if( !(table.getModel().getValueAt(row, 14).toString().equals(table.getModel().getValueAt(row, 15).toString()))){
                     c.setOpaque(true);
-                    if(column == 15 || column == 16){
+                    if(column == 14 || column == 15){
                         c.setBackground(new Color(210, 71, 38));
                         c.setForeground(Color.white);
                     }
@@ -135,7 +135,7 @@ public class ColorPrepararDespacho extends DefaultTableCellRenderer{
     return c;
     }
 
-    public ColorPrepararDespacho() {        
+    public ColorDespachoARemision() {        
         setOpaque(true);
     }
     

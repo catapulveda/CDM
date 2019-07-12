@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Frame;
 import java.awt.HeadlessException;
+import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -25,7 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.stage.FileChooser;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -38,6 +41,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import modelo.Cliente;
@@ -55,7 +59,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class PROTOS extends javax.swing.JFrame{
+public class PROTOS extends javax.swing.JFrame {
 
     private String ESTADO_TRAFO = null;
     private boolean ACTUALIZANDO = false;
@@ -64,136 +68,135 @@ public class PROTOS extends javax.swing.JFrame{
     TableModelListener listenerTablaUno;
     Hilofases alertas;
     modelo.Sesion sesion = modelo.Sesion.getConfigurador(null, -1);
-    
+
     CustomTableModel modeloTabla;
     TableRowSorter rowSorter;
-    RowFilter<TableModel, Object>  compoundRowFilter;
+    RowFilter<TableModel, Object> compoundRowFilter;
     private int IDBUSQUEDA = 3;
-    
+
     private int idUsuario = 1;
-    
+
     TableColumnAdjuster ajustarColumna;
-    
+
     public PROTOS() {
         initComponents();
-              
+
         setExtendedState(Frame.MAXIMIZED_BOTH);
         cjfechasalida.setDate(new java.util.Date());
-        cjprotocolo.setText("A-"+modelo.Metodos.getConsecutivoRemision("protocolo", false)+"-"+new SimpleDateFormat("yy").format(new java.util.Date()));
-        habilitarCampos((comboFase.getSelectedIndex()==0));
-        
+        cjprotocolo.setText("A-" + modelo.Metodos.getConsecutivoRemision("protocolo", false) + "-" + new SimpleDateFormat("yy").format(new java.util.Date()));
+        habilitarCampos((comboFase.getSelectedIndex() == 0));
+
         ajustarColumna = new TableColumnAdjuster(tablaProtocolos);
-        cargarProtocolos(); 
-        
+        cargarProtocolos();
+
         comboCliente.addItem(new Cliente(-1, "Seleccione...", null));
         modelo.Cliente.cargarComboNombreClientes(comboCliente);
         comboCliente.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
-        
+
         comboCliente.setUI(JComboBoxColor.JComboBoxColor.createUI(comboCliente));
         comboCliente.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
     }
-    
-    void HallarTensionSerie(){
+
+    void HallarTensionSerie() {
         String tensionserie = "", nba = "";
-        tensionserie = (7000 <= cjvp.getInt() && cjvp.getInt() <= 15000)?"15":(16000 <= cjvp.getInt() && cjvp.getInt() <= 25000)?"25":(26000 <= cjvp.getInt() && cjvp.getInt() <= 38000)?"38":(39000 <= cjvp.getInt() && cjvp.getInt() <= 52000)?"52":(cjvp.getInt() <= 1200)?"1.2":"0";
-        nba = (7000 <= cjvp.getInt() && cjvp.getInt() <= 15000)?"95":(16000 <= cjvp.getInt() && cjvp.getInt() <= 25000)?"125":(26000 <= cjvp.getInt() && cjvp.getInt() <= 38000)?"200":(39000 <= cjvp.getInt() && cjvp.getInt() <= 52000)?"250":(cjvp.getInt() <= 1200)?"30":"0";
-        tensionserie += (cjvs.getInt()>1200)?"/15":"/1.2";
-        nba += (cjvs.getInt()<=1200)?"/30":(7000 <= cjvs.getInt() && cjvs.getInt() <= 15000)?"/95":"0";
+        tensionserie = (7000 <= cjvp.getInt() && cjvp.getInt() <= 15000) ? "15" : (16000 <= cjvp.getInt() && cjvp.getInt() <= 25000) ? "25" : (26000 <= cjvp.getInt() && cjvp.getInt() <= 38000) ? "38" : (39000 <= cjvp.getInt() && cjvp.getInt() <= 52000) ? "52" : (cjvp.getInt() <= 1200) ? "1.2" : "0";
+        nba = (7000 <= cjvp.getInt() && cjvp.getInt() <= 15000) ? "95" : (16000 <= cjvp.getInt() && cjvp.getInt() <= 25000) ? "125" : (26000 <= cjvp.getInt() && cjvp.getInt() <= 38000) ? "200" : (39000 <= cjvp.getInt() && cjvp.getInt() <= 52000) ? "250" : (cjvp.getInt() <= 1200) ? "30" : "0";
+        tensionserie += (cjvs.getInt() > 1200) ? "/15" : "/1.2";
+        nba += (cjvs.getInt() <= 1200) ? "/30" : (7000 <= cjvs.getInt() && cjvs.getInt() <= 15000) ? "/95" : "0";
         cjtensionSerie.setText(tensionserie);
         cjnba.setText(nba);
     }
-    
+
     public void HallarConexionYPolaridad() {
         if (comboFase.getSelectedIndex() == 0) {
-            comboGrupoConexion .setSelectedItem((cjvp.getInt()<=8000)?"Ii6":"Ii0");
-            comboPolaridad.setSelectedIndex((cjvp.getInt()<=8000)?1:0);
+            comboGrupoConexion.setSelectedItem((cjvp.getInt() <= 8000) ? "Ii6" : "Ii0");
+            comboPolaridad.setSelectedIndex((cjvp.getInt() <= 8000) ? 1 : 0);
         } else if (comboFase.getSelectedIndex() == 1) {
-            comboGrupoConexion .setSelectedItem("DYn5");
+            comboGrupoConexion.setSelectedItem("DYn5");
             comboPolaridad.setSelectedIndex(0);
         }
     }
-    
-    void HallarCorrientes(){
-        try{
-            cji1.setText(String.valueOf(QD(((cjkva.getDouble() * 1000) / ((comboFase.getSelectedIndex()==0)?1:Math.sqrt(3)) ) / cjvp.getInt(), 2)));
-            cji2.setText(String.valueOf
-        (QD(
-                ((cjkva.getDouble() * 1000) / ((comboFase.getSelectedIndex()==0)?1:Math.sqrt(3)) ) / cjvs.getInt(), 2)));
-        }catch(Exception e){
+
+    void HallarCorrientes() {
+        try {
+            cji1.setText(String.valueOf(QD(((cjkva.getDouble() * 1000) / ((comboFase.getSelectedIndex() == 0) ? 1 : Math.sqrt(3))) / cjvp.getInt(), 2)));
+            cji2.setText(String.valueOf(QD(
+                    ((cjkva.getDouble() * 1000) / ((comboFase.getSelectedIndex() == 0) ? 1 : Math.sqrt(3))) / cjvs.getInt(), 2)));
+        } catch (Exception e) {
             Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-    
-    void HallarPromedioCorrientes(){
-        if(comboFase.getSelectedIndex()==0){
+
+    void HallarPromedioCorrientes() {
+        if (comboFase.getSelectedIndex() == 0) {
             cjpromedioi.setText(String.valueOf(QD((cjiu.getDouble() / cji2.getDouble()) * 100, 2)));
-        }else{
+        } else {
             cjpromedioi.setText(String.valueOf(QD((((cjiu.getDouble() + cjiv.getDouble() + cjiw.getDouble()) / 3) / cji2.getDouble()) * 100, 2)));
         }
     }
-    
-    void HallarPromedioResistencias(){
-        if(comboFase.getSelectedIndex()==0){
-            cjproresalta.setText(""+cjuv.getDouble());
-            cjproresbaja.setText(""+cjxy.getDouble());
-        }else{
-            cjproresalta.setText(""+QD((cjuv.getDouble()+cjwu.getDouble()+cjvw.getDouble())/3, 2));
-            cjproresbaja.setText(""+QD((cjxy.getDouble()+cjyz.getDouble()+cjzx.getDouble())/3, 2));
-        }        
-    }        
-    
-    double I2R(){
-        if(comboFase.getSelectedIndex()==0){
-            cji2r.setText(""+QD(((Math.pow(cji1.getDouble(), 2) * cjproresalta.getDouble()) + (Math.pow(cji2.getDouble(), 2) * (cjproresbaja.getDouble() / 1000))), 2));
-            return ((Math.pow(cji1.getDouble(), 2) * cjproresalta.getDouble()) + (Math.pow(cji2.getDouble(), 2) * (cjproresbaja.getDouble() / 1000)));
-        }else{
-            cji2r.setText(""+QD(1.5 * ((Math.pow(cji1.getDouble(), 2) * cjproresalta.getDouble()) + (Math.pow(cji2.getDouble(), 2) * (cjproresbaja.getDouble() / 1000))), 2));
-            return 1.5 * ((Math.pow(cji1.getDouble(), 2) * cjproresalta.getDouble()) + (Math.pow(cji2.getDouble(), 2) * (cjproresbaja.getDouble() / 1000)));
-        }                
+
+    void HallarPromedioResistencias() {
+        if (comboFase.getSelectedIndex() == 0) {
+            cjproresalta.setText("" + cjuv.getDouble());
+            cjproresbaja.setText("" + cjxy.getDouble());
+        } else {
+            cjproresalta.setText("" + QD((cjuv.getDouble() + cjwu.getDouble() + cjvw.getDouble()) / 3, 2));
+            cjproresbaja.setText("" + QD((cjxy.getDouble() + cjyz.getDouble() + cjzx.getDouble()) / 3, 2));
+        }
     }
-    
-    double I2R85(){
+
+    double I2R() {
+        if (comboFase.getSelectedIndex() == 0) {
+            cji2r.setText("" + QD(((Math.pow(cji1.getDouble(), 2) * cjproresalta.getDouble()) + (Math.pow(cji2.getDouble(), 2) * (cjproresbaja.getDouble() / 1000))), 2));
+            return ((Math.pow(cji1.getDouble(), 2) * cjproresalta.getDouble()) + (Math.pow(cji2.getDouble(), 2) * (cjproresbaja.getDouble() / 1000)));
+        } else {
+            cji2r.setText("" + QD(1.5 * ((Math.pow(cji1.getDouble(), 2) * cjproresalta.getDouble()) + (Math.pow(cji2.getDouble(), 2) * (cjproresbaja.getDouble() / 1000))), 2));
+            return 1.5 * ((Math.pow(cji1.getDouble(), 2) * cjproresalta.getDouble()) + (Math.pow(cji2.getDouble(), 2) * (cjproresbaja.getDouble() / 1000)));
+        }
+    }
+
+    double I2R85() {
         cji2ra85.setText(String.valueOf(QD(I2R() * K(), 1)));
         return I2R() * K();
     }
-    
+
     double R() {
         return cjpcumedido.getDouble() / (10 * cjkva.getDouble());
     }
-    
+
     double R85() {
         return R() * K();
     }
-    
+
     double Z() {
-        cjimpedancia.setText(""+QD((cjvcc.getDouble() / cjvp.getDouble()) * 100, 3));
+        cjimpedancia.setText("" + QD((cjvcc.getDouble() / cjvp.getDouble()) * 100, 3));
         return (cjvcc.getDouble() / cjvp.getDouble()) * 100;
     }
-    
+
     public double Z85() {
         double Z85 = Math.sqrt((Math.pow(R85(), 2)) + (Math.pow(X(), 2)));
         cjimpedancia85.setText(String.valueOf(QD(Z85, 2)));
         return Z85;
     }
-    
+
     double X() {
         return Math.sqrt((Math.pow(Z(), 2)) - (Math.pow(R(), 2)));
     }
-    
-    double getkc(){
-        return (comboMaterialAlta.getSelectedItem().toString().equalsIgnoreCase("COBRE")&& comboMaterialBaja.getSelectedItem().equals("COBRE"))
-                ?234.5
-                :(comboMaterialAlta.getSelectedItem().toString().equalsIgnoreCase("ALUMINIO")&& comboMaterialBaja.getSelectedItem().equals("ALUMINIO"))
-                ?225
-                :229;        
+
+    double getkc() {
+        return (comboMaterialAlta.getSelectedItem().toString().equalsIgnoreCase("COBRE") && comboMaterialBaja.getSelectedItem().equals("COBRE"))
+                ? 234.5
+                : (comboMaterialAlta.getSelectedItem().toString().equalsIgnoreCase("ALUMINIO") && comboMaterialBaja.getSelectedItem().equals("ALUMINIO"))
+                ? 225
+                : 229;
     }
-    
-    double K(){
+
+    double K() {
         double K = 0;
-        if(comboRefrigeracion.getSelectedIndex() < 2){
+        if (comboRefrigeracion.getSelectedIndex() < 2) {
             K = (getkc() + 85) / (getkc() + Double.parseDouble(cjtemperatura.getText()));
-        }else if (comboRefrigeracion.getSelectedIndex() == 2){
-            switch (comboClaseAislamiento.getSelectedIndex()){
+        } else if (comboRefrigeracion.getSelectedIndex() == 2) {
+            switch (comboClaseAislamiento.getSelectedIndex()) {
                 case 1:
                     K = (getkc() + 75) / (getkc() + Double.parseDouble(cjtemperatura.getText()));
                     break;
@@ -213,53 +216,53 @@ public class PROTOS extends javax.swing.JFrame{
         }
         return K;
     }
-    
+
     public void CargarTablas() {
         try {
             tablaUno.getModel().removeTableModelListener(listenerTablaUno);
-            for (int i = 0; i < 5; i++){
-                tablaUno.setValueAt("Posic: "+(i+1), i, 0);
-                tablaUno.setValueAt((ACTUALIZANDO)?tablaUno.getValueAt(i, 2):0, i, 2);
-                tablaUno.setValueAt((ACTUALIZANDO)?tablaUno.getValueAt(i, 3):0, i, 3);
-                tablaUno.setValueAt((ACTUALIZANDO)?tablaUno.getValueAt(i, 4):0, i, 4);
+            for (int i = 0; i < 5; i++) {
+                tablaUno.setValueAt("Posic: " + (i + 1), i, 0);
+                tablaUno.setValueAt((ACTUALIZANDO) ? tablaUno.getValueAt(i, 2) : 0, i, 2);
+                tablaUno.setValueAt((ACTUALIZANDO) ? tablaUno.getValueAt(i, 3) : 0, i, 3);
+                tablaUno.setValueAt((ACTUALIZANDO) ? tablaUno.getValueAt(i, 4) : 0, i, 4);
             }
-            
+
             double factor = 1.0;
             tablaUno.setValueAt(Math.round(cjvp.getInt() * factor), conmutador.getSelectedIndex(), 1);
-            for (int i = conmutador.getSelectedIndex()+1; i < conmutador.getItemCount(); i++) {//ME PARO UNA FILA DESPUES DE DONDE VA LA POSICION DEL CONMUTADOR
-                factor = factor-(factor*0.025);
-                System.out.println("HACIA ABAJO FACTOR ES: "+factor);
-                tablaUno.setValueAt(Math.round( cjvp.getInt() * factor ), i, 1);
+            for (int i = conmutador.getSelectedIndex() + 1; i < conmutador.getItemCount(); i++) {//ME PARO UNA FILA DESPUES DE DONDE VA LA POSICION DEL CONMUTADOR
+                factor = factor - (factor * 0.025);
+                System.out.println("HACIA ABAJO FACTOR ES: " + factor);
+                tablaUno.setValueAt(Math.round(cjvp.getInt() * factor), i, 1);
             }
             factor = 1.0;
-            System.out.println("SELECCION ES "+conmutador.getSelectedIndex()+" -> "+(conmutador.getSelectedIndex()-1) );
-            for (int i = conmutador.getSelectedIndex()-1; i >= 0; i--) {//ME PARO UNA FILA ANTES DE DONDE VA LA POSICION DEL CONMUTADOR
-                factor = factor+(factor*0.025);
-                System.out.println("HACIA ARRIBA FACTOR ES: "+factor);
-                tablaUno.setValueAt(Math.round( cjvp.getInt() * factor ), i, 1);
+            System.out.println("SELECCION ES " + conmutador.getSelectedIndex() + " -> " + (conmutador.getSelectedIndex() - 1));
+            for (int i = conmutador.getSelectedIndex() - 1; i >= 0; i--) {//ME PARO UNA FILA ANTES DE DONDE VA LA POSICION DEL CONMUTADOR
+                factor = factor + (factor * 0.025);
+                System.out.println("HACIA ARRIBA FACTOR ES: " + factor);
+                tablaUno.setValueAt(Math.round(cjvp.getInt() * factor), i, 1);
             }
-            
+
             tablaUno.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             tablaUno.setCellSelectionEnabled(true);
 
-            for(int i = 0; i < tablaUno.getRowCount(); i++){
-                tablaDos.setValueAt(QD((Integer.parseInt(tablaUno.getValueAt(i, 1).toString()) * ((comboFase.getSelectedIndex()==0)?1:Math.sqrt(3)) ) / cjvs.getInt(), 3), i, 0);
-                tablaDos.setValueAt(QD((Integer.parseInt(tablaUno.getValueAt(i, 1).toString()) * ((comboFase.getSelectedIndex()==0)?1:Math.sqrt(3)) ) / cjvs.getInt(), 3) * 0.995, i, 1);
-                tablaDos.setValueAt(QD((Integer.parseInt(tablaUno.getValueAt(i, 1).toString()) * ((comboFase.getSelectedIndex()==0)?1:Math.sqrt(3)) ) / cjvs.getInt(), 3) * 1.005, i, 2);
+            for (int i = 0; i < tablaUno.getRowCount(); i++) {
+                tablaDos.setValueAt(QD((Integer.parseInt(tablaUno.getValueAt(i, 1).toString()) * ((comboFase.getSelectedIndex() == 0) ? 1 : Math.sqrt(3))) / cjvs.getInt(), 3), i, 0);
+                tablaDos.setValueAt(QD((Integer.parseInt(tablaUno.getValueAt(i, 1).toString()) * ((comboFase.getSelectedIndex() == 0) ? 1 : Math.sqrt(3))) / cjvs.getInt(), 3) * 0.995, i, 1);
+                tablaDos.setValueAt(QD((Integer.parseInt(tablaUno.getValueAt(i, 1).toString()) * ((comboFase.getSelectedIndex() == 0) ? 1 : Math.sqrt(3))) / cjvs.getInt(), 3) * 1.005, i, 2);
             }
             tablaDos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             tablaDos.setCellSelectionEnabled(true);
             listenerTablaUno = new TableModelListener() {
                 @Override
                 public void tableChanged(TableModelEvent e) {
-                    if(e.getType() == TableModelEvent.UPDATE){
-                        if(e.getColumn()>1){
-                            if(comboFase.getSelectedIndex()==0 && e.getColumn()==2 || comboFase.getSelectedIndex()==1 && e.getColumn()>2){
-                                if( alertas==null || alertas.getState()==java.lang.Thread.State.TERMINATED){
+                    if (e.getType() == TableModelEvent.UPDATE) {
+                        if (e.getColumn() > 1) {
+                            if (comboFase.getSelectedIndex() == 0 && e.getColumn() == 2 || comboFase.getSelectedIndex() == 1 && e.getColumn() > 2) {
+                                if (alertas == null || alertas.getState() == java.lang.Thread.State.TERMINATED) {
                                     alertas = new Hilofases(e.getFirstRow(), e.getColumn());
                                     alertas.start();
                                 }
-                            }                            
+                            }
                         }
                     }
                 }
@@ -267,14 +270,14 @@ public class PROTOS extends javax.swing.JFrame{
             tablaUno.getModel().addTableModelListener(listenerTablaUno);
         } catch (Exception e) {
             Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, e);
-        }      
+        }
     }
-    
-    double QD(double n, double d){
+
+    double QD(double n, double d) {
         return Math.round(n * Math.pow(10, d)) / Math.pow(10, d);
     }
-    
-    void habilitarCampos(boolean ver){
+
+    void habilitarCampos(boolean ver) {
         cjwu.setEnabled(ver);
         cjvw.setEnabled(ver);
         cjyz.setEnabled(ver);
@@ -282,85 +285,91 @@ public class PROTOS extends javax.swing.JFrame{
         cjiv.setEnabled(ver);
         cjiw.setEnabled(ver);
     }
-    
+
     double PCU85() {
-        cjpcua85.setText(String.valueOf(QD( ((cjpcumedido.getDouble() - I2R()) / K()) + I2R85(), 1)));
-        return QD( ((cjpcumedido.getDouble() - I2R()) / K()) + I2R85(), 1);
+        cjpcua85.setText(String.valueOf(QD(((cjpcumedido.getDouble() - I2R()) / K()) + I2R85(), 1)));
+        return QD(((cjpcumedido.getDouble() - I2R()) / K()) + I2R85(), 1);
     }
-    
-    public void HallarReg() {                                  
+
+    public void HallarReg() {
         double REG = QD(Math.sqrt(R85() + Math.pow(X(), 2) + (200 * R85() * 0.8) + (200 * X() * 0.6) + 10000) - 100, 2);
         REG = Math.pow(R85(), 2) + Math.pow(X(), 2) + 200 * R85() * 0.8 + 200 * X() * 0.6 + 10000;
         REG = Math.sqrt(REG);
         REG = REG - 100;
         REG = QD(REG, 2);
-        cjreg.setText(String.valueOf(REG));       
+        cjreg.setText(String.valueOf(REG));
     }
-    
-    void HallarEf(){
+
+    void HallarEf() {
         cjef.setText(String.valueOf(QD((0.8 * cjkva.getDouble() * Math.pow(10, 5)) / (0.8 * cjkva.getDouble() * Math.pow(10, 3) + cjpomedido.getDouble() + PCU85()), 2)));
     }
-    
-    void cargarValores(){
+
+    void cargarValores() {
         String servicio = comboServicio.getSelectedItem().toString(), tabla = null;
-        System.out.println("***************SERVICIO ES: "+servicio+"*************");
+        System.out.println("***************SERVICIO ES: " + servicio + "*************");
         int ano = cjano.getInt();
         int vp = cjvp.getInt();
         int fase = Integer.parseInt(comboFase.getSelectedItem().toString());
-        
-        if(comboAceite.getSelectedItem().equals("SECO")){
-            tabla = (vp<=15000)?"trifasicosecoserie1212":"trifasicosecoserie1512";
-        }else if("NUEVO".equals(servicio)||"RECONSTRUIDO".equals(servicio) || cjcliente.getText().equals("EMPRESAS PUBLICAS DE MEDELLIN S.A E.S.P")){
-            tabla = (vp<=15000)?(fase==1)?"monofasiconuevo":"trifasiconuevo":(vp > 15000 && vp <= 35000)?(fase==1)?"monofasiconuevoserie35":"trifasiconuevoserie35":null;
-        }else if(servicio.equals("REPARACION")){
-            if(vp <= 15000){
-                tabla = (fase==1)?(ano < 1996)?"monofasicoantesde1996":"monofasicodespuesde1996":(ano < 1996)?"trifasicoantesde1996":"trifasicodespuesde1996";
-            }else if (vp > 15000 && vp <= 35000){
-                tabla = (fase==1)?(ano >= 1996)?"monofasicoantesde1996serie35":"monofasicodespuesde1996serie35":(ano < 1996)?"trifasicoantesde1996serie35":"trifasicodespuesde1996serie46";
-            }else if(vp > 35000 && vp <= 46000 && fase==3 ){
+
+        if (comboAceite.getSelectedItem().equals("SECO")) {
+            tabla = (vp <= 15000) ? "trifasicosecoserie1212" : "trifasicosecoserie1512";
+        } else if ("NUEVO".equals(servicio) || "RECONSTRUIDO".equals(servicio) || cjcliente.getText().equals("EMPRESAS PUBLICAS DE MEDELLIN S.A E.S.P")) {
+            tabla = (vp <= 15000) ? (fase == 1) ? "monofasiconuevo" : "trifasiconuevo" : (vp > 15000 && vp <= 35000) ? (fase == 1) ? "monofasiconuevoserie35" : "trifasiconuevoserie35" : null;
+        } else if (servicio.equals("REPARACION")) {
+            if (vp <= 15000) {
+                tabla = (fase == 1) ? (ano < 1996) ? "monofasicoantesde1996" : "monofasicodespuesde1996" : (ano < 1996) ? "trifasicoantesde1996" : "trifasicodespuesde1996";
+            } else if (vp > 15000 && vp <= 35000) {
+                tabla = (fase == 1) ? (ano >= 1996) ? "monofasicoantesde1996serie35" : "monofasicodespuesde1996serie35" : (ano < 1996) ? "trifasicoantesde1996serie35" : "trifasicodespuesde1996serie46";
+            } else if (vp > 35000 && vp <= 46000 && fase == 3) {
                 tabla = "trifasicodespuesde1996serie46";
             }
-        }else if(servicio.equals("MANTENIMIENTO")){
-            tabla = ESTADO_TRAFO.equals("REPARADO")?(ano < 1996)?(fase == 1)?"monofasicoantesde1996":"trifasicoantesde1996":(fase == 1)?"monofasicodespuesde1996":"trifasicodespuesde1996":(fase == 1)?"monofasiconuevo":"trifasiconuevo";
+        } else if (servicio.equals("MANTENIMIENTO")) {
+            tabla = ESTADO_TRAFO.equals("REPARADO") ? (ano < 1996) ? (fase == 1) ? "monofasicoantesde1996" : "trifasicoantesde1996" : (fase == 1) ? "monofasicodespuesde1996" : "trifasicodespuesde1996" : (fase == 1) ? "monofasiconuevo" : "trifasiconuevo";
         }
-        if(comboRefrigeracion.getSelectedIndex() == 2){
-            tabla = (fase==3&&(vp > 1200 && vp <= 15000) )?"trifasicosecoserie1512":"trifasicosecoserie1212";
-        }        
+        if (comboRefrigeracion.getSelectedIndex() == 2) {
+            tabla = (fase == 3 && (vp > 1200 && vp <= 15000)) ? "trifasicosecoserie1512" : "trifasicosecoserie1212";
+        }
         double kva = getKva(tabla, cjkva.getDouble());
         System.out.println("************BUSCANDO VALORES DE TABLA************");
         String sql = "SELECT * FROM " + tabla + " WHERE kva=" + kva;
         conex.conectar();
         ResultSet rs = conex.CONSULTAR(sql);
-        try{
-            if(rs.next()){
-                cjiogarantizado.setText(""+rs.getDouble("io"));
-                cjpogarantizado.setText(""+rs.getDouble("po"));
-                switch(comboClaseAislamiento.getSelectedIndex()){
-                    case 0:cjpcugarantizado.setText(""+rs.getInt("pc"));
+        try {
+            if (rs.next()) {
+                cjiogarantizado.setText("" + rs.getDouble("io"));
+                cjpogarantizado.setText("" + rs.getDouble("po"));
+                switch (comboClaseAislamiento.getSelectedIndex()) {
+                    case 0:
+                        cjpcugarantizado.setText("" + rs.getInt("pc"));
                         break;
-                    case 1:cjpcugarantizado.setText(""+rs.getInt("pc75"));
+                    case 1:
+                        cjpcugarantizado.setText("" + rs.getInt("pc75"));
                         break;
-                    case 2:cjpcugarantizado.setText(""+rs.getInt("pc85"));
+                    case 2:
+                        cjpcugarantizado.setText("" + rs.getInt("pc85"));
                         break;
-                    case 3:cjpcugarantizado.setText(""+rs.getInt("pc100"));
+                    case 3:
+                        cjpcugarantizado.setText("" + rs.getInt("pc100"));
                         break;
-                    case 4:cjpcugarantizado.setText(""+rs.getInt("pc120"));
+                    case 4:
+                        cjpcugarantizado.setText("" + rs.getInt("pc120"));
                         break;
-                    case 5:cjpcugarantizado.setText(""+rs.getInt("pc145"));
+                    case 5:
+                        cjpcugarantizado.setText("" + rs.getInt("pc145"));
                         break;
                 }
-                
-                cjimpedanciagarantizado.setText(""+rs.getDouble("uz"));
+
+                cjimpedanciagarantizado.setText("" + rs.getDouble("uz"));
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, "ERROR EN LA BUSQUEDA DE LOS VALORES EN LA TABLA "+tabla+" CON EL KVA "+kva);
-        }finally{
+            JOptionPane.showMessageDialog(null, "ERROR EN LA BUSQUEDA DE LOS VALORES EN LA TABLA " + tabla + " CON EL KVA " + kva);
+        } finally {
             conex.CERRAR();
         }
     }
-    
-    public static double getKva(String tabla, double KVAdigitada){
+
+    public static double getKva(String tabla, double KVAdigitada) {
         double kva = 0;
         String sql = "select * from " + tabla + " ORDER BY kva ASC";
         ConexionBD conex = new ConexionBD();
@@ -378,7 +387,7 @@ public class PROTOS extends javax.swing.JFrame{
                     break;
                 } else if (BD < KVAdigitada) {
                     auxiliar = BD;
-                } else if(KVAdigitada < ((auxiliar + BD) / 2)) {
+                } else if (KVAdigitada < ((auxiliar + BD) / 2)) {
                     kva = auxiliar;
                     esta = true;
                     break;
@@ -399,119 +408,113 @@ public class PROTOS extends javax.swing.JFrame{
         }
         return kva;
     }
-    
+
     void cargarMedidas() {
-        double kva = cjkva.getDouble();        
-        cjancho.setText((comboFase.getSelectedIndex()==0)?((kva==3)?"250":(kva==5)?"280":(kva==10)?"320":(kva==15)?"350":(kva==25)?"380":(kva==37.5)?"420":(kva==50)?"450":(kva==75)?"480":"0"):((kva==15)?"350":(kva==30)?"500":(kva==45)?"600":(kva==75)?"620":(kva==112.5)?"700":(kva==150)?"750":(kva==225)?"800":"0"));
-        cjlargo.setText((comboFase.getSelectedIndex()==0)?((kva==3)?"250":(kva==5)?"280":(kva==10)?"320":(kva==15)?"350":(kva==25)?"380":(kva==37.5)?"420":(kva==50)?"450":(kva==75)?"480":"0"):((kva==15)?"280":(kva==30)?"320":(kva==45)?"350":(kva==75)?"380":(kva==112.5)?"430":(kva==150)?"480":(kva==225)?"520":"0"));
-        cjalto.setText((comboFase.getSelectedIndex()==0)?((kva==3)?"450":(kva==5)?"500":(kva==10)?"550":(kva==15)?"550":(kva==25)?"550":(kva==37.5)?"600":(kva==50)?"650":(kva==75)?"700":"0"):((kva==15)?"500":(kva==30)?"500":(kva==45)?"550":(kva==75)?"600":(kva==112.5)?"650":(kva==150)?"700":(kva==225)?"750":"0"));
-        cjelementos.setText((comboFase.getSelectedIndex()==0)?((kva==50)?"6":(kva==75)?"8":"0"):((kva==75)?"6":(kva==112.5)?"10":(kva==150)?"14":(kva==225)?"18":"0"));
-        cjlargoelemento.setText((comboFase.getSelectedIndex()==0)?((kva==50||kva==75)?"300":"0"):((kva==75)?"300":(kva==112.5)?"380":(kva==150)?"300":(kva==225)?"300":"0"));
-        cjaltoelemento.setText((comboFase.getSelectedIndex()==0)?((kva==50)?"480":(kva==75)?"480":"0"):((kva==75)?"480":(kva==112.5)?"380":(kva==150)?"480":(kva==225)?"480":"0"));
-        cjcolor.setText((cjcliente.getText().equals("EMPRESAS PUBLICAS DE MEDELLIN S.A E.S.P"))?"VERDE":"GRIS");
+        double kva = cjkva.getDouble();
+        cjancho.setText((comboFase.getSelectedIndex() == 0) ? ((kva == 3) ? "250" : (kva == 5) ? "280" : (kva == 10) ? "320" : (kva == 15) ? "350" : (kva == 25) ? "380" : (kva == 37.5) ? "420" : (kva == 50) ? "450" : (kva == 75) ? "480" : "0") : ((kva == 15) ? "350" : (kva == 30) ? "500" : (kva == 45) ? "600" : (kva == 75) ? "620" : (kva == 112.5) ? "700" : (kva == 150) ? "750" : (kva == 225) ? "800" : "0"));
+        cjlargo.setText((comboFase.getSelectedIndex() == 0) ? ((kva == 3) ? "250" : (kva == 5) ? "280" : (kva == 10) ? "320" : (kva == 15) ? "350" : (kva == 25) ? "380" : (kva == 37.5) ? "420" : (kva == 50) ? "450" : (kva == 75) ? "480" : "0") : ((kva == 15) ? "280" : (kva == 30) ? "320" : (kva == 45) ? "350" : (kva == 75) ? "380" : (kva == 112.5) ? "430" : (kva == 150) ? "480" : (kva == 225) ? "520" : "0"));
+        cjalto.setText((comboFase.getSelectedIndex() == 0) ? ((kva == 3) ? "450" : (kva == 5) ? "500" : (kva == 10) ? "550" : (kva == 15) ? "550" : (kva == 25) ? "550" : (kva == 37.5) ? "600" : (kva == 50) ? "650" : (kva == 75) ? "700" : "0") : ((kva == 15) ? "500" : (kva == 30) ? "500" : (kva == 45) ? "550" : (kva == 75) ? "600" : (kva == 112.5) ? "650" : (kva == 150) ? "700" : (kva == 225) ? "750" : "0"));
+        cjelementos.setText((comboFase.getSelectedIndex() == 0) ? ((kva == 50) ? "6" : (kva == 75) ? "8" : "0") : ((kva == 75) ? "6" : (kva == 112.5) ? "10" : (kva == 150) ? "14" : (kva == 225) ? "18" : "0"));
+        cjlargoelemento.setText((comboFase.getSelectedIndex() == 0) ? ((kva == 50 || kva == 75) ? "300" : "0") : ((kva == 75) ? "300" : (kva == 112.5) ? "380" : (kva == 150) ? "300" : (kva == 225) ? "300" : "0"));
+        cjaltoelemento.setText((comboFase.getSelectedIndex() == 0) ? ((kva == 50) ? "480" : (kva == 75) ? "480" : "0") : ((kva == 75) ? "480" : (kva == 112.5) ? "380" : (kva == 150) ? "480" : (kva == 225) ? "480" : "0"));
+        cjcolor.setText((cjcliente.getText().equals("EMPRESAS PUBLICAS DE MEDELLIN S.A E.S.P")) ? "VERDE" : "GRIS");
     }
-    
-    Object getT(int r, int col){return "'"+tablaUno.getValueAt(r, col)+"'";}
-    
-    void guardarProtocolo(){
-        (new Thread(){
+
+    Object getT(int r, int col) {
+        return "'" + tablaUno.getValueAt(r, col) + "'";
+    }
+
+    void guardarProtocolo() {
+        (new Thread() {
             @Override
-            public void run(){
+            public void run() {
                 String GUARDAR = null;
-                if(!ACTUALIZANDO){
-                    GUARDAR = "INSERT INTO public.protocolos(\n" +
-            "            idtransformador, codigo, frecuencia, refrigeracion, \n" +
-            "            tensionserie, nba, calentamientodevanado, claseaislamiento, alturadiseno, \n" +
-            "            derivacionprimaria, i1, i2, temperaturadeensayo, conmutador, \n" +
-            "            liquidoaislante, referenciadeaceite, tensionderuptura, metodo, \n" +
-            "            tiemporalt, tensiondeprueba, atcontrabt, \n" +
-            "            atcontratierra, btcontratierra, grupodeconexion, polaridad, punou, \n" +
-            "            punov, punow, pdosu, pdosv, pdosw, ptresu, ptresv, ptresw, pcuatrou, \n" +
-            "            pcuatrov, pcuatrow, pcincou, pcincov, pcincow, resuv, resvw, \n" +
-            "            reswu, proresuno, materialconductoralta, resxy, resyz, reszx, \n" +
-            "            proresdos, materialconductorbaja, iu, iv, iw, promedioi, iogarantizado, \n" +
-            "            pomedido, pogarantizado, vcc, pcu, pcua85, pcugarantizado, i2r, \n" +
-            "            i2ra85, impedancia, impedancia85, impedanciagarantizada, reg, \n" +
-            "            ef, largotanque, anchotanque, altotanque, color, espesor, radiadores, \n" +
-            "            largoradiador, altoradiador, observaciones, fechalaboratorio, \n" +
-            "            fechaderegistro, estadoservicio, garantia, idusuario, btcontraatytierra, atcontrabtytierra)\n" +
-            "    VALUES ("+IDTRAFO+", '"+cjprotocolo.getText()+"', '"+comboFrecuencia.getSelectedItem()+"', '"+comboRefrigeracion.getSelectedItem()+"', \n" +
-            "            '"+cjtensionSerie.getText()+"', '"+cjnba.getText()+"', '"+cjcalentamientodevanado.getText()+"', '"+comboClaseAislamiento.getSelectedItem()+"', '"+cjaltdiseno.getText()+"', \n" +
-            "            '"+comboDerivacion.getSelectedItem()+"', '"+cji1.getText()+"', '"+cji2.getText()+"', '"+cjtemperatura.getText()+"', '"+conmutador.getSelectedItem()+"', \n" +
-            "            '"+comboAceite.getSelectedItem()+"', '"+comboReferenciaAceite.getSelectedItem()+"', '"+cjRuptura.getText()+"', '"+cjmetodo.getText()+"', \n" +
-            "            '"+cjtiemporalt.getText()+"', '"+comboTensionPrueba.getSelectedItem()+"', '"+cjATcontraBT.getText()+"', \n" +
-            "            '"+cjATcontraTierra.getText()+"', '"+cjBTcontraTierra.getText()+"', '"+comboGrupoConexion.getSelectedItem()+"', '"+comboPolaridad.getSelectedItem()+"', \n" +
-            "            "+getT(0,2)+", "+getT(0,3)+", "+getT(0,4)+",  \n" +
-            "            "+getT(1,2)+", "+getT(1,3)+", "+getT(1,4)+",  \n" +
-            "            "+getT(2,2)+", "+getT(2,3)+", "+getT(2,4)+",  \n" +
-            "            "+getT(3,2)+", "+getT(3,3)+", "+getT(3,4)+",  \n" +
-            "            "+getT(4,2)+", "+getT(4,3)+", "+getT(4,4)+",  \n" +
-            "            '"+cjuv.getDouble()+"', '"+cjvw.getDouble()+"','"+cjwu.getDouble()+"', '"+cjproresalta.getText()+"',  \n" +
-            "            '"+comboMaterialAlta.getSelectedItem()+"', '"+cjxy.getDouble()+"', '"+cjyz.getDouble()+"', '"+cjzx.getDouble()+"','"+cjproresbaja.getText()+"', '"+comboMaterialBaja.getSelectedItem()+"', "
-                     + " '"+cjiu.getDouble()+"', '"+cjiv.getDouble()+"', '"+cjiw.getDouble()+"', '"+cjpromedioi.getText()+"', '"+cjiogarantizado.getText()+"','"+cjpomedido.getText()+"', '"+cjpogarantizado.getText()+"', "
-                     + " '"+cjvcc.getText()+"', '"+cjpcumedido.getText()+"', '"+cjpcua85.getText()+"', '"+cjpcugarantizado.getText()+"', '"+cji2r.getText()+"','"+cji2ra85.getText()+"', '"+cjimpedancia.getText()+"', "
-                     + " '"+cjimpedancia85.getText()+"', '"+cjimpedanciagarantizado.getText()+"', '"+cjreg.getText()+"', \n" +
-            "            '"+cjef.getText()+"', '"+cjlargo.getText()+"', '"+cjancho.getText()+"', '"+cjalto.getText()+"', '"+cjcolor.getText()+"', '"+cjespesor.getText()+"', '"+cjelementos.getText()+"', \n" +
-            "            '"+cjlargoelemento.getText()+"', '"+cjaltoelemento.getText()+"', '"+cjobservaciones.getText()+"', '"+cjfechasalida.getDate()+"', \n" +
-            "            '"+new java.util.Date()+"', '"+ESTADO_TRAFO+"' , '"+checkGarantia.isSelected()+"' , "+sesion.getIdUsuario()+", "+cjBTcontraATyTierra.getText()+", "+cjATcontraBTyTierra.getText()+")";
-                }else{
-                    GUARDAR = "UPDATE public.protocolos SET\n" +
-            "            frecuencia='"+comboFrecuencia.getSelectedItem()+"', refrigeracion='"+comboRefrigeracion.getSelectedItem()+"', \n" +
-            "            tensionserie='"+cjtensionSerie.getText()+"', nba='"+cjnba.getText()+"', calentamientodevanado='"+cjcalentamientodevanado.getText()+"', claseaislamiento='"+comboClaseAislamiento.getSelectedItem()+"', alturadiseno='"+cjaltdiseno.getText()+"', \n" +
-            "            derivacionprimaria='"+comboDerivacion.getSelectedItem()+"', i1='"+cji1.getText()+"', i2='"+cji2.getText()+"', temperaturadeensayo='"+cjtemperatura.getText()+"', conmutador='"+conmutador.getSelectedItem()+"', \n" +
-            "            liquidoaislante='"+comboAceite.getSelectedItem()+"', referenciadeaceite='"+comboReferenciaAceite.getSelectedItem()+"', tensionderuptura='"+cjRuptura.getText()+"', metodo='"+cjmetodo.getText()+"', \n" +
-            "            tiemporalt='"+cjtiemporalt.getText()+"', tensiondeprueba='"+comboTensionPrueba.getSelectedItem()+"', atcontrabt='"+cjATcontraBT.getText()+"', \n" +
-            "            atcontratierra='"+cjATcontraTierra.getText()+"', btcontratierra='"+cjBTcontraTierra.getText()+"', grupodeconexion='"+comboGrupoConexion.getSelectedItem()+"', polaridad='"+comboPolaridad.getSelectedItem()+"', punou="+getT(0,2)+", \n" +
-            "            punov="+getT(0,3)+", punow="+getT(0,4)+", pdosu="+getT(1,2)+", pdosv="+getT(1,3)+", pdosw="+getT(1,4)+", ptresu="+getT(2,2)+", ptresv="+getT(2,3)+", ptresw="+getT(2,4)+", pcuatrou="+getT(3,2)+", \n" +
-            "            pcuatrov="+getT(3,3)+", pcuatrow="+getT(3,4)+", pcincou="+getT(4,2)+", pcincov="+getT(4,3)+", pcincow="+getT(4,4)+", resuv='"+cjuv.getDouble()+"', resvw='"+cjvw.getDouble()+"', \n" +
-            "            reswu='"+cjwu.getDouble()+"', proresuno='"+cjproresalta.getText()+"', materialconductoralta='"+comboMaterialAlta.getSelectedItem()+"', resxy='"+cjxy.getDouble()+"', resyz='"+cjyz.getDouble()+"', reszx='"+cjzx.getDouble()+"', \n" +
-            "            proresdos='"+cjproresbaja.getText()+"', materialconductorbaja='"+comboMaterialBaja.getSelectedItem()+"', iu='"+cjiu.getDouble()+"', iv='"+cjiv.getDouble()+"', iw='"+cjiw.getDouble()+"', promedioi='"+cjpromedioi.getText()+"', iogarantizado='"+cjiogarantizado.getText()+"', \n" +
-            "            pomedido='"+cjpomedido.getText()+"', pogarantizado='"+cjpogarantizado.getText()+"', vcc='"+cjvcc.getText()+"', pcu='"+cjpcumedido.getText()+"', pcua85='"+cjpcua85.getText()+"', pcugarantizado='"+cjpcugarantizado.getText()+"', i2r='"+cji2r.getText()+"', \n" +
-            "            i2ra85='"+cji2ra85.getText()+"', impedancia='"+cjimpedancia.getText()+"', impedancia85='"+cjimpedancia85.getText()+"', impedanciagarantizada='"+cjimpedanciagarantizado.getText()+"', reg='"+cjreg.getText()+"', \n" +
-            "            ef='"+cjef.getText()+"', largotanque='"+cjlargo.getText()+"', anchotanque='"+cjancho.getText()+"', altotanque='"+cjalto.getText()+"', color='"+cjcolor.getText()+"', espesor='"+cjespesor.getText()+"', radiadores='"+cjelementos.getText()+"', \n" +
-            "            largoradiador='"+cjlargoelemento.getText()+"', altoradiador='"+cjaltoelemento.getText()+"', observaciones='"+cjobservaciones.getText()+"', fechalaboratorio='"+cjfechasalida.getDate()+"', \n" +
-            "            estadoservicio='"+ESTADO_TRAFO+"' , garantia='"+checkGarantia.isSelected()+"' , idusuario="+sesion.getIdUsuario()+", btcontraatytierra="+cjBTcontraATyTierra.getText()+" , atcontrabtytierra="+cjATcontraBTyTierra.getText()+" WHERE idprotocolo="+IDPROTOCOLO+" ";
+                if (!ACTUALIZANDO) {
+                    GUARDAR = "INSERT INTO public.protocolos(\n"
+                            + "            idtransformador, codigo, frecuencia, refrigeracion, \n"
+                            + "            tensionserie, nba, calentamientodevanado, claseaislamiento, alturadiseno, \n"
+                            + "            derivacionprimaria, i1, i2, temperaturadeensayo, conmutador, \n"
+                            + "            liquidoaislante, referenciadeaceite, tensionderuptura, metodo, \n"
+                            + "            tiemporalt, tensiondeprueba, atcontrabt, \n"
+                            + "            atcontratierra, btcontratierra, grupodeconexion, polaridad, punou, \n"
+                            + "            punov, punow, pdosu, pdosv, pdosw, ptresu, ptresv, ptresw, pcuatrou, \n"
+                            + "            pcuatrov, pcuatrow, pcincou, pcincov, pcincow, resuv, resvw, \n"
+                            + "            reswu, proresuno, materialconductoralta, resxy, resyz, reszx, \n"
+                            + "            proresdos, materialconductorbaja, iu, iv, iw, promedioi, iogarantizado, \n"
+                            + "            pomedido, pogarantizado, vcc, pcu, pcua85, pcugarantizado, i2r, \n"
+                            + "            i2ra85, impedancia, impedancia85, impedanciagarantizada, reg, \n"
+                            + "            ef, largotanque, anchotanque, altotanque, color, espesor, radiadores, \n"
+                            + "            largoradiador, altoradiador, observaciones, fechalaboratorio, \n"
+                            + "            fechaderegistro, estadoservicio, garantia, idusuario, btcontraatytierra, atcontrabtytierra)\n"
+                            + "    VALUES (" + IDTRAFO + ", '" + cjprotocolo.getText() + "', '" + comboFrecuencia.getSelectedItem() + "', '" + comboRefrigeracion.getSelectedItem() + "', \n"
+                            + "            '" + cjtensionSerie.getText() + "', '" + cjnba.getText() + "', '" + cjcalentamientodevanado.getText() + "', '" + comboClaseAislamiento.getSelectedItem() + "', '" + cjaltdiseno.getText() + "', \n"
+                            + "            '" + comboDerivacion.getSelectedItem() + "', '" + cji1.getText() + "', '" + cji2.getText() + "', '" + cjtemperatura.getText() + "', '" + conmutador.getSelectedItem() + "', \n"
+                            + "            '" + comboAceite.getSelectedItem() + "', '" + comboReferenciaAceite.getSelectedItem() + "', '" + cjRuptura.getText() + "', '" + cjmetodo.getText() + "', \n"
+                            + "            '" + cjtiemporalt.getText() + "', '" + comboTensionPrueba.getSelectedItem() + "', '" + cjATcontraBT.getText() + "', \n"
+                            + "            '" + cjATcontraTierra.getText() + "', '" + cjBTcontraTierra.getText() + "', '" + comboGrupoConexion.getSelectedItem() + "', '" + comboPolaridad.getSelectedItem() + "', \n"
+                            + "            " + getT(0, 2) + ", " + getT(0, 3) + ", " + getT(0, 4) + ",  \n"
+                            + "            " + getT(1, 2) + ", " + getT(1, 3) + ", " + getT(1, 4) + ",  \n"
+                            + "            " + getT(2, 2) + ", " + getT(2, 3) + ", " + getT(2, 4) + ",  \n"
+                            + "            " + getT(3, 2) + ", " + getT(3, 3) + ", " + getT(3, 4) + ",  \n"
+                            + "            " + getT(4, 2) + ", " + getT(4, 3) + ", " + getT(4, 4) + ",  \n"
+                            + "            '" + cjuv.getDouble() + "', '" + cjvw.getDouble() + "','" + cjwu.getDouble() + "', '" + cjproresalta.getText() + "',  \n"
+                            + "            '" + comboMaterialAlta.getSelectedItem() + "', '" + cjxy.getDouble() + "', '" + cjyz.getDouble() + "', '" + cjzx.getDouble() + "','" + cjproresbaja.getText() + "', '" + comboMaterialBaja.getSelectedItem() + "', "
+                            + " '" + cjiu.getDouble() + "', '" + cjiv.getDouble() + "', '" + cjiw.getDouble() + "', '" + cjpromedioi.getText() + "', '" + cjiogarantizado.getText() + "','" + cjpomedido.getText() + "', '" + cjpogarantizado.getText() + "', "
+                            + " '" + cjvcc.getText() + "', '" + cjpcumedido.getText() + "', '" + cjpcua85.getText() + "', '" + cjpcugarantizado.getText() + "', '" + cji2r.getText() + "','" + cji2ra85.getText() + "', '" + cjimpedancia.getText() + "', "
+                            + " '" + cjimpedancia85.getText() + "', '" + cjimpedanciagarantizado.getText() + "', '" + cjreg.getText() + "', \n"
+                            + "            '" + cjef.getText() + "', '" + cjlargo.getText() + "', '" + cjancho.getText() + "', '" + cjalto.getText() + "', '" + cjcolor.getText() + "', '" + cjespesor.getText() + "', '" + cjelementos.getText() + "', \n"
+                            + "            '" + cjlargoelemento.getText() + "', '" + cjaltoelemento.getText() + "', '" + cjobservaciones.getText() + "', '" + cjfechasalida.getDate() + "', \n"
+                            + "            '" + new java.util.Date() + "', '" + ESTADO_TRAFO + "' , '" + checkGarantia.isSelected() + "' , " + sesion.getIdUsuario() + ", " + cjBTcontraATyTierra.getText() + ", " + cjATcontraBTyTierra.getText() + ")";
+                } else {
+                    GUARDAR = "UPDATE public.protocolos SET\n"
+                            + "            frecuencia='" + comboFrecuencia.getSelectedItem() + "', refrigeracion='" + comboRefrigeracion.getSelectedItem() + "', \n"
+                            + "            tensionserie='" + cjtensionSerie.getText() + "', nba='" + cjnba.getText() + "', calentamientodevanado='" + cjcalentamientodevanado.getText() + "', claseaislamiento='" + comboClaseAislamiento.getSelectedItem() + "', alturadiseno='" + cjaltdiseno.getText() + "', \n"
+                            + "            derivacionprimaria='" + comboDerivacion.getSelectedItem() + "', i1='" + cji1.getText() + "', i2='" + cji2.getText() + "', temperaturadeensayo='" + cjtemperatura.getText() + "', conmutador='" + conmutador.getSelectedItem() + "', \n"
+                            + "            liquidoaislante='" + comboAceite.getSelectedItem() + "', referenciadeaceite='" + comboReferenciaAceite.getSelectedItem() + "', tensionderuptura='" + cjRuptura.getText() + "', metodo='" + cjmetodo.getText() + "', \n"
+                            + "            tiemporalt='" + cjtiemporalt.getText() + "', tensiondeprueba='" + comboTensionPrueba.getSelectedItem() + "', atcontrabt='" + cjATcontraBT.getText() + "', \n"
+                            + "            atcontratierra='" + cjATcontraTierra.getText() + "', btcontratierra='" + cjBTcontraTierra.getText() + "', grupodeconexion='" + comboGrupoConexion.getSelectedItem() + "', polaridad='" + comboPolaridad.getSelectedItem() + "', punou=" + getT(0, 2) + ", \n"
+                            + "            punov=" + getT(0, 3) + ", punow=" + getT(0, 4) + ", pdosu=" + getT(1, 2) + ", pdosv=" + getT(1, 3) + ", pdosw=" + getT(1, 4) + ", ptresu=" + getT(2, 2) + ", ptresv=" + getT(2, 3) + ", ptresw=" + getT(2, 4) + ", pcuatrou=" + getT(3, 2) + ", \n"
+                            + "            pcuatrov=" + getT(3, 3) + ", pcuatrow=" + getT(3, 4) + ", pcincou=" + getT(4, 2) + ", pcincov=" + getT(4, 3) + ", pcincow=" + getT(4, 4) + ", resuv='" + cjuv.getDouble() + "', resvw='" + cjvw.getDouble() + "', \n"
+                            + "            reswu='" + cjwu.getDouble() + "', proresuno='" + cjproresalta.getText() + "', materialconductoralta='" + comboMaterialAlta.getSelectedItem() + "', resxy='" + cjxy.getDouble() + "', resyz='" + cjyz.getDouble() + "', reszx='" + cjzx.getDouble() + "', \n"
+                            + "            proresdos='" + cjproresbaja.getText() + "', materialconductorbaja='" + comboMaterialBaja.getSelectedItem() + "', iu='" + cjiu.getDouble() + "', iv='" + cjiv.getDouble() + "', iw='" + cjiw.getDouble() + "', promedioi='" + cjpromedioi.getText() + "', iogarantizado='" + cjiogarantizado.getText() + "', \n"
+                            + "            pomedido='" + cjpomedido.getText() + "', pogarantizado='" + cjpogarantizado.getText() + "', vcc='" + cjvcc.getText() + "', pcu='" + cjpcumedido.getText() + "', pcua85='" + cjpcua85.getText() + "', pcugarantizado='" + cjpcugarantizado.getText() + "', i2r='" + cji2r.getText() + "', \n"
+                            + "            i2ra85='" + cji2ra85.getText() + "', impedancia='" + cjimpedancia.getText() + "', impedancia85='" + cjimpedancia85.getText() + "', impedanciagarantizada='" + cjimpedanciagarantizado.getText() + "', reg='" + cjreg.getText() + "', \n"
+                            + "            ef='" + cjef.getText() + "', largotanque='" + cjlargo.getText() + "', anchotanque='" + cjancho.getText() + "', altotanque='" + cjalto.getText() + "', color='" + cjcolor.getText() + "', espesor='" + cjespesor.getText() + "', radiadores='" + cjelementos.getText() + "', \n"
+                            + "            largoradiador='" + cjlargoelemento.getText() + "', altoradiador='" + cjaltoelemento.getText() + "', observaciones='" + cjobservaciones.getText() + "', fechalaboratorio='" + cjfechasalida.getDate() + "', \n"
+                            + "            estadoservicio='" + ESTADO_TRAFO + "' , garantia='" + checkGarantia.isSelected() + "' , idusuario=" + sesion.getIdUsuario() + ", btcontraatytierra=" + cjBTcontraATyTierra.getText() + " , atcontrabtytierra=" + cjATcontraBTyTierra.getText() + " WHERE idprotocolo=" + IDPROTOCOLO + " ";
                 }
-                if(conex.GUARDAR(GUARDAR)){
-                    modelo.Metodos.M("PROTOCOLO "+((ACTUALIZANDO)?"ACTUALIZADO":"REGISTRADO"), "bien.png");                    
-                    try{
+                if (conex.GUARDAR(GUARDAR)) {
+                    modelo.Metodos.M("PROTOCOLO " + ((ACTUALIZANDO) ? "ACTUALIZADO" : "REGISTRADO"), "bien.png");
+                    try {
                         btnGuardar.setEnabled(false);
                         btnGuardar.setIcon(new ImageIcon(getClass().getResource("/recursos/images/gif.gif")));
                         JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PROTOCOLO.jasper").toString()));
                         Map<String, Object> p = new HashMap<String, Object>();
-                        p.put("IDPROTOCOLO", (ACTUALIZANDO)?IDPROTOCOLO:modelo.Metodos.getUltimoID("protocolos", "idprotocolo"));
-                        p.put("BTcontraAT", cjBTcontraATyTierra.getText());
-                        p.put("ATcontraBT", cjATcontraBTyTierra.getText());
-                        p.put("tension1", Integer.parseInt(tablaUno.getValueAt(0, 1).toString()));
-                        p.put("tension2", Integer.parseInt(tablaUno.getValueAt(1, 1).toString()));
-                        p.put("tension3", Integer.parseInt(tablaUno.getValueAt(2, 1).toString()));
-                        p.put("tension4", Integer.parseInt(tablaUno.getValueAt(3, 1).toString()));
-                        p.put("tension5", Integer.parseInt(tablaUno.getValueAt(4, 1).toString()));
+                        p.put("IDPROTOCOLO", (ACTUALIZANDO) ? IDPROTOCOLO : modelo.Metodos.getUltimoID("protocolos", "idprotocolo"));
                         JasperPrint jasperprint = JasperFillManager.fillReport(reporte, p, conex.conectar());
-                        if(mostrarProtocolo.isSelected()){
+                        if (mostrarProtocolo.isSelected()) {
                             JasperViewer.viewReport(jasperprint, false);
                         }
-                                                //314 415 5422
+                        //314 415 5422
                         String protocolo = cjprotocolo.getText();
                         String cliente = cjcliente.getText().replace("/", "");
                         limpiar();
-                        cjprotocolo.setText("A-"+modelo.Metodos.getConsecutivoRemision("protocolo", false)+"-"+new SimpleDateFormat("yy").format(new java.util.Date()));
+                        cjprotocolo.setText("A-" + modelo.Metodos.getConsecutivoRemision("protocolo", false) + "-" + new SimpleDateFormat("yy").format(new java.util.Date()));
                         JasperExportManager.exportReportToPdfFile(
-                                jasperprint, 
-                                System.getProperties().getProperty("user.dir")+"\\PROTOCOLOS PDF\\"+protocolo+"_"+cliente+".pdf");
-                                               
+                                jasperprint,
+                                System.getProperties().getProperty("user.dir") + "\\PROTOCOLOS PDF\\" + protocolo + "_" + cliente + ".pdf");
+
 //                        if(!ACTUALIZANDO){
 //                            cjprotocolo.setText("A-"+modelo.Metodos.getConsecutivoRemision("protocolo", true)+"-"+new SimpleDateFormat("yy").format(new java.util.Date()));
 //                        }else{
-                            
 //                        }
-                    }catch(MalformedURLException | JRException | NumberFormatException ex){
+                    } catch (MalformedURLException | JRException | NumberFormatException ex) {
                         Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
                         modelo.Metodos.escribirFichero(ex);
                         modelo.Metodos.ERROR(ex, "ERROR AL GENERAR EL PROTOCOLO");
-                    }catch(Exception ex){
+                    } catch (Exception ex) {
                         modelo.Metodos.ERROR(ex, "ERROR AL EXPORTAR Y GUARDAR EL ARCHIVO PDF EN LA CARPTEA 'PROTOCOLOS PDF'\nVERIFIQUE QUE EL NOMBRE DEL CLIENTE NO CONTENGA PUNTOS NI CARACTERES ESPECIALES.");
-                    }finally{
+                    } finally {
                         btnGuardar.setIcon(new ImageIcon(getClass().getResource("/recursos/images/guardar.png")));
                         btnGuardar.setEnabled(true);
                     }
@@ -519,12 +522,12 @@ public class PROTOS extends javax.swing.JFrame{
             }
         }).start();
     }
-    
-    void abrirProtocolo(){
+
+    void abrirProtocolo() {
         conex.conectar();
-        ResultSet rs = conex.CONSULTAR("SELECT * FROM protocolos INNER JOIN transformador t USING(idtransformador) INNER JOIN entrada e ON t.identrada=e.identrada INNER JOIN cliente c ON c.idcliente=e.idcliente WHERE idprotocolo="+IDPROTOCOLO);
+        ResultSet rs = conex.CONSULTAR("SELECT * FROM protocolos INNER JOIN transformador t USING(idtransformador) INNER JOIN entrada e ON t.identrada=e.identrada INNER JOIN cliente c ON c.idcliente=e.idcliente WHERE idprotocolo=" + IDPROTOCOLO);
         try {
-            if(rs.next()){
+            if (rs.next()) {
                 ESTADO_TRAFO = rs.getString("estadoservicio");
                 comboServicio.setSelectedItem(rs.getString("serviciosalida"));
                 ACTUALIZANDO = true;
@@ -539,8 +542,8 @@ public class PROTOS extends javax.swing.JFrame{
                 cjano.setText(rs.getString("ano"));
                 cjvp.setText(rs.getString("tps"));
                 cjvs.setText(rs.getString("tss"));
-                cjtensionBT.setText(String.valueOf(rs.getInt("tss")*2));
-                cjTensionBT2.setText(rs.getString("tss"));                
+                cjtensionBT.setText(String.valueOf(rs.getInt("tss") * 2));
+                cjTensionBT2.setText(rs.getString("tss"));
                 cjmasa.setText(rs.getString("peso"));
                 cjaceite.setText(rs.getString("aceite"));
                 CargarTablas();
@@ -553,7 +556,7 @@ public class PROTOS extends javax.swing.JFrame{
                 cjcalentamientodevanado.setText(rs.getString("calentamientodevanado"));
                 comboClaseAislamiento.setSelectedItem(rs.getString("claseaislamiento"));
                 cjaltdiseno.setText(rs.getString("alturadiseno"));
-                cji1.setText(""+rs.getDouble("i1"));
+                cji1.setText("" + rs.getDouble("i1"));
                 cji2.setText(rs.getString("i2"));
                 comboDerivacion.setSelectedItem(rs.getString("derivacionprimaria"));
                 cjtemperatura.setText(rs.getString("temperaturadeensayo"));
@@ -569,40 +572,50 @@ public class PROTOS extends javax.swing.JFrame{
                 cjBTcontraTierra.setText(rs.getString("btcontratierra"));
                 comboGrupoConexion.setSelectedItem(rs.getString("grupodeconexion"));
                 comboPolaridad.setSelectedItem(rs.getString("polaridad"));
-                tablaUno.setValueAt(rs.getDouble("punou"), 0, 2);tablaUno.setValueAt(rs.getDouble("punov"), 0, 3);tablaUno.setValueAt(rs.getDouble("punow"), 0, 4);
-                tablaUno.setValueAt(rs.getDouble("pdosu"), 1, 2);tablaUno.setValueAt(rs.getDouble("pdosv"), 1, 3);tablaUno.setValueAt(rs.getDouble("pdosw"), 1, 4);
-                tablaUno.setValueAt(rs.getDouble("ptresu"), 2, 2);tablaUno.setValueAt(rs.getDouble("ptresv"), 2, 3);tablaUno.setValueAt(rs.getDouble("ptresw"), 2, 4);
-                tablaUno.setValueAt(rs.getDouble("pcuatrou"), 3, 2);tablaUno.setValueAt(rs.getDouble("pcuatrov"), 3, 3);tablaUno.setValueAt(rs.getDouble("pcuatrow"), 3, 4);
-                tablaUno.setValueAt(rs.getDouble("pcincou"), 4, 2);tablaUno.setValueAt(rs.getDouble("pcincov"), 4, 3);tablaUno.setValueAt(rs.getDouble("pcincow"), 4, 4);
-                cjuv.setText(""+rs.getDouble("resuv"));
-                cjvw.setText(""+rs.getDouble("resvw"));
-                cjwu.setText(""+rs.getDouble("reswu"));
-                cjproresalta.setText(""+rs.getDouble("proresuno"));
+                tablaUno.setValueAt(rs.getDouble("punou"), 0, 2);
+                tablaUno.setValueAt(rs.getDouble("punov"), 0, 3);
+                tablaUno.setValueAt(rs.getDouble("punow"), 0, 4);
+                tablaUno.setValueAt(rs.getDouble("pdosu"), 1, 2);
+                tablaUno.setValueAt(rs.getDouble("pdosv"), 1, 3);
+                tablaUno.setValueAt(rs.getDouble("pdosw"), 1, 4);
+                tablaUno.setValueAt(rs.getDouble("ptresu"), 2, 2);
+                tablaUno.setValueAt(rs.getDouble("ptresv"), 2, 3);
+                tablaUno.setValueAt(rs.getDouble("ptresw"), 2, 4);
+                tablaUno.setValueAt(rs.getDouble("pcuatrou"), 3, 2);
+                tablaUno.setValueAt(rs.getDouble("pcuatrov"), 3, 3);
+                tablaUno.setValueAt(rs.getDouble("pcuatrow"), 3, 4);
+                tablaUno.setValueAt(rs.getDouble("pcincou"), 4, 2);
+                tablaUno.setValueAt(rs.getDouble("pcincov"), 4, 3);
+                tablaUno.setValueAt(rs.getDouble("pcincow"), 4, 4);
+                cjuv.setText("" + rs.getDouble("resuv"));
+                cjvw.setText("" + rs.getDouble("resvw"));
+                cjwu.setText("" + rs.getDouble("reswu"));
+                cjproresalta.setText("" + rs.getDouble("proresuno"));
                 comboMaterialAlta.setSelectedItem(rs.getString("materialconductoralta"));
-                cjxy.setText(""+rs.getDouble("resxy"));
-                cjyz.setText(""+rs.getDouble("resyz"));
-                cjzx.setText(""+rs.getDouble("reszx"));
-                cjproresbaja.setText(""+rs.getDouble("proresdos"));
+                cjxy.setText("" + rs.getDouble("resxy"));
+                cjyz.setText("" + rs.getDouble("resyz"));
+                cjzx.setText("" + rs.getDouble("reszx"));
+                cjproresbaja.setText("" + rs.getDouble("proresdos"));
                 comboMaterialBaja.setSelectedItem(rs.getString("materialconductorbaja"));
                 cjtensionBT.setText(rs.getString("tss"));
-                cjiu.setText(""+rs.getDouble("iu"));
-                cjiv.setText(""+rs.getDouble("iv"));
-                cjiw.setText(""+rs.getDouble("iw"));
-                cjpromedioi.setText(""+rs.getDouble("promedioi"));
-                cjiogarantizado.setText(""+rs.getDouble("iogarantizado"));
+                cjiu.setText("" + rs.getDouble("iu"));
+                cjiv.setText("" + rs.getDouble("iv"));
+                cjiw.setText("" + rs.getDouble("iw"));
+                cjpromedioi.setText("" + rs.getDouble("promedioi"));
+                cjiogarantizado.setText("" + rs.getDouble("iogarantizado"));
                 cjpomedido.setText(rs.getString("pomedido"));
-                cjpogarantizado.setText(""+rs.getDouble("pogarantizado"));
+                cjpogarantizado.setText("" + rs.getDouble("pogarantizado"));
                 cjvcc.setText(rs.getString("vcc"));
                 cjpcumedido.setText(rs.getString("pcu"));
-                cjpcua85.setText(""+rs.getDouble("pcua85"));
+                cjpcua85.setText("" + rs.getDouble("pcua85"));
                 cjpcugarantizado.setText(rs.getString("pcugarantizado"));
-                cji2r.setText(""+rs.getDouble("i2r"));
-                cji2ra85.setText(""+rs.getDouble("i2ra85"));
-                cjimpedancia.setText(""+rs.getDouble("impedancia"));
-                cjimpedancia85.setText(""+rs.getDouble("impedancia85"));
-                cjimpedanciagarantizado.setText(""+rs.getDouble("impedanciagarantizada"));
+                cji2r.setText("" + rs.getDouble("i2r"));
+                cji2ra85.setText("" + rs.getDouble("i2ra85"));
+                cjimpedancia.setText("" + rs.getDouble("impedancia"));
+                cjimpedancia85.setText("" + rs.getDouble("impedancia85"));
+                cjimpedanciagarantizado.setText("" + rs.getDouble("impedanciagarantizada"));
                 cjreg.setText(rs.getString("reg"));
-                cjef.setText(""+rs.getDouble("ef"));
+                cjef.setText("" + rs.getDouble("ef"));
                 cjobservaciones.setText(rs.getString("observaciones"));
                 cjfechasalida.setDate(rs.getDate("fechalaboratorio"));
                 cjlargo.setText(rs.getString("largotanque"));
@@ -619,64 +632,74 @@ public class PROTOS extends javax.swing.JFrame{
             Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    void limpiar(){
+
+    void limpiar() {
         ESTADO_TRAFO = null;
         Component c = jTabbedPane1.getComponentAt(0);
         JPanel p = (JPanel) c;
-        for (Component com : p.getComponents()){
-            if(com instanceof JPanel){
+        for (Component com : p.getComponents()) {
+            if (com instanceof JPanel) {
                 JPanel panel = (JPanel) com;
-                for (Component txt : panel.getComponents()){
-                    if(txt instanceof JTextField){
+                for (Component txt : panel.getComponents()) {
+                    if (txt instanceof JTextField) {
                         ((JTextField) txt).setText("");
                     }
                 }
             }
         }
-        cjcalentamientodevanado.setText("65");cjtemperatura.setText("30");cjRuptura.setText("40");
-        cjmetodo.setText("ASTM 877");cjBTcontraATyTierra.setText("10");cjATcontraBTyTierra.setText("34.5");
-        cjtiempoaplicado.setText("60");cjFrecuenciaInducida.setText("414");cjtiempoInducido.setText("17");
-        cjespesor.setText("110");cjobservaciones.setText("");cjtiemporalt.setText("60");
+        cjcalentamientodevanado.setText("65");
+        cjtemperatura.setText("30");
+        cjRuptura.setText("40");
+        cjmetodo.setText("ASTM 877");
+        cjBTcontraATyTierra.setText("10");
+        cjATcontraBTyTierra.setText("34.5");
+        cjtiempoaplicado.setText("60");
+        cjFrecuenciaInducida.setText("414");
+        cjtiempoInducido.setText("17");
+        cjespesor.setText("110");
+        cjobservaciones.setText("");
+        cjtiemporalt.setText("60");
         btnGuardar.setIcon(new ImageIcon(getClass().getResource("/recursos/images/Guardar.png")));
-        btnGuardar.setEnabled(true);checkGarantia.setSelected(false);        
+        btnGuardar.setEnabled(true);
+        checkGarantia.setSelected(false);
     }
-    
-    void cargarProtocolos(){
+
+    void cargarProtocolos() {
         modeloTabla = new CustomTableModel(
-                new Object[][]{}, 
-                modelo.PROTOCOLO.getColumnNames(), 
-                tablaProtocolos, 
-                modelo.PROTOCOLO.getColumnClass(), 
+                new Object[][]{},
+                modelo.PROTOCOLO.getColumnNames(),
+                tablaProtocolos,
+                modelo.PROTOCOLO.getColumnClass(),
                 modelo.PROTOCOLO.getColumnEditables());
         modelo.PROTOCOLO.cargarProtocolos(modeloTabla);
-        
+
         tablaProtocolos.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         tablaProtocolos.setCellSelectionEnabled(true);
         tablaProtocolos.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "selectNextColumnCell");
-        
-        ajustarColumna.adjustColumns();            
-        tablaProtocolos.getColumnModel().getColumn(0).setCellRenderer(new JButtonIntoJTable.BotonEnColumna());                  
-        
+
+        ajustarColumna.adjustColumns();
+        tablaProtocolos.getColumnModel().getColumn(0).setCellRenderer(new JButtonIntoJTable.BotonEnColumna());
+
         rowSorter = new TableRowSorter(modeloTabla);
-        tablaProtocolos.setRowSorter(rowSorter); 
+        tablaProtocolos.setRowSorter(rowSorter);
     }
-    
-    void buscarProtocolo(){
+
+    void buscarProtocolo() {
         RowFilter<TableModel, Object> serie = RowFilter.regexFilter(cjbuscarPorSerie.getText().toUpperCase(), 3);
-        RowFilter<TableModel, Object> cliente = RowFilter.regexFilter((comboCliente.getSelectedIndex()>0)?comboCliente.getSelectedItem().toString():"", 2);
+        RowFilter<TableModel, Object> cliente = RowFilter.regexFilter((comboCliente.getSelectedIndex() > 0) ? comboCliente.getSelectedItem().toString() : "", 2);
         RowFilter<TableModel, Object> lote = RowFilter.regexFilter(cjBuscarPorLote.getText(), 9);
-        RowFilter<TableModel, Object> marca = RowFilter.regexFilter(cjBuscarPorMarca.getText().toUpperCase(), 5);        
+        RowFilter<TableModel, Object> marca = RowFilter.regexFilter(cjBuscarPorMarca.getText().toUpperCase(), 5);
+        RowFilter<TableModel, Object> despacho = RowFilter.regexFilter(cjdespacho.getText().toUpperCase(), 11);
         List<RowFilter<TableModel, Object>> filters = new ArrayList<>();
         filters.add(serie);
         filters.add(cliente);
         filters.add(lote);
-        filters.add(marca);        
+        filters.add(marca);
+        filters.add(despacho);
         compoundRowFilter = RowFilter.andFilter(filters);
         rowSorter.setRowFilter(compoundRowFilter);
     }
-       
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -885,10 +908,15 @@ public class PROTOS extends javax.swing.JFrame{
         jLabel83 = new javax.swing.JLabel();
         cjBuscarPorLote = new CompuChiqui.JTextFieldPopup();
         jSeparator4 = new javax.swing.JToolBar.Separator();
+        jLabel86 = new javax.swing.JLabel();
+        cjdespacho = new javax.swing.JTextField();
+        jSeparator8 = new javax.swing.JToolBar.Separator();
         jLabel84 = new javax.swing.JLabel();
         cjBuscarPorMarca = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         btnGenerarExcel = new javax.swing.JButton();
+        jSeparator9 = new javax.swing.JToolBar.Separator();
+        btnExportarPdfs = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         tablaProtocolos = new javax.swing.JTable();
         jProgressBar1 = new javax.swing.JProgressBar();
@@ -2024,6 +2052,17 @@ public class PROTOS extends javax.swing.JFrame{
         jToolBar1.add(cjBuscarPorLote);
         jToolBar1.add(jSeparator4);
 
+        jLabel86.setText("Despacho:");
+        jToolBar1.add(jLabel86);
+
+        cjdespacho.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                cjdespachoKeyReleased(evt);
+            }
+        });
+        jToolBar1.add(cjdespacho);
+        jToolBar1.add(jSeparator8);
+
         jLabel84.setFont(new java.awt.Font("SansSerif", 1, 11)); // NOI18N
         jLabel84.setText("Marca:");
         jToolBar1.add(jLabel84);
@@ -2046,6 +2085,18 @@ public class PROTOS extends javax.swing.JFrame{
             }
         });
         jToolBar1.add(btnGenerarExcel);
+        jToolBar1.add(jSeparator9);
+
+        btnExportarPdfs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/pdf.png"))); // NOI18N
+        btnExportarPdfs.setFocusable(false);
+        btnExportarPdfs.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnExportarPdfs.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnExportarPdfs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportarPdfsActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnExportarPdfs);
 
         tablaProtocolos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -2163,31 +2214,31 @@ public class PROTOS extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void cjserieKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjserieKeyPressed
-        if(evt.getKeyCode()==10){
-            try{
+        if (evt.getKeyCode() == 10) {
+            try {
                 boolean mostrar = false;
                 ResultSet rs = null;
                 conex.conectar();
-                rs = conex.CONSULTAR("SELECT numeroserie, count(*) FROM transformador t WHERE t.numeroserie='"+cjserie.getText()+"' GROUP BY numeroserie ");
+                rs = conex.CONSULTAR("SELECT numeroserie, count(*) FROM transformador t WHERE t.numeroserie='" + cjserie.getText() + "' GROUP BY numeroserie ");
                 int total = 0;
-                if(rs.next()){
+                if (rs.next()) {
                     total = rs.getInt("count");
-                }else{
+                } else {
                     modelo.Metodos.M("NO SE ENCONTRÒ EL NUMERO DE SERIE DIGITADO", "advertencia.png");
                     return;
                 }
-                rs = conex.CONSULTAR("SELECT * FROM entrada e INNER JOIN transformador t USING(identrada) INNER JOIN cliente c USING (idcliente) WHERE t.numeroserie='"+cjserie.getText().trim()+"'");
-                if(total == 1){                    
+                rs = conex.CONSULTAR("SELECT * FROM entrada e INNER JOIN transformador t USING(identrada) INNER JOIN cliente c USING (idcliente) WHERE t.numeroserie='" + cjserie.getText().trim() + "'");
+                if (total == 1) {
                     mostrar = rs.next();
-                }else if(total > 1){
+                } else if (total > 1) {
                     DialogoTrafosRepetidos trafos = new DialogoTrafosRepetidos(this, rootPaneCheckingEnabled);
                     trafos.CargarDatos(rs);
                     trafos.setVisible(true);
                     IDTRAFO = trafos.getIDTRAFO();
-                    rs = conex.CONSULTAR("SELECT * FROM entrada e INNER JOIN transformador t USING(identrada) INNER JOIN cliente c USING (idcliente) WHERE t.idtransformador='"+trafos.getIDTRAFO()+"'");
+                    rs = conex.CONSULTAR("SELECT * FROM entrada e INNER JOIN transformador t USING(identrada) INNER JOIN cliente c USING (idcliente) WHERE t.idtransformador='" + trafos.getIDTRAFO() + "'");
                     mostrar = rs.next();
                 }
-                if(mostrar){
+                if (mostrar) {
                     IDTRAFO = rs.getInt("idtransformador");
                     cjcliente.setText(rs.getString("nombrecliente"));
                     cjlote.setText(rs.getString("lote"));
@@ -2198,7 +2249,7 @@ public class PROTOS extends javax.swing.JFrame{
                     cjano.setText(rs.getString("ano"));
                     cjvp.setText(rs.getString("tps"));
                     cjvs.setText(rs.getString("tss"));
-                    cjtensionBT.setText(String.valueOf(rs.getInt("tss")*2));
+                    cjtensionBT.setText(String.valueOf(rs.getInt("tss") * 2));
                     cjTensionBT2.setText(rs.getString("tss"));
                     comboServicio.setSelectedItem(rs.getString("serviciosalida"));
                     cjmasa.setText(rs.getString("peso"));
@@ -2208,10 +2259,10 @@ public class PROTOS extends javax.swing.JFrame{
                     cjcliente.setCaretPosition(0);
                     subMenuItemRecalcular.doClick();
                 }
-            }catch(SQLException ex){
-                modelo.Metodos.M("ERROR AL BUSCAR EL NUMERO DE SERIE\n"+ex, "error.png");
+            } catch (SQLException ex) {
+                modelo.Metodos.M("ERROR AL BUSCAR EL NUMERO DE SERIE\n" + ex, "error.png");
                 Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
-            }finally{
+            } finally {
                 conex.CERRAR();
             }
         }
@@ -2229,18 +2280,18 @@ public class PROTOS extends javax.swing.JFrame{
         I2R85();
         Z85();
         HallarReg();
-        HallarEf();        
+        HallarEf();
         cargarMedidas();
     }//GEN-LAST:event_subMenuItemRecalcularActionPerformed
 
     private void tablaUnoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tablaUnoKeyTyped
-        if(evt.getKeyChar()==10){
-            if(comboFase.getSelectedIndex()==0){
-                if(tablaUno.getSelectedRow()==0&&tablaUno.getSelectedColumn()==3){
+        if (evt.getKeyChar() == 10) {
+            if (comboFase.getSelectedIndex() == 0) {
+                if (tablaUno.getSelectedRow() == 0 && tablaUno.getSelectedColumn() == 3) {
                     cjuv.grabFocus();
                 }
-            }else{
-                if(tablaUno.getSelectedRow()==0&&tablaUno.getSelectedColumn()==0){
+            } else {
+                if (tablaUno.getSelectedRow() == 0 && tablaUno.getSelectedColumn() == 0) {
                     cjuv.grabFocus();
                 }
             }
@@ -2248,34 +2299,34 @@ public class PROTOS extends javax.swing.JFrame{
     }//GEN-LAST:event_tablaUnoKeyTyped
 
     private void cjuvKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjuvKeyPressed
-        if(evt.getKeyCode()==10 && !cjuv.getText().isEmpty()){
-            if(comboFase.getSelectedIndex()==0){
+        if (evt.getKeyCode() == 10 && !cjuv.getText().isEmpty()) {
+            if (comboFase.getSelectedIndex() == 0) {
                 cjxy.grabFocus();
-            }else{
+            } else {
                 cjwu.grabFocus();
             }
         }
     }//GEN-LAST:event_cjuvKeyPressed
 
     private void cjxyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjxyKeyReleased
-        if(evt.getKeyCode()==10 && !cjxy.getText().isEmpty()){
-            if(comboFase.getSelectedIndex()==0){
+        if (evt.getKeyCode() == 10 && !cjxy.getText().isEmpty()) {
+            if (comboFase.getSelectedIndex() == 0) {
                 cjiu.grabFocus();
-            }else{
+            } else {
                 cjyz.grabFocus();
             }
         }
     }//GEN-LAST:event_cjxyKeyReleased
 
     private void comboFaseItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboFaseItemStateChanged
-        if(evt.getStateChange()==ItemEvent.DESELECTED){
-            habilitarCampos((comboFase.getSelectedIndex()==1));
+        if (evt.getStateChange() == ItemEvent.DESELECTED) {
+            habilitarCampos((comboFase.getSelectedIndex() == 1));
             subMenuItemRecalcular.doClick();
         }
     }//GEN-LAST:event_comboFaseItemStateChanged
 
     private void cjBTcontraTierraKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjBTcontraTierraKeyPressed
-        if(evt.getKeyCode()==10){
+        if (evt.getKeyCode() == 10) {
             tablaUno.setRowSelectionInterval(0, 0);
             tablaUno.setColumnSelectionInterval(2, 2);
             tablaUno.grabFocus();
@@ -2283,26 +2334,26 @@ public class PROTOS extends javax.swing.JFrame{
     }//GEN-LAST:event_cjBTcontraTierraKeyPressed
 
     private void cjiuKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjiuKeyPressed
-        if(evt.getKeyCode()==10){
-            if(comboFase.getSelectedIndex()==0){
+        if (evt.getKeyCode() == 10) {
+            if (comboFase.getSelectedIndex() == 0) {
                 cjpomedido.grabFocus();
-            }else{
+            } else {
                 cjiv.grabFocus();
             }
         }
     }//GEN-LAST:event_cjiuKeyPressed
 
     private void comboServicioItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboServicioItemStateChanged
-        if(evt.getStateChange() == ItemEvent.DESELECTED){
-            if(!ACTUALIZANDO && "MANTENIMIENTO".equals(comboServicio.getSelectedItem().toString()) && ESTADO_TRAFO==null){
-                while(true){
-                    int n = JOptionPane.showOptionDialog(this, "SELECCIONE EL ESTADO DEL TRANSFORMADOR", "Seleccione una opcion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, modelo.Metodos.getIcon("advertencia.png"), new Object[]{"ORIGINAL","REPARADO"}, "ORIGINAL");
-                    if(n>=0){
-                        ESTADO_TRAFO = (n==0)?"ORIGINAL":"REPARADO";
+        if (evt.getStateChange() == ItemEvent.DESELECTED) {
+            if (!ACTUALIZANDO && "MANTENIMIENTO".equals(comboServicio.getSelectedItem().toString()) && ESTADO_TRAFO == null) {
+                while (true) {
+                    int n = JOptionPane.showOptionDialog(this, "SELECCIONE EL ESTADO DEL TRANSFORMADOR", "Seleccione una opcion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, modelo.Metodos.getIcon("advertencia.png"), new Object[]{"ORIGINAL", "REPARADO"}, "ORIGINAL");
+                    if (n >= 0) {
+                        ESTADO_TRAFO = (n == 0) ? "ORIGINAL" : "REPARADO";
                         break;
                     }
                 }
-            }else{
+            } else {
                 ESTADO_TRAFO = comboServicio.getSelectedItem().toString();
             }
         }
@@ -2321,19 +2372,19 @@ public class PROTOS extends javax.swing.JFrame{
     }//GEN-LAST:event_cjbuscarPorSerieKeyReleased
 
     private void tablaProtocolosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaProtocolosMouseClicked
-        if(SwingUtilities.isRightMouseButton(evt)){
-            tablaProtocolos.setRowSelectionInterval(tablaProtocolos.rowAtPoint( evt.getPoint() ), tablaProtocolos.rowAtPoint( evt.getPoint() ));
-            tablaProtocolos.setColumnSelectionInterval(tablaProtocolos.columnAtPoint(evt.getPoint()), tablaProtocolos.columnAtPoint(evt.getPoint()));           
-            menuProtocolos.show(tablaProtocolos, evt.getPoint().x, evt.getPoint().y); 
+        if (SwingUtilities.isRightMouseButton(evt)) {
+            tablaProtocolos.setRowSelectionInterval(tablaProtocolos.rowAtPoint(evt.getPoint()), tablaProtocolos.rowAtPoint(evt.getPoint()));
+            tablaProtocolos.setColumnSelectionInterval(tablaProtocolos.columnAtPoint(evt.getPoint()), tablaProtocolos.columnAtPoint(evt.getPoint()));
+            menuProtocolos.show(tablaProtocolos, evt.getPoint().x, evt.getPoint().y);
             IDPROTOCOLO = (int) tablaProtocolos.getValueAt(tablaProtocolos.getSelectedRow(), 0);
             IDBUSQUEDA = tablaProtocolos.columnAtPoint(evt.getPoint());
         }
-        if(evt.getClickCount()==2){
+        if (evt.getClickCount() == 2) {
             IDPROTOCOLO = (int) tablaProtocolos.getValueAt(tablaProtocolos.getSelectedRow(), 0);
             abrirProtocolo();
         }
     }//GEN-LAST:event_tablaProtocolosMouseClicked
-        
+
     private void cjBuscarPorMarcaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjBuscarPorMarcaKeyReleased
         buscarProtocolo();
     }//GEN-LAST:event_cjBuscarPorMarcaKeyReleased
@@ -2347,12 +2398,12 @@ public class PROTOS extends javax.swing.JFrame{
     }//GEN-LAST:event_subMenuAbrirProtocoloActionPerformed
 
     private void subMenuEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subMenuEliminarActionPerformed
-        if(JOptionPane.showConfirmDialog(rootPane, "Desea eliminar el protocolo "+tablaProtocolos.getValueAt(tablaProtocolos.getSelectedRow(), 1)+"?")==JOptionPane.YES_OPTION){
-            if(conex.GUARDAR("DELETE FROM protocolos WHERE idprotocolo="+IDPROTOCOLO)){
+        if (JOptionPane.showConfirmDialog(rootPane, "Desea eliminar el protocolo " + tablaProtocolos.getValueAt(tablaProtocolos.getSelectedRow(), 1) + "?") == JOptionPane.YES_OPTION) {
+            if (conex.GUARDAR("DELETE FROM protocolos WHERE idprotocolo=" + IDPROTOCOLO)) {
                 modeloTabla.removeRow(tablaProtocolos.getSelectedRow());
                 //modelo.Metodos.M("EL PROTOCOLO HA SIDO ELIMINADO", "bien.png");                
             }
-        }        
+        }
     }//GEN-LAST:event_subMenuEliminarActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -2360,38 +2411,38 @@ public class PROTOS extends javax.swing.JFrame{
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void conmutadorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_conmutadorItemStateChanged
-        if(evt.getStateChange() == ItemEvent.DESELECTED ){
+        if (evt.getStateChange() == ItemEvent.DESELECTED) {
             CargarTablas();
             comboDerivacion.setSelectedIndex(conmutador.getSelectedIndex());
         }
     }//GEN-LAST:event_conmutadorItemStateChanged
 
     private void cjobservacionesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjobservacionesKeyReleased
-        if(evt.getKeyChar()==10){
+        if (evt.getKeyChar() == 10) {
             cjfechasalida.grabFocus();
         }
     }//GEN-LAST:event_cjobservacionesKeyReleased
 
     private void cjpcumedidoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjpcumedidoKeyTyped
-        if(evt.getKeyChar()==10){
+        if (evt.getKeyChar() == 10) {
             subMenuItemRecalcular.doClick();
-            if(cjpcumedido.getDouble() < cji2r.getDouble()){
+            if (cjpcumedido.getDouble() < cji2r.getDouble()) {
                 modelo.Metodos.M("Las perdidas en el cobre son menores a las I²R.!", "advertencia.png");
-                cjpcumedido.setBorder(new LineBorder(new Color(209,72,54), 2));
-                cji2r.setBorder(new LineBorder(new Color(209,72,54), 2));
-            }else{
-                cjobservaciones.grabFocus();                
+                cjpcumedido.setBorder(new LineBorder(new Color(209, 72, 54), 2));
+                cji2r.setBorder(new LineBorder(new Color(209, 72, 54), 2));
+            } else {
+                cjobservaciones.grabFocus();
             }
         }
     }//GEN-LAST:event_cjpcumedidoKeyTyped
 
     private void cjpomedidoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjpomedidoKeyTyped
-        if(evt.getKeyChar()== 10){
-            if(cjpomedido.getDouble() > cjpogarantizado.getDouble()){
+        if (evt.getKeyChar() == 10) {
+            if (cjpomedido.getDouble() > cjpogarantizado.getDouble()) {
                 modelo.Metodos.M("Las Po Medidas con mayores a las garantizadas.!!", "advertencia.png");
-                cjpogarantizado.setBorder(new LineBorder(new Color(209,72,54), 2));
-                cjpomedido.setBorder(new LineBorder(new Color(209,72,54), 2));
-            }else{
+                cjpogarantizado.setBorder(new LineBorder(new Color(209, 72, 54), 2));
+                cjpomedido.setBorder(new LineBorder(new Color(209, 72, 54), 2));
+            } else {
                 cjvcc.grabFocus();
             }
         }
@@ -2400,71 +2451,71 @@ public class PROTOS extends javax.swing.JFrame{
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         ProgressMonitor pm = new ProgressMonitor(this, "Generando excel", "", 0, 0);
         int idcliente = comboCliente.getItemAt(comboCliente.getSelectedIndex()).getIdCliente();
-        
-        String sql = " SELECT count(*)\n" +
-        "FROM entrada e \n" +
-        "INNER JOIN transformador t ON e.identrada=t.identrada\n" +
-        "LEFT JOIN despacho d ON d.iddespacho=t.iddespacho\n" +
-        "LEFT JOIN remision r ON r.idremision=t.idremision\n" +
-        "LEFT JOIN protocolos p ON p.idtransformador=t.idtransformador\n" +
-        "WHERE e.idcliente="+idcliente+" "+((!cjBuscarPorLote.getText().isEmpty())?" AND e.lote='"+cjBuscarPorLote.getText().trim()+"' ":"");
+
+        String sql = " SELECT count(*)\n"
+                + "FROM entrada e \n"
+                + "INNER JOIN transformador t ON e.identrada=t.identrada\n"
+                + "LEFT JOIN despacho d ON d.iddespacho=t.iddespacho\n"
+                + "LEFT JOIN remision r ON r.idremision=t.idremision\n"
+                + "LEFT JOIN protocolos p ON p.idtransformador=t.idtransformador\n"
+                + "WHERE e.idcliente=" + idcliente + " " + ((!cjBuscarPorLote.getText().isEmpty()) ? " AND e.lote='" + cjBuscarPorLote.getText().trim() + "' " : "");
         conex.conectar();
         ResultSet rs1 = conex.CONSULTAR(sql);
-        
+
         try {
             rs1.next();
             pm.setMaximum(rs1.getInt("count"));
         } catch (SQLException ex) {
             Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         conex.conectar();
-        (new Thread(){
+        (new Thread() {
             @Override
-            public void run(){
+            public void run() {
                 try {
-                    String sql1 = " SELECT p.codigo, t.numeroserie, t.marca, t.kvasalida, t.fase, t.ano, t.tps, t.tss, p.i1, p.i2, p.proresuno, p.proresdos, p.pomedido, p.iu, p.iv, p.iw, \n" +
-                    "p.promedioi, p.pogarantizado, p.pcu, p.vcc, p.temperaturadeensayo, p.i2r, p.i2ra85, p.pcua85, p.impedancia85, p.pcugarantizado, p.reg, p.atcontrabt, \n" +
-                    "p.atcontratierra, p.btcontratierra, p.grupodeconexion, punou, pdosu, ptresu, pcuatrou, pcincou, punov, pdosv, ptresv, pcuatrov, pcincov, punow, pdosw, ptresw, pcuatrow, pcincow,\n" +
-                    "p.anchotanque, p.largotanque, altotanque, t.serviciosalida, to_char(p.fechaderegistro, 'DD Mon YYYY'), ('') as vencegarantia, p.liquidoaislante, t.aceite, p.color, t.peso, \n" +
-                    "e.lote, e.op, t.numeroempresa\n" +
-                    "FROM entrada e \n" +
-                    "INNER JOIN transformador t ON e.identrada=t.identrada\n" +
-                    "LEFT JOIN despacho d ON d.iddespacho=t.iddespacho\n" +
-                    "LEFT JOIN remision r ON r.idremision=t.idremision\n" +
-                    "LEFT JOIN protocolos p ON p.idtransformador=t.idtransformador\n" +
-                    "WHERE e.idcliente="+idcliente+"\n " +
-                    ((!cjBuscarPorLote.getText().isEmpty())?" AND e.lote='"+cjBuscarPorLote.getText().trim()+"' ":"")+
-                    "ORDER BY e.identrada, fase, kvasalida, marca, item ";
+                    String sql1 = " SELECT p.codigo, t.numeroserie, t.marca, t.kvasalida, t.fase, t.ano, t.tps, t.tss, p.i1, p.i2, p.proresuno, p.proresdos, p.pomedido, p.iu, p.iv, p.iw, \n"
+                            + "p.promedioi, p.pogarantizado, p.pcu, p.vcc, p.temperaturadeensayo, p.i2r, p.i2ra85, p.pcua85, p.impedancia85, p.pcugarantizado, p.reg, p.atcontrabt, \n"
+                            + "p.atcontratierra, p.btcontratierra, p.grupodeconexion, punou, pdosu, ptresu, pcuatrou, pcincou, punov, pdosv, ptresv, pcuatrov, pcincov, punow, pdosw, ptresw, pcuatrow, pcincow,\n"
+                            + "p.anchotanque, p.largotanque, altotanque, t.serviciosalida, to_char(p.fechaderegistro, 'DD Mon YYYY'), ('') as vencegarantia, p.liquidoaislante, t.aceite, p.color, t.peso, \n"
+                            + "e.lote, e.op, t.numeroempresa\n"
+                            + "FROM entrada e \n"
+                            + "INNER JOIN transformador t ON e.identrada=t.identrada\n"
+                            + "LEFT JOIN despacho d ON d.iddespacho=t.iddespacho\n"
+                            + "LEFT JOIN remision r ON r.idremision=t.idremision\n"
+                            + "LEFT JOIN protocolos p ON p.idtransformador=t.idtransformador\n"
+                            + "WHERE e.idcliente=" + idcliente + "\n "
+                            + ((!cjBuscarPorLote.getText().isEmpty()) ? " AND e.lote='" + cjBuscarPorLote.getText().trim() + "' " : "")
+                            + "ORDER BY e.identrada, fase, kvasalida, marca, item ";
                     ResultSet rs = conex.CONSULTAR(sql1);
                     ResultSetMetaData rsmd = rs.getMetaData();
                     XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(new File("PLANTILLAS EXCEL//CARACTERISTICAS DE PROTOCOLOS.xlsx")));
                     XSSFSheet hoja = wb.getSheetAt(0);
                     XSSFRow fila;
                     int filas = 4;
-                    while(rs.next()){
+                    while (rs.next()) {
                         pm.setProgress(rs.getRow());
                         fila = hoja.createRow(filas);
                         for (int i = 0; i < rsmd.getColumnCount(); i++) {
-                            if(rs.getObject((i+1)) instanceof Double){
-                                fila.createCell(i, XSSFCell.CELL_TYPE_STRING).setCellValue(QD(rs.getDouble((i+1)), 3));
-                            }else if(rs.getObject((i+1)) instanceof Integer){
-                                fila.createCell(i, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt( (i+1) ));
-                            }else{
-                                fila.createCell(i, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString( (i+1) ));
+                            if (rs.getObject((i + 1)) instanceof Double) {
+                                fila.createCell(i, XSSFCell.CELL_TYPE_STRING).setCellValue(QD(rs.getDouble((i + 1)), 3));
+                            } else if (rs.getObject((i + 1)) instanceof Integer) {
+                                fila.createCell(i, XSSFCell.CELL_TYPE_NUMERIC).setCellValue(rs.getInt((i + 1)));
+                            } else {
+                                fila.createCell(i, XSSFCell.CELL_TYPE_STRING).setCellValue(rs.getString((i + 1)));
                             }
                         }
                         filas++;
                     }
-                    for(int j = 0; j < rsmd.getColumnCount(); j++) {
+                    for (int j = 0; j < rsmd.getColumnCount(); j++) {
                         wb.getSheetAt(0).autoSizeColumn(j);
                     }
-                    File f = File.createTempFile("PROTOCOLOS",".xlsx");
+                    File f = File.createTempFile("PROTOCOLOS", ".xlsx");
                     OutputStream out = new FileOutputStream(f);
                     wb.write(out);
                     out.close();
                     Desktop.getDesktop().open(f);
-                } catch (Exception ex){
+                } catch (Exception ex) {
                     Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
                     modelo.Metodos.ERROR(ex, "ERROR AL GENERAR EL REPORTE");
                 }
@@ -2473,24 +2524,30 @@ public class PROTOS extends javax.swing.JFrame{
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void comboClienteItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboClienteItemStateChanged
-        if(evt.getStateChange() == ItemEvent.DESELECTED){
+        if (evt.getStateChange() == ItemEvent.DESELECTED) {
             buscarProtocolo();
-        }        
+        }
     }//GEN-LAST:event_comboClienteItemStateChanged
 
     private void comboClaseAislamientoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboClaseAislamientoItemStateChanged
-        switch(comboClaseAislamiento.getSelectedIndex()){
-            case 0:jLabel61.setText("Pcc A°(W):");
+        switch (comboClaseAislamiento.getSelectedIndex()) {
+            case 0:
+                jLabel61.setText("Pcc A°(W):");
                 break;
-            case 1:jLabel61.setText("Pcc a 75°(W):");
+            case 1:
+                jLabel61.setText("Pcc a 75°(W):");
                 break;
-            case 2:jLabel61.setText("Pcc a 85°(W):");
+            case 2:
+                jLabel61.setText("Pcc a 85°(W):");
                 break;
-            case 3:jLabel61.setText("Pcc a 100°(W):");
+            case 3:
+                jLabel61.setText("Pcc a 100°(W):");
                 break;
-            case 4:jLabel61.setText("Pcc a 120°(W):");
+            case 4:
+                jLabel61.setText("Pcc a 120°(W):");
                 break;
-            case 5:jLabel61.setText("Pcc a 145°(W):");
+            case 5:
+                jLabel61.setText("Pcc a 145°(W):");
                 break;
         }
     }//GEN-LAST:event_comboClaseAislamientoItemStateChanged
@@ -2502,6 +2559,45 @@ public class PROTOS extends javax.swing.JFrame{
     private void comboContratoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboContratoItemStateChanged
         // TODO add your handling code here:
     }//GEN-LAST:event_comboContratoItemStateChanged
+
+    private void btnExportarPdfsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportarPdfsActionPerformed
+
+        if (JOptionPane.showConfirmDialog(this, "Se van a generar " + tablaProtocolos.getRowCount() + " protocolos en PDF, ¿Desea continuar?", "Confirmar", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            JFileChooser fc = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos PDF", "pdf");
+            fc.setFileFilter(filter);
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int res = fc.showSaveDialog(this);
+            if (res == JFileChooser.APPROVE_OPTION) {
+                (new Thread() {
+                    public void run() {
+                        tablaProtocolos.setColumnSelectionInterval(3, 3);
+                        try {
+                            for (int i = 0; i < tablaProtocolos.getRowCount(); i++) {
+                                tablaProtocolos.setRowSelectionInterval(i, i);
+                                tablaProtocolos.scrollRectToVisible(new Rectangle(tablaProtocolos.getCellRect(i, 3, true)));
+                                repaint();
+                                JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/PROTOCOLO.jasper").toString()));
+                                Map<String, Object> p = new HashMap<String, Object>();
+                                p.put("IDPROTOCOLO", tablaProtocolos.getValueAt(i, 0));
+                                JasperPrint jasperprint = JasperFillManager.fillReport(reporte, p, conex.conectar());
+                                JasperExportManager.exportReportToPdfFile(jasperprint, new File(fc.getSelectedFile(), tablaProtocolos.getValueAt(i, 3) + ".pdf").toString());
+                            }
+                            JOptionPane.showMessageDialog(null, "TERMINADO");
+                            Desktop.getDesktop().open(fc.getSelectedFile());
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(null, "ERROR EL GENERAR LOS PDF\n" + e);                            
+                        }
+                    }
+                }).start();
+            }
+        }
+
+    }//GEN-LAST:event_btnExportarPdfsActionPerformed
+
+    private void cjdespachoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cjdespachoKeyReleased
+        buscarProtocolo();
+    }//GEN-LAST:event_cjdespachoKeyReleased
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -2520,7 +2616,7 @@ public class PROTOS extends javax.swing.JFrame{
             java.util.logging.Logger.getLogger(PROTOS.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+
         //</editor-fold>
 
         /* Create and display the form */
@@ -2532,6 +2628,7 @@ public class PROTOS extends javax.swing.JFrame{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExportarPdfs;
     private javax.swing.JButton btnGenerarExcel;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JCheckBox checkGarantia;
@@ -2555,6 +2652,7 @@ public class PROTOS extends javax.swing.JFrame{
     private CompuChiqui.JTextFieldPopup cjcalentamientodevanado;
     private CompuChiqui.JTextFieldPopup cjcliente;
     private CompuChiqui.JTextFieldPopup cjcolor;
+    private javax.swing.JTextField cjdespacho;
     private CompuChiqui.JTextFieldPopup cjef;
     private CompuChiqui.JTextFieldPopup cjelementos;
     private CompuChiqui.JTextFieldPopup cjempresa;
@@ -2707,6 +2805,7 @@ public class PROTOS extends javax.swing.JFrame{
     private javax.swing.JLabel jLabel83;
     private javax.swing.JLabel jLabel84;
     private javax.swing.JLabel jLabel85;
+    private javax.swing.JLabel jLabel86;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -2739,6 +2838,8 @@ public class PROTOS extends javax.swing.JFrame{
     private javax.swing.JToolBar.Separator jSeparator5;
     private javax.swing.JToolBar.Separator jSeparator6;
     private javax.swing.JToolBar.Separator jSeparator7;
+    private javax.swing.JToolBar.Separator jSeparator8;
+    private javax.swing.JToolBar.Separator jSeparator9;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
@@ -2752,44 +2853,44 @@ public class PROTOS extends javax.swing.JFrame{
     private javax.swing.JTable tablaUno;
     // End of variables declaration//GEN-END:variables
 
-    private class Hilofases extends Thread{
-        
+    private class Hilofases extends Thread {
+
         private int fila = -1;
         private int col = -1;
-        
+
         public Hilofases(int row, int col) {
             this.fila = row;
             this.col = col;
         }
-        
+
         @Override
-        public void run(){
-            while(true){
+        public void run() {
+            while (true) {
                 System.out.println("CORRIENDO HILO");
                 double fase = Double.parseDouble(tablaUno.getValueAt(getFila(), getCol()).toString());
                 double minimo = Double.parseDouble(tablaDos.getValueAt(getFila(), 1).toString());
                 double maximo = Double.parseDouble(tablaDos.getValueAt(getFila(), 2).toString());
-                if(fase < minimo || fase > maximo){
+                if (fase < minimo || fase > maximo) {
                     try {
                         JTextField fileName = new JTextField(String.valueOf(fase));
-                        Object[] message = {"INGRESE UN NUEVO VALOR.\n(MIN = "+minimo+" MAX = "+maximo+")", fileName};
-                        int n =JOptionPane.showOptionDialog(rootPane, message, "VALOR FUERA DE RANGO", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,modelo.Metodos.getIcon("advertencia.png"), new Object[]{"ACEPTAR","OMITIR ERROR"}, "ACEPTAR");
-                        if(n==1){
+                        Object[] message = {"INGRESE UN NUEVO VALOR.\n(MIN = " + minimo + " MAX = " + maximo + ")", fileName};
+                        int n = JOptionPane.showOptionDialog(rootPane, message, "VALOR FUERA DE RANGO", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, modelo.Metodos.getIcon("advertencia.png"), new Object[]{"ACEPTAR", "OMITIR ERROR"}, "ACEPTAR");
+                        if (n == 1) {
                             break;
-                        }else if(n==0){
-                            if(Double.parseDouble(fileName.getText()) >= minimo && Double.parseDouble(fileName.getText()) <= maximo){
+                        } else if (n == 0) {
+                            if (Double.parseDouble(fileName.getText()) >= minimo && Double.parseDouble(fileName.getText()) <= maximo) {
                                 tablaUno.setValueAt(Double.parseDouble(fileName.getText()), getFila(), getCol());
                                 break;
                             }
                         }
-                    } catch (HeadlessException | NumberFormatException ex){
-                        modelo.Metodos.M("ERROR\n"+ex, "error.png");
-                    }                                
-                }else{
+                    } catch (HeadlessException | NumberFormatException ex) {
+                        modelo.Metodos.M("ERROR\n" + ex, "error.png");
+                    }
+                } else {
                     break;
                 }
             }
-        }       
+        }
 
         public int getFila() {
             return fila;
@@ -2806,7 +2907,7 @@ public class PROTOS extends javax.swing.JFrame{
         public void setCol(int col) {
             this.col = col;
         }
-        
+
     }
 
 }

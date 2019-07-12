@@ -281,9 +281,9 @@ WHERE e.identrada=$P{IDENTRADA} AND t.serviciosalida='REPARACION';]]>
 				<textFieldExpression><![CDATA["Tensión: "+$F{tps}+"/"+$F{tss}+"/"+$F{tts}+" | KVA: "+$F{kvasalida}+" | Marca: "+$F{marca}+" | Año: "+$F{ano}]]></textFieldExpression>
 			</textField>
 			<componentElement>
-				<reportElement x="60" y="28" width="223" height="23" uuid="b8c65b58-dcb9-40ac-8129-197eb6b4720a"/>
+				<reportElement x="79" y="28" width="189" height="23" uuid="b8c65b58-dcb9-40ac-8129-197eb6b4720a"/>
 				<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code128" drawText="false" checksumRequired="false" barHeight="0">
-					<jr:codeExpression><![CDATA[$P{IDENTRADA}+"-"+$F{numeroserie}]]></jr:codeExpression>
+					<jr:codeExpression><![CDATA[$P{IDENTRADA}+" "+$F{numeroserie}]]></jr:codeExpression>
 				</jr:barbecue>
 			</componentElement>
 		</band>

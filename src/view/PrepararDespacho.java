@@ -86,7 +86,7 @@ public class PrepararDespacho extends javax.swing.JFrame {
             public boolean isCellEditable(int row, int col){
                 if(col==4)
                     return null == modeloTabla.getValueAt(row, 1);
-                return col==9||col==11||col==13||col==15||col==17;
+                return col==10||col==12||col==14||col==16||col==18;
             }
             
         };
@@ -107,20 +107,21 @@ public class PrepararDespacho extends javax.swing.JFrame {
         JComboBox comboServicios = new JComboBox(SERVICIOS);
         comboServicios.setUI(JComboBoxColor.JComboBoxColor.createUI(comboServicios));
         comboServicios.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
-        tablaTrafos.getColumnModel().getColumn(13).setCellEditor(new DefaultCellEditor(comboServicios));
+        tablaTrafos.getColumnModel().getColumn(14).setCellEditor(new DefaultCellEditor(comboServicios));
 //        tablaTrafos.getColumnModel().getColumn(13).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(SERVICIOS));
         
         //COLUMNA TIPO TRAFOS
         comboServicios = new JComboBox(TIPOS);
         comboServicios.setUI(JComboBoxColor.JComboBoxColor.createUI(comboServicios));
         comboServicios.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
-        tablaTrafos.getColumnModel().getColumn(15).setCellEditor(new DefaultCellEditor(comboServicios));
+        tablaTrafos.getColumnModel().getColumn(16).setCellEditor(new DefaultCellEditor(comboServicios));
 //        tablaTrafos.getColumnModel().getColumn(15).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(TIPOS));
         
-        String sql = " SELECT d.nodespacho, r.numero_remision, t.idtransformador, t.numeroempresa, t.numeroserie, t.marca, t.fase, t.kvaentrada, t.kvasalida, t.tpe, t.tse, tte, t.tps, t.tss, tts, t.servicioentrada, t.serviciosalida, t.observacionentrada, t.observacionsalida, t.tipotrafoentrada, t.tipotrafosalida, t.peso, t.aceite FROM transformador t \n" +
+        String sql = " SELECT p.codigo, d.nodespacho, r.numero_remision, t.idtransformador, t.numeroempresa, t.numeroserie, t.marca, t.fase, t.kvaentrada, t.kvasalida, t.tpe, t.tse, tte, t.tps, t.tss, tts, t.servicioentrada, t.serviciosalida, t.observacionentrada, t.observacionsalida, t.tipotrafoentrada, t.tipotrafosalida, t.peso, t.aceite FROM transformador t \n" +
                     "LEFT JOIN despacho d USING(iddespacho)\n" +
                     "LEFT JOIN remision r USING(idremision)\n" +
-                    "WHERE t.identrada="+getIDENTRADA()+" ORDER BY fase, kvaentrada, marca, item";
+                    "left join protocolos p on t.idtransformador=p.idtransformador\n" +
+                    "WHERE t.identrada="+getIDENTRADA()+" ORDER BY fase, kvaentrada, marca, item;";
         
         conexion.conectar();
         ResultSet rs = conexion.CONSULTAR(sql);
@@ -132,6 +133,7 @@ public class PrepararDespacho extends javax.swing.JFrame {
                     rs.getString("numero_remision"),
                     rs.getString("numeroempresa"),
                     false,
+                    rs.getString("codigo"),
                     rs.getString("numeroserie"),
                     rs.getString("marca"),
                     rs.getInt("fase"),
@@ -157,43 +159,43 @@ public class PrepararDespacho extends javax.swing.JFrame {
                         
                         String val = modeloTabla.getValueAt(e.getFirstRow(), e.getColumn()).toString();
                         String item = modeloTabla.getValueAt(e.getFirstRow(), 0).toString();
-                        String serie = modeloTabla.getValueAt(e.getFirstRow(), 5).toString();
+                        String serie = modeloTabla.getValueAt(e.getFirstRow(), 6).toString();
                         
                         if(e.getColumn() == 4){
                             if(Boolean.parseBoolean(modeloTabla.getValueAt(e.getFirstRow(), 4).toString())){
-                                PESO += (int)modeloTabla.getValueAt(e.getFirstRow(), 18);
+                                PESO += (int)modeloTabla.getValueAt(e.getFirstRow(), 19);
                             }else{
-                                PESO -= (int)modeloTabla.getValueAt(e.getFirstRow(), 18);
+                                PESO -= (int)modeloTabla.getValueAt(e.getFirstRow(), 19);
                             }
                             lblPeso.setText("Peso Total: "+PESO);
                         }
                         
-                        if(e.getColumn() == 9){
+                        if(e.getColumn() == 10){
                             actualizarSalidas("kvasalida", val, item, serie);
                         }
                         
-                        if(e.getColumn() == 11){
+                        if(e.getColumn() == 12){
                             String GUARDAR = "";
-                            String t[] = modeloTabla.getValueAt(e.getFirstRow(), 11).toString().split("/");
+                            String t[] = modeloTabla.getValueAt(e.getFirstRow(), 12).toString().split("/");
                             if(t.length==3){
-                                if(new ConexionBD().GUARDAR("UPDATE transformador SET tps='"+t[0]+"' , tss='"+t[1]+"' , tts='"+t[2]+"' WHERE item='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND identrada='"+getIDENTRADA()+"' AND numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), 5)+"' ")){}
+                                if(new ConexionBD().GUARDAR("UPDATE transformador SET tps='"+t[0]+"' , tss='"+t[1]+"' , tts='"+t[2]+"' WHERE item='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND identrada='"+getIDENTRADA()+"' AND numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), 6)+"' ")){}
                             }else{
-                                if(new ConexionBD().GUARDAR("UPDATE transformador SET tps='0' , tss='0' , tts='0' WHERE item='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND identrada='"+IDENTRADA+"' AND numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), 5)+"' ")){
+                                if(new ConexionBD().GUARDAR("UPDATE transformador SET tps='0' , tss='0' , tts='0' WHERE item='"+modeloTabla.getValueAt(e.getFirstRow(), 0)+"' AND identrada='"+IDENTRADA+"' AND numeroserie='"+modeloTabla.getValueAt(e.getFirstRow(), 6)+"' ")){
                                     JOptionPane.showMessageDialog(null, "EL FORMATO DE LA TENSION DEBE COMPONERSE DE 3 TENSIONES SEPARADAS POR EL SIMBOLO /, RELLENAR CON 0(cero), EN CASO DE TENER LAS TRES.", "TENSION NO VÁLIDA", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getClass().getResource("/recursos/images/advertencia.png")));
                                     modeloTabla.setValueAt("0/0/0", e.getFirstRow(), 11);
                                 }                                
                             }    
                         }
                         
-                        if(e.getColumn() == 13){
+                        if(e.getColumn() == 14){
                             actualizarSalidas("serviciosalida", val, item, serie);
                         }
                         
-                        if(e.getColumn() == 15){
+                        if(e.getColumn() == 16){
                             actualizarSalidas("tipotrafosalida", val, item, serie);
                         }
                         
-                        if(e.getColumn() == 17){
+                        if(e.getColumn() == 18){
                             actualizarSalidas("observacionsalida", val, item, serie);
                         }
                     }

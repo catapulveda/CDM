@@ -188,7 +188,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                 });
             }
 
-            tabla.setDefaultRenderer(Object.class, new modelo.ColorPrepararDespacho());
+            tabla.setDefaultRenderer(Object.class, new modelo.ColorDespachoARemision());
 
             ajustarColumna.adjustColumns();
 
