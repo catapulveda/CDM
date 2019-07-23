@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,8 +74,9 @@ public class Metodos {
                     btn.setEnabled(false);
                     btn.setIcon(new ImageIcon(getClass().getResource("/recursos/images/gif.gif")));
                     XSSFWorkbook wb = new XSSFWorkbook();
-                    fileOut = new FileOutputStream(table.getName()+".xlsx");
-                    XSSFSheet hoja = wb.createSheet(table.getName()+".xlsx");
+                    File f = File.createTempFile(LocalDate.now().toString().replace('-', '_'), ".xlsx");
+                    fileOut = new FileOutputStream(f);
+                    XSSFSheet hoja = wb.createSheet(f.getName().replace('-', '_'));
                     XSSFRow fila;
                     for(int i=0; i<=table.getRowCount(); i++){
                         if(pm.isCanceled()){
@@ -89,7 +91,7 @@ public class Metodos {
                                 fila.createCell(j).setCellValue(table.getColumnName(j));
                             }else{
                                 fila.createCell(j).setCellValue((table.getValueAt(i-1, j)==null)?"0":table.getValueAt(i-1, j).toString());
-                            }                            
+                            }
                         }
                     }                    
                     if(!pm.isCanceled()){
@@ -98,7 +100,7 @@ public class Metodos {
                         }
                         wb.write(fileOut);
                         fileOut.close();
-                        Desktop.getDesktop().open(new File(table.getName()+".xlsx"));
+                        Desktop.getDesktop().open(f);
                     }else{
                         System.err.println("CANCELADO");
                     }

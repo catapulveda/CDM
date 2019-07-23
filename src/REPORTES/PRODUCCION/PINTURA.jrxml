@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PRODUCCION" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5eddb234-9a72-47fc-a18b-8bb1971b6e2f">
 	<property name="ireport.zoom" value="5.0"/>
-	<property name="ireport.x" value="2375"/>
+	<property name="ireport.x" value="2122"/>
 	<property name="ireport.y" value="586"/>
 	<style name="table">
 		<box>
@@ -62,7 +62,7 @@
 	<subDataset name="TRAFOS" uuid="914d5b87-7321-416c-900b-70d7933c7371">
 		<parameter name="IDENTRADA" class="java.lang.Integer"/>
 		<parameter name="SQLORDEN" class="java.lang.String">
-			<defaultValueExpression><![CDATA[$P{ORDEN_TABLA}?"fase ASC, kvaentrada ASC, marca":"item"]]></defaultValueExpression>
+			<defaultValueExpression><![CDATA[$P{ORDEN_TABLA}?"fase ASC, kvaentrada ASC, marca, numeroserie":"item"]]></defaultValueExpression>
 		</parameter>
 		<parameter name="ORDEN_TABLA" class="java.lang.Boolean">
 			<defaultValueExpression><![CDATA[true]]></defaultValueExpression>

@@ -395,6 +395,7 @@ public class DespachoARemision extends javax.swing.JFrame {
             }
         ));
         tabla.setDragEnabled(true);
+        tabla.setName(""); // NOI18N
         tabla.setRowHeight(25);
         jScrollPane1.setViewportView(tabla);
 

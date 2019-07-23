@@ -215,6 +215,7 @@
               </Table>
             </Property>
             <Property name="dragEnabled" type="boolean" value="true"/>
+            <Property name="name" type="java.lang.String" value="" noResource="true"/>
             <Property name="rowHeight" type="int" value="25"/>
           </Properties>
           <AuxValues>

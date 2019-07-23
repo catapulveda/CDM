@@ -268,3 +268,24 @@ org.postgresql.util.PSQLException: ERROR: división por cero
 
 
 
+java.lang.NullPointerException
+	at java.io.File.createTempFile(File.java:2000)
+	at java.io.File.createTempFile(File.java:2070)
+	at modelo.Metodos$1.run(Metodos.java:101)
+
+
+
+java.lang.IllegalArgumentException: Prefix string too short
+	at java.io.File.createTempFile(File.java:2001)
+	at java.io.File.createTempFile(File.java:2070)
+	at modelo.Metodos$1.run(Metodos.java:101)
+
+
+
+java.lang.IllegalArgumentException: Prefix string too short
+	at java.io.File.createTempFile(File.java:2001)
+	at java.io.File.createTempFile(File.java:2070)
+	at modelo.Metodos$1.run(Metodos.java:101)
+
+
+

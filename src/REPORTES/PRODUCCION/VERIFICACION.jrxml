@@ -60,45 +60,17 @@
 		</conditionalStyle>
 	</style>
 	<subDataset name="TRAFOS" uuid="914d5b87-7321-416c-900b-70d7933c7371">
-		<parameter name="IDENTRADA" class="java.lang.Integer">
+		<parameter name="IDENTRADA_TABLA" class="java.lang.Integer" isForPrompting="false">
 			<defaultValueExpression><![CDATA[322]]></defaultValueExpression>
 		</parameter>
-		<parameter name="ORDEN" class="java.lang.Boolean">
+		<parameter name="ORDEN_TABLA" class="java.lang.Boolean" isForPrompting="false">
 			<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
 		</parameter>
 		<parameter name="SQLORDEN" class="java.lang.String" isForPrompting="false">
-			<defaultValueExpression><![CDATA["SELECT idcliente, numeroempresa, numeroserie, marca, kvaentrada, fase, servicioentrada, ano, observacionentrada, "+
-	"CASE	WHEN idcliente=5 THEN "+
-					"CASE 	WHEN fase=1 THEN (SELECT po FROM monofasiconuevo WHERE kva=t.kvaentrada)"+
-						"WHEN fase=3 THEN (SELECT po FROM trifasiconuevo WHERE kva=t.kvaentrada) "+
-					"END "+
-		"ELSE "+
-			"CASE "+
-				"WHEN ano<1996 AND fase=1 THEN (SELECT po FROM monofasicoantesde1996 WHERE kva=t.kvaentrada) "+
-				"WHEN ano<1996 AND fase=3 THEN (SELECT po FROM trifasicoantesde1996 WHERE kva=t.kvaentrada) "+
-				"WHEN ano>=1996 AND fase=1 THEN (SELECT po FROM monofasicodespuesde1996 WHERE kva=t.kvaentrada) "+
-				"WHEN ano>=1996 AND fase=3 THEN (SELECT po FROM trifasicodespuesde1996 WHERE kva=t.kvaentrada) "+
-			"END "+
-	"END AS po, "+
-	"CASE	WHEN idcliente=5 THEN "+
-					"CASE 	WHEN fase=1 THEN (SELECT pc FROM monofasiconuevo WHERE kva=t.kvaentrada) "+
-						"WHEN fase=3 THEN (SELECT pc FROM trifasiconuevo WHERE kva=t.kvaentrada) "+
-					"END "+
-		"ELSE "+
-			"CASE "+
-				"WHEN ano<1996 AND fase=1 THEN (SELECT pc FROM monofasicoantesde1996 WHERE kva=t.kvaentrada) "+
-				"WHEN ano<1996 AND fase=3 THEN (SELECT pc FROM trifasicoantesde1996 WHERE kva=t.kvaentrada) "+
-				"WHEN ano>=1996 AND fase=1 THEN (SELECT pc FROM monofasicodespuesde1996 WHERE kva=t.kvaentrada) "+
-				"WHEN ano>=1996 AND fase=3 THEN (SELECT pc FROM trifasicodespuesde1996 WHERE kva=t.kvaentrada) "+
-			"END "+
-	"END AS pc "+
-"FROM entrada e "+
-"LEFT JOIN transformador t USING(identrada) "+
-"WHERE identrada="+$P{IDENTRADA}+
-( ($P{ORDEN}.equals( true ))?"ORDER BY fase, kvaentrada, marca ":"ORDER BY item ")]]></defaultValueExpression>
+			<defaultValueExpression><![CDATA[(($P{ORDEN_TABLA}.equals( true ))?"ORDER BY fase, kvaentrada, marca ":"ORDER BY item ")]]></defaultValueExpression>
 		</parameter>
-		<parameter name="ORDERBY" class="java.lang.String">
-			<defaultValueExpression><![CDATA[$P{ORDEN}.equals( true )?"fase, kvaentrada, marca":"item"]]></defaultValueExpression>
+		<parameter name="ORDERBY" class="java.lang.String" isForPrompting="false">
+			<defaultValueExpression><![CDATA[$P{ORDEN_TABLA}.equals( true )?"fase, kvaentrada, marca, numeroserie":"item"]]></defaultValueExpression>
 		</parameter>
 		<queryString>
 			<![CDATA[SELECT idcliente, numeroempresa, numeroserie, marca, kvaentrada, fase, servicioentrada, ano, observacionentrada, 
@@ -128,7 +100,7 @@
 	END AS pc 
 FROM entrada e 
 LEFT JOIN transformador t USING(identrada) 
-WHERE identrada=$P{IDENTRADA} ORDER BY $P!{ORDERBY}]]>
+WHERE identrada=$P{IDENTRADA_TABLA} ORDER BY $P!{ORDERBY}]]>
 		</queryString>
 		<field name="idcliente" class="java.lang.Integer"/>
 		<field name="numeroempresa" class="java.lang.String"/>
@@ -143,7 +115,7 @@ WHERE identrada=$P{IDENTRADA} ORDER BY $P!{ORDERBY}]]>
 		<field name="pc" class="java.lang.Double"/>
 	</subDataset>
 	<parameter name="IDENTRADA" class="java.lang.Integer" isForPrompting="false"/>
-	<parameter name="ORDEN" class="java.lang.Boolean">
+	<parameter name="ORDEN" class="java.lang.Boolean" isForPrompting="false">
 		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
 	</parameter>
 	<queryString>
@@ -289,11 +261,11 @@ WHERE identrada=$P{IDENTRADA}]]>
 			<componentElement>
 				<reportElement key="table" style="table" x="0" y="0" width="572" height="24" uuid="c9dc9aec-73a7-42d4-824d-ef55aabf53b8"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="TRAFOS" uuid="8460cfa1-426a-4108-8a12-01a4c35dd1f6">
-						<datasetParameter name="IDENTRADA">
+					<datasetRun subDataset="TRAFOS" uuid="cac7ed3c-bba0-4385-9c30-75ece6f1b922">
+						<datasetParameter name="IDENTRADA_TABLA">
 							<datasetParameterExpression><![CDATA[$P{IDENTRADA}]]></datasetParameterExpression>
 						</datasetParameter>
-						<datasetParameter name="ORDEN">
+						<datasetParameter name="ORDEN_TABLA">
 							<datasetParameterExpression><![CDATA[$P{ORDEN}]]></datasetParameterExpression>
 						</datasetParameter>
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
