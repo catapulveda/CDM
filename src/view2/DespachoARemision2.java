@@ -1,5 +1,6 @@
 package view2;
 
+import DataSource.TrafosDataSource;
 import JTableAutoResizeColumn.TableColumnAdjuster;
 import java.awt.Desktop;
 import java.awt.event.ItemEvent;
@@ -8,9 +9,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultCellEditor;
@@ -26,8 +32,18 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import modelo.Cliente;
 import modelo.ConexionBD;
+import modelo.Lote;
 import modelo.Metodos;
+import modelo.Transformador;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -105,13 +121,22 @@ public class DespachoARemision2 extends javax.swing.JFrame {
 //        );
         String[] cols = {"ITEM", "LOTE", "REMISION", "O.P", "No EMPRESA", "No SERIE", "MARCA",
             "FASE", "KVA ENT.", "KVA. SAL.", "TENS. ENT.", "TENS. SAL.", "SERV. ENT.",
-            "SERV. SALIDA", "TIPO TRAF. ENT.", "TIPO TRAF. SAL.", "OBSERV. ENT.", "OBSERV. SAL.",
+            "SERV. SALIDA", "TIPO TRAF. ENT.", "TIPO TRAF. SAL.", "OBSERV. ENT.", "OBSERV. SAL.", "", "",
             "AÑO", "PESO", "ACEITE", "CIUDAD", "FECHA DE RECEPCION", "CAUSA DE FALLA"};
         modeloTabla = new DefaultTableModel(new Object[][]{}, cols) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 4 || column == 9 || column == 11 || column == 13 || column == 15 || column == 17 || column == 23;
+                return column == 4 || column == 9 || column == 11 || column == 13 || column == 15 || column == 17 || column == 18 || column == 25;
             }
+
+            @Override
+            public Class<?> getColumnClass(int column) {
+                if (column == 18) {
+                    return Boolean.class;
+                }
+                return super.getColumnClass(column);
+            }
+
         };
 
         tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -146,9 +171,9 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         combo.setMaximumRowCount(10);
         combo.setUI(JComboBoxColor.JComboBoxColor.createUI(combo));
         combo.addPopupMenuListener(new JComboBoxFullText.BoundsPopupMenuListener(true, false));
-        tabla.getColumnModel().getColumn(23).setCellEditor(new DefaultCellEditor(combo));
+        tabla.getColumnModel().getColumn(25).setCellEditor(new DefaultCellEditor(combo));
 
-        String SQL = "SELECT e.lote, e.op, e.fecharecepcion, c.nombreciudad, r.numero_remision, t.* FROM entrada e\n";
+        String SQL = "SELECT e.identrada, e.lote, e.op, e.fecharecepcion, c.nombreciudad, r.numero_remision, t.* FROM entrada e\n";
         SQL += "INNER JOIN transformador t USING(identrada)\n";
         SQL += "LEFT JOIN remision r USING(idremision)\n";
         SQL += "INNER JOIN ciudad c USING(idciudad) WHERE\n";
@@ -162,7 +187,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             while (rs.next()) {
                 modeloTabla.addRow(new Object[]{
                     rs.getInt("idtransformador"),
-                    rs.getString("lote"),
+                    new modelo.Lote(rs.getInt("identrada"), rs.getString("lote")),
                     rs.getString("numero_remision"),
                     rs.getString("op"),
                     rs.getString("numeroempresa"),
@@ -179,6 +204,8 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                     rs.getString("tipotrafosalida"),
                     rs.getString("observacionentrada"),
                     rs.getString("observacionsalida"),
+                    false,
+                    (rs.getBoolean("hojaderuta")?"SI":""),
                     rs.getInt("ano"),
                     rs.getInt("peso"),
                     rs.getInt("aceite"),
@@ -237,7 +264,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                                 actualizarSalidas("observacionsalida", val, idtransformador, serie);
                             }
 
-                            if (e.getColumn() == 23) {
+                            if (e.getColumn() == 25) {
                                 actualizarSalidas("causadefalla", val, idtransformador, serie);
                             }
                         } catch (NullPointerException ex) {
@@ -295,7 +322,10 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         btnImprimirRemision = new javax.swing.JButton();
         jSeparator5 = new javax.swing.JToolBar.Separator();
         btnBuscar = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
         btnRefrescar3 = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
+        btnBuscar1 = new javax.swing.JButton();
         jSeparator3 = new javax.swing.JToolBar.Separator();
         btnDevolver = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -352,6 +382,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         jToolBar1.add(jSeparator5);
 
         btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/multiple2.png"))); // NOI18N
+        btnBuscar.setText("Placas");
         btnBuscar.setToolTipText("Datos para placas");
         btnBuscar.setFocusable(false);
         btnBuscar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -362,8 +393,10 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(btnBuscar);
+        jToolBar1.add(jSeparator1);
 
         btnRefrescar3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/excel2.png"))); // NOI18N
+        btnRefrescar3.setText("Excel");
         btnRefrescar3.setToolTipText("Exportar a excel");
         btnRefrescar3.setFocusable(false);
         btnRefrescar3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -374,6 +407,20 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(btnRefrescar3);
+        jToolBar1.add(jSeparator2);
+
+        btnBuscar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/hojasderuta2.png"))); // NOI18N
+        btnBuscar1.setText("Rutas");
+        btnBuscar1.setToolTipText("Datos para placas");
+        btnBuscar1.setFocusable(false);
+        btnBuscar1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnBuscar1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnBuscar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscar1ActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnBuscar1);
         jToolBar1.add(jSeparator3);
 
         btnDevolver.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/images/izquierda.png"))); // NOI18N
@@ -426,7 +473,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -660,6 +707,71 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+    private void btnBuscar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscar1ActionPerformed
+        (new Thread() {
+            public void run() {
+                try {
+                    JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA_FRENTE_1.jasper").toString()));
+                    java.util.List<modelo.Transformador> lista = new ArrayList<>();
+
+                    String sql = "select c.nombrecliente from entrada e\n"
+                            + "inner join cliente c on c.idcliente=e.idcliente\n"
+                            + "inner join transformador t on t.identrada=e.identrada\n"
+                            + "where t.iddespacho=" + getIDDESPACHO() + " limit 1;";
+                    conexion.conectar();
+                    ResultSet rs = conexion.CONSULTAR(sql);
+                    if (rs.next()) {
+                        String nombrecliente = rs.getString("nombrecliente");
+
+                        for (int i = 0; i < tabla.getRowCount(); i++) {
+                            if (Boolean.parseBoolean(tabla.getValueAt(i, 18).toString())) {
+                                Transformador t = new Transformador();
+                                t.setNumeroserie(tabla.getValueAt(i, 5).toString());
+                                String[] tension = tabla.getValueAt(i, 11).toString().split("/");
+                                t.setTps(Integer.parseInt(tension[0]));
+                                t.setTss(Integer.parseInt(tension[1]));
+                                t.setTts(Integer.parseInt(tension[2]));
+                                t.setKvasalida(Double.parseDouble(tabla.getValueAt(i, 9).toString()));
+                                t.setMarca(tabla.getValueAt(i, 6).toString());
+                                t.setTipotrafosalida(tabla.getValueAt(i, 15).toString());
+                                t.setFase(Integer.parseInt(tabla.getValueAt(i, 7).toString()));
+                                t.setServiciosalida(tabla.getValueAt(i, 13).toString());
+                                t.setAno(Integer.parseInt(tabla.getValueAt(i, 20).toString()));
+
+                                Cliente cliente = new Cliente();
+                                cliente.setNombreCliente(nombrecliente);
+
+                                Lote lote = new Lote();
+                                lote.setIdentrada( ((Lote)tabla.getValueAt(i, 1)).getIdentrada() );
+                                lote.setOp(Integer.parseInt(tabla.getValueAt(i, 3).toString()));
+                                lote.setLote(tabla.getValueAt(i, 1).toString());
+                                lote.setCliente(cliente);
+
+                                t.setEntrada(lote);
+
+                                if (lista.add(t) && conexion.GUARDAR("UPDATE transformador SET hojaderuta=" + true + " WHERE idtransformador=" + tabla.getValueAt(i, 0))) {
+                                    tabla.setRowSelectionInterval(i, i);
+                                    tabla.setColumnSelectionInterval(18, 18);
+                                    repaint();
+                                    tabla.updateUI();
+                                    tabla.repaint();
+                                }
+                            }
+                        }
+                    }
+
+                    JasperPrint jp = JasperFillManager.fillReport(reporte, null, new JRBeanCollectionDataSource(lista));
+                    new JasperViewer(jp, false).setVisible(true);
+                } catch (Exception e) {
+                    System.out.println(e);
+                    modelo.Metodos.ERROR(e, "OCURRIO UN ERROR INESPERADO");
+                }finally{
+                    conexion.CERRAR();
+                }
+            }
+        }).start();
+    }//GEN-LAST:event_btnBuscar1ActionPerformed
+
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -678,6 +790,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton btnBuscar;
+    public javax.swing.JButton btnBuscar1;
     public javax.swing.JButton btnDevolver;
     public javax.swing.JButton btnImprimirRemision;
     public javax.swing.JButton btnRefrescar3;
@@ -688,6 +801,8 @@ public class DespachoARemision2 extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar.Separator jSeparator5;

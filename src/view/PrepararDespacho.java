@@ -314,7 +314,7 @@ public class PrepararDespacho extends javax.swing.JFrame {
     public void cargarComboDespachos(){
         conexion.conectar();
         ResultSet rs = conexion.CONSULTAR(" SELECT * FROM despacho WHERE idcliente="+IDCLIENTE+" "
-                + "ORDER BY iddespacho DESC LIMIT 10 ");
+                + "ORDER BY iddespacho DESC ");
         try {
             comboListaDespachos.addItem(new Despacho(0, "NUEVO"));
             while(rs.next()){

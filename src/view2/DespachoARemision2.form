@@ -52,7 +52,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="jToolBar1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="237" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="219" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jToolBar2" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -139,6 +139,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/recursos/images/multiple2.png"/>
             </Property>
+            <Property name="text" type="java.lang.String" value="Placas"/>
             <Property name="toolTipText" type="java.lang.String" value="Datos para placas"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -151,11 +152,14 @@
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
           </AuxValues>
         </Component>
+        <Component class="javax.swing.JToolBar$Separator" name="jSeparator1">
+        </Component>
         <Component class="javax.swing.JButton" name="btnRefrescar3">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/recursos/images/excel2.png"/>
             </Property>
+            <Property name="text" type="java.lang.String" value="Excel"/>
             <Property name="toolTipText" type="java.lang.String" value="Exportar a excel"/>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -163,6 +167,26 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRefrescar3ActionPerformed"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JToolBar$Separator" name="jSeparator2">
+        </Component>
+        <Component class="javax.swing.JButton" name="btnBuscar1">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/recursos/images/hojasderuta2.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Rutas"/>
+            <Property name="toolTipText" type="java.lang.String" value="Datos para placas"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBuscar1ActionPerformed"/>
           </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>

@@ -1,153 +1,222 @@
 package modelo;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JComboBox;
-import javax.swing.table.DefaultTableModel;
- 
-/**
- *
- * @author AUXPLANTA
- */
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
 public class Lote {
-    
-    private int idEntrada;
+        
+    private int identrada;
     private Cliente cliente;
     private Ciudad ciudad;
     private Conductor conductor;
-    private String idEntradaAlmacen;
+    private int identradaalmacen;
+    private String nombrepc;
     private String lote;
     private String contrato;
-    private String op;
-    private String centroDeCostos;
-    private Date fechaRecepcion;
-    private Date fechaRegistro;
-    private Date fechaActualizado;
-    private Date fechaLiberado;
-    private boolean estado;
+    private int op;
+    private String centrodecostos;
+    private LocalDate fecharecepcion;
+    private LocalDateTime fecharegistrado;
+    private LocalDateTime fechaactualizado;
+    private LocalDateTime fechaliberado;
+    private Boolean estado;
     private String observacion;
-    
-    private static int totalLotes = 0;
-    
-    static final ConexionBD conexion = new ConexionBD();     
-    
-    public static String[] getColumnNames(){
-        return new String[]{"ID",
-            "CLIENTE",
-            "LOTE",
-            "FECHA RECEPCION",
-            "CIUDAD",
-            "CONDUCTOR",
-            "N° ENTRADA",            
-            "CONTRATO",
-            "OP",
-            "CENTRO DE COSTOS",            
-            "FECHA REGISTRO",
-            "FECHA ULT. ACTUALIZACION",
-            "FECHA LIBERADO",
-            "ESTADO",
-            "ELABORADO POR"
-        };
+    private String placavehiculo;
+    private boolean nuevo;
+    private String representante;
+    private int entregados;
+    private int pendientes;
+    private List<Transformador> trafos;
+
+    public Lote() {
+    }
+
+    public Lote(int identrada, String lote) {
+        this.identrada = identrada;
+        this.lote = lote;
+    }        
+
+    public int getIdentrada() {
+        return identrada;
+    }
+
+    public void setIdentrada(int identrada) {
+        this.identrada = identrada;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Ciudad getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(Ciudad ciudad) {
+        this.ciudad = ciudad;
+    }
+
+    public Conductor getConductor() {
+        return conductor;
+    }
+
+    public void setConductor(Conductor conductor) {
+        this.conductor = conductor;
+    }
+
+    public int getIdentradaalmacen() {
+        return identradaalmacen;
+    }
+
+    public void setIdentradaalmacen(int identradaalmacen) {
+        this.identradaalmacen = identradaalmacen;
+    }
+
+    public String getNombrepc() {
+        return nombrepc;
+    }
+
+    public void setNombrepc(String nombrepc) {
+        this.nombrepc = nombrepc;
+    }
+
+    public String getLote() {
+        return lote;
+    }
+
+    public void setLote(String lote) {
+        this.lote = lote;
+    }
+
+    public String getContrato() {
+        return contrato;
+    }
+
+    public void setContrato(String contrato) {
+        this.contrato = contrato;
+    }
+
+    public int getOp() {
+        return op;
+    }
+
+    public void setOp(int op) {
+        this.op = op;
+    }
+
+    public String getCentrodecostos() {
+        return centrodecostos;
+    }
+
+    public void setCentrodecostos(String centrodecostos) {
+        this.centrodecostos = centrodecostos;
+    }
+
+    public LocalDate getFecharecepcion() {
+        return fecharecepcion;
+    }
+
+    public void setFecharecepcion(LocalDate fecharecepcion) {
+        this.fecharecepcion = fecharecepcion;
+    }
+
+    public LocalDateTime getFecharegistrado() {
+        return fecharegistrado;
+    }
+
+    public void setFecharegistrado(LocalDateTime fecharegistrado) {
+        this.fecharegistrado = fecharegistrado;
+    }
+
+    public LocalDateTime getFechaactualizado() {
+        return fechaactualizado;
+    }
+
+    public void setFechaactualizado(LocalDateTime fechaactualizado) {
+        this.fechaactualizado = fechaactualizado;
+    }
+
+    public LocalDateTime getFechaliberado() {
+        return fechaliberado;
+    }
+
+    public void setFechaliberado(LocalDateTime fechaliberado) {
+        this.fechaliberado = fechaliberado;
+    }
+
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
+    }
+
+    public String getPlacavehiculo() {
+        return placavehiculo;
+    }
+
+    public void setPlacavehiculo(String placavehiculo) {
+        this.placavehiculo = placavehiculo;
+    }
+
+    public boolean isNuevo() {
+        return nuevo;
+    }
+
+    public void setNuevo(boolean nuevo) {
+        this.nuevo = nuevo;
+    }
+
+    public String getRepresentante() {
+        return representante;
+    }
+
+    public void setRepresentante(String representante) {
+        this.representante = representante;
+    }
+
+    public int getEntregados() {
+        return entregados;
+    }
+
+    public void setEntregados(int entregados) {
+        this.entregados = entregados;
+    }
+
+    public int getPendientes() {
+        return pendientes;
+    }
+
+    public void setPendientes(int pendientes) {
+        this.pendientes = pendientes;
+    }
+
+    public List<Transformador> getTrafos() {
+        return trafos;
+    }
+
+    public void setTrafos(List<Transformador> trafos) {
+        this.trafos = trafos;
+    }
+
+    @Override
+    public String toString() {
+        return lote;
     }
     
-    public static Boolean[] getColumnEditables(){
-        return new Boolean[]{
-            false,//"ID",
-            false,//"CLIENTE",
-            false,//"LOTE",
-            false,//"FECHA RECEPCION",
-            false,//"CIUDAD",
-            false,//"CONDUCTOR",
-            false,//"N° ENTRADA",            
-            false,//"CONTRATO",
-            false,//"OP",
-            false,//"CENTRO DE COSTOS",            
-            false,//"FECHA REGISTRO",
-            false,//"FECHA REGISTRO",
-            false,//"FECHA LIBERADO",
-            false,//"ESTADO"
-            false//"ELABORADO POR NOMBRE ALMACEN"
-        };
-    }
-    
-    public static Class[] getColumnClass(){
-        return new Class[]{
-            Integer.class,//ID
-            Cliente.class,//CLIENTE
-            String.class,//LOTE
-            Date.class,//FECHA RECEPCION
-            Ciudad.class,//CIUDAD
-            Conductor.class,//CONDUCTOR
-            String.class,//N ENTRADA            
-            String.class,//CONTRATO
-            String.class,//OP
-            String.class,//CENTRO DE COSTOS            
-            Date.class,//FECHA REGISTRO
-            Date.class,//FECHA ACTUALIZACION
-            Date.class,//FECHA LIBERADO
-            Boolean.class,//ESTADO
-            String.class//NOMBRE USUARIO ALMACEN
-        };
-    }
-    
-    public static void cargarLotes(DefaultTableModel modelo, 
-            int indiceComboTipoContrato, 
-            int idcliente, 
-            JComboBox comboBuscarLotePorContrato, 
-            JComboBox comboBuscarLotePorLote){
-        try {
-            String sql = " SELECT e.identrada, e.idcliente, e.idciudad, e.idconductor, e.identradaAlmacen, e.lote, \n";
-            sql += " e.contrato, e.op, e.centrodecostos, e.fecharecepcion, e.fecharegistrado, e.fechaactualizado, \n";
-            sql += " e.fechaliberado, e.estado, e.observacion, ciu.nombreciudad, ciu.direccionciudad, ciu.telefonociudad, \n";
-            sql += " cli.nombrecliente, cli.nitcliente, con.cedulaconductor, con.nombreconductor, usu.nombreusuario \n";
-            sql += " FROM entrada e  ";
-            sql += " INNER JOIN ciudad ciu ON (e.idciudad = ciu.idciudad)\n ";
-            sql += " INNER JOIN cliente cli ON (e.idcliente = cli.idcliente)\n ";
-            sql += " INNER JOIN conductor con ON (e.idconductor = con.idconductor)\n ";
-            sql += " INNER JOIN usuario usu ON (e.idusuario = usu.idusuario)\n ";
-            sql += (idcliente==-1)?"WHERE e.idcliente>"+idcliente+" ":" WHERE e.idcliente="+idcliente+" ";
-            sql += (indiceComboTipoContrato==1)?"AND contrato!='PARTICULAR' \n":(indiceComboTipoContrato==2)?"AND contrato='PARTICULAR' \n":"";
-            sql += (comboBuscarLotePorContrato.getSelectedIndex()>0)?"AND contrato='"+comboBuscarLotePorContrato.getSelectedItem()+"' ":"";
-            sql += (comboBuscarLotePorLote.getSelectedIndex()>0)?" AND lote='"+comboBuscarLotePorLote.getSelectedItem()+"' ":"";
-            sql += " ORDER BY fecharecepcion DESC";
-            
-            conexion.conectar();
-            ResultSet rs = conexion.CONSULTAR(sql);
-            totalLotes = 0;
-            while(rs.next()){
-                totalLotes++;
-                modelo.addRow(
-                    new Object[]{rs.getInt("identrada"), 
-                        new Cliente(rs.getInt("idcliente"), rs.getString("nombrecliente"), rs.getString("nitcliente")), 
-                        rs.getString("lote"), 
-                        new SimpleDateFormat("EEE, d MMM yyyy").format(rs.getDate("fecharecepcion")), 
-                        new Ciudad(rs.getInt("idciudad"), rs.getString("nombreciudad"), rs.getString("direccionciudad"), rs.getString("telefonociudad")), 
-                        new Conductor(rs.getInt("idconductor"), rs.getString("cedulaconductor"), rs.getString("nombreconductor")), 
-                        rs.getString("identradaAlmacen"),                        
-                        rs.getString("contrato"),
-                        rs.getString("op"), 
-                        rs.getString("centrodecostos"),                        
-                        new SimpleDateFormat("EEE, d MMM yyyy").format(rs.getDate("fecharegistrado")),
-                        (null!=rs.getDate("fechaactualizado"))?new SimpleDateFormat("EEE, d MMM yyyy").format(rs.getDate("fechaactualizado")):"SIN ACTUALIZAR",
-                        rs.getDate("fechaliberado"),
-                        rs.getBoolean("estado"), 
-                        rs.getString("nombreusuario")
-                    }
-                );                        
-            }
-            conexion.CERRAR();
-        } catch (SQLException ex){
-            Logger.getLogger(Lote.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
-    
-    public static int getTotalLotes(){
-        return totalLotes;
-    }
     
 }

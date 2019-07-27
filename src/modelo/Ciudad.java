@@ -18,6 +18,9 @@ public class Ciudad {
     private String telefonoCiudad;
     
     static final ConexionBD conexion = new ConexionBD();
+
+    public Ciudad() {
+    }
     
     public Ciudad(int idCiudad, String nombreCiudad, String direccionCiudad, String telefonoCiudad){
         this.idCiudad = idCiudad;

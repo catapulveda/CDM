@@ -11,14 +11,17 @@ import javax.swing.table.DefaultTableModel;
 public class Cliente {
 
     private int idCliente;
-    private String nombreCliente;
+    private String nombrecliente;
     private String nitCliente;
     
     static final ConexionBD conexion = new ConexionBD();
+
+    public Cliente() {
+    }
     
     public Cliente(int idCliente, String nombreCliente, String nitCliente) {
         this.idCliente = idCliente;
-        this.nombreCliente = nombreCliente;
+        this.nombrecliente = nombreCliente;
         this.nitCliente = nitCliente;
     }
     
@@ -31,11 +34,11 @@ public class Cliente {
     }
 
     public String getNombreCliente() {
-        return nombreCliente;
+        return nombrecliente;
     }
 
     public void setNombreCliente(String nombreCliente) {
-        this.nombreCliente = nombreCliente;
+        this.nombrecliente = nombreCliente;
     }
 
     public String getNitCliente() {
@@ -48,7 +51,7 @@ public class Cliente {
     
     @Override
     public String toString(){
-        return nombreCliente;
+        return nombrecliente;
     }
         
     public static String[] getColumnNames(){

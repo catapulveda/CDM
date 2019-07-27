@@ -101,6 +101,12 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
     ExcelAdapter copypaste;
 
     private int COL_PLACA = 4;
+    
+    private int INDEX_COL_SERVICES = 20;
+    private int INDEX_COL_TIPO_TRAFOS = 21;
+    private int INDEX_COL_MARCAS = 5;
+    private int INDEX_COL_HERRAJES = 15;
+    private int INDEX_COL_TENSIONES = 8;
 
     public EntradaDeTrafos() {
         initComponents();
@@ -177,25 +183,25 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
             tablaTrafos.getColumnModel().getColumn(0).setCellRenderer(new JButtonIntoJTable.BotonEnColumna());
 
             //COLUMNA SERVICIOS
-            tablaTrafos.getColumnModel().getColumn(20).setCellEditor(new DefaultCellEditor(new JComboBox(SERVICIOS)));
-            tablaTrafos.getColumnModel().getColumn(20).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(SERVICIOS));
+            tablaTrafos.getColumnModel().getColumn(INDEX_COL_SERVICES).setCellEditor(new DefaultCellEditor(new JComboBox(SERVICIOS)));
+            tablaTrafos.getColumnModel().getColumn(INDEX_COL_SERVICES).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(SERVICIOS));
 
             //COLUMNA TIPO DE TRANSFORMADOR
-            tablaTrafos.getColumnModel().getColumn(21).setCellEditor(new DefaultCellEditor(new JComboBox(TIPOS)));
+            tablaTrafos.getColumnModel().getColumn(INDEX_COL_TIPO_TRAFOS).setCellEditor(new DefaultCellEditor(new JComboBox(TIPOS)));
 //        tablaTrafos.getColumnModel().getColumn(21).setCellRenderer(new JComboBoxIntoJTable.JComboBoxEnColumnaJTable(TIPOS));                
 
             //COLUMNA MARCAS
 //        tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getJTextFieldMarcas()));
-            tablaTrafos.getColumnModel().getColumn(5).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(new modelo.JTextFieldAutoComplete(modelo.Marca.getMarcas())));
+            tablaTrafos.getColumnModel().getColumn(INDEX_COL_MARCAS).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(new modelo.JTextFieldAutoComplete(modelo.Marca.getMarcas())));
 //        entradaDeTrafos.tablaTrafos.getColumnModel().getColumn(4).setCellRenderer(new JTextFieldIntoJTable.JTextField_TableCellRenderer());
 
             //COLUMNA HERRAJE
-            tablaTrafos.getColumnModel().getColumn(15).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getTextFieldHerrajes()));
+            tablaTrafos.getColumnModel().getColumn(INDEX_COL_HERRAJES).setCellEditor(new JTextFieldIntoJTable.JTextField_DefaultCellEditor(modelo.Marca.getTextFieldHerrajes()));
 
             //COLUMNA TENSIONES       
             JTextComponent txt = new JTextField();
             AutoCompleteDecorator.decorate(txt, tensiones, true);
-            tablaTrafos.getColumnModel().getColumn(8).setCellEditor(new DefaultCellEditor((JTextField) txt));
+            tablaTrafos.getColumnModel().getColumn(INDEX_COL_TENSIONES).setCellEditor(new DefaultCellEditor((JTextField) txt));
 
             modeloTabla.addTableModelListener(new TableModelListener() {
                 @Override
@@ -340,7 +346,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
                     rs.getInt("peso"),//"PESO",
                     rs.getInt("aceite"),//"ACEITE",
                     rs.getString("observacionentrada"),//"OBSERVACION",
-                    rs.getString("servicioentrada"),//"SERVICIO",
+                    rs.getString("serviciosalida"),//"SERVICIO",
                     rs.getString("tipotrafoentrada"),//"TIPO", 
                 });
             }
@@ -477,6 +483,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
         subMenuImprimirMuestrasDeAceite = new javax.swing.JMenuItem();
         imprimirHojasDeRuta = new javax.swing.JMenuItem();
         tarjetaDeAprobacion = new javax.swing.JMenuItem();
+        imprimirHojasDeRutaDinamico = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         panelTabla = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -628,6 +635,14 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
             }
         });
         subMenuImprimirFormatos.add(tarjetaDeAprobacion);
+
+        imprimirHojasDeRutaDinamico.setText("jMenuItem1");
+        imprimirHojasDeRutaDinamico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                imprimirHojasDeRutaDinamicoActionPerformed(evt);
+            }
+        });
+        subMenuImprimirFormatos.add(imprimirHojasDeRutaDinamico);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Entrada de transformadores");
@@ -1580,7 +1595,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
 
     private void imprimirHojasDeRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imprimirHojasDeRutaActionPerformed
         try {
-            JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA.jasper").toString()));
+            JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA_FRENTE.jasper").toString()));
             Map<String, Object> p = new HashMap<>();
             p.put("IDENTRADA", getIDENTRADA());
             JasperPrint jp = JasperFillManager.fillReport(reporte, p, conexion.conectar());
@@ -1596,7 +1611,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
             jv1.setVisible(true);
 
             jv1 = new JasperViewer(JasperFillManager.fillReport(
-                    (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA_1.jasper").toString())), null, new JREmptyDataSource()), false);
+                    (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA_REVES.jasper").toString())), null, new JREmptyDataSource()), false);
             jv1.setSize(ancho / 2, alto - (alto - Barra.height));
             jv1.setLocation(ancho / 2, 0);
             jv1.setVisible(true);
@@ -1631,6 +1646,10 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
             Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_tarjetaDeAprobacionActionPerformed
+
+    private void imprimirHojasDeRutaDinamicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imprimirHojasDeRutaDinamicoActionPerformed
+         
+    }//GEN-LAST:event_imprimirHojasDeRutaDinamicoActionPerformed
 
     private void unirPaginas(JasperPrint source, JasperPrint dst) {
         List<JRPrintPage> pages = source.getPages();
@@ -1698,6 +1717,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
     public javax.swing.JComboBox<Cliente> comboCliente;
     public javax.swing.JComboBox<Conductor> comboConductor;
     private javax.swing.JMenuItem imprimirHojasDeRuta;
+    private javax.swing.JMenuItem imprimirHojasDeRutaDinamico;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
