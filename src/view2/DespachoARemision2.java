@@ -1,6 +1,5 @@
 package view2;
 
-import DataSource.TrafosDataSource;
 import JTableAutoResizeColumn.TableColumnAdjuster;
 import java.awt.Desktop;
 import java.awt.event.ItemEvent;
@@ -13,12 +12,24 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toMap;
+import java.util.stream.Stream;
+import javafx.scene.paint.Color;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -32,19 +43,23 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import modelo.Ciudad;
 import modelo.Cliente;
 import modelo.ConexionBD;
 import modelo.Lote;
 import modelo.Metodos;
 import modelo.Transformador;
-import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
+
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -59,6 +74,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
     TableRowSorter rowSorter;
 
     private int IDDESPACHO = -1, IDREMISION = -1;
+    private String nodespacho, cliente;
 
     private boolean ACTUALIZANDO = false;
 
@@ -205,7 +221,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                     rs.getString("observacionentrada"),
                     rs.getString("observacionsalida"),
                     false,
-                    (rs.getBoolean("hojaderuta")?"SI":""),
+                    (rs.getBoolean("hojaderuta") ? "SI" : ""),
                     rs.getInt("ano"),
                     rs.getInt("peso"),
                     rs.getInt("aceite"),
@@ -290,7 +306,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
     public void cargarServicios() {
         String sql = " SELECT DISTINCT(t.serviciosalida) FROM transformador t WHERE ";
         sql += (isACTUALIZANDO()) ? "t.idremision=" + getIDREMISION() : "t.iddespacho=" + getIDDESPACHO();
-        sql += "ORDER BY 1 DESC";
+        sql += " ORDER BY 1 DESC";
         conexion.conectar();
         ResultSet rs = conexion.CONSULTAR(sql);
         try {
@@ -487,7 +503,213 @@ public class DespachoARemision2 extends javax.swing.JFrame {
     }//GEN-LAST:event_cjBuscarKeyReleased
 
     private void btnRefrescar3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefrescar3ActionPerformed
-        modelo.Metodos.JTableToExcel(tabla, btnRefrescar3);
+        ConexionBD con = new ConexionBD();
+        try {
+            con.conectar();
+            ResultSet rs = con.CONSULTAR("select e.lote, e.op, t.numeroempresa, t.numeroserie, \n"
+                    + "t.marca, t.kvaentrada, t.kvasalida, t.tps as  t1, t.tss as t2, t.tts as t3, \n"
+                    + "t.serviciosalida, t.ano, t.peso, t.aceite, ciu.nombreciudad, e.fecharecepcion,\n"
+                    + "t.tipotrafosalida, t.observacionsalida, t.causadefalla, t.fase\n"
+                    + "from transformador t \n"
+                    + "inner join entrada e on e.identrada=t.identrada\n"
+                    + "inner join despacho d on d.iddespacho=t.iddespacho\n"
+                    + "inner join ciudad ciu on ciu.idciudad=e.idciudad\n"
+                    + "where t.iddespacho=" + getIDDESPACHO() + "\n"
+                    + "order by e.identrada desc, fase ASC, kvasalida ASC, marca ASC, item ASC;");
+
+            XSSFWorkbook wb = new XSSFWorkbook();
+            File f = File.createTempFile("Despacho Nº "+getNodespacho()+" "+getCliente(),".xlsx");
+            FileOutputStream fileOut = new FileOutputStream(f);
+            XSSFSheet hoja = wb.createSheet("datos");
+            XSSFRow fila = null;
+
+            List<Transformador> lista = new ArrayList<>();
+            while (rs.next()) {
+
+                Transformador t = new Transformador();
+
+                Lote l = new Lote();
+                l.setOp(rs.getInt("op"));
+                l.setLote(rs.getString("lote"));
+                l.setFecharecepcion(rs.getDate("fecharecepcion").toLocalDate());
+
+                Ciudad c = new Ciudad();
+                c.setNombreCiudad(rs.getString("nombreciudad"));
+                l.setCiudad(c);
+
+                t.setEntrada(l);
+                t.setNumeroempresa(rs.getString("numeroempresa"));
+                t.setNumeroserie(rs.getString("numeroserie"));
+                t.setMarca(rs.getString("marca"));
+                t.setKvaentrada(rs.getDouble("kvaentrada"));
+                t.setKvasalida(rs.getDouble("kvasalida"));
+                t.setTps(rs.getInt("t1"));
+                t.setTss(rs.getInt("t2"));
+                t.setTts(rs.getInt("t3"));
+                t.setServiciosalida(rs.getString("serviciosalida"));
+                t.setObservacionsalida(rs.getString("observacionsalida"));
+                t.setCausadefalla(rs.getString("causadefalla"));
+                t.setAno(rs.getInt("ano"));
+                t.setPeso(rs.getInt("peso"));
+                t.setAceite(rs.getInt("aceite"));
+                t.setFase(rs.getInt("fase"));                
+                t.setTipotrafosalida(rs.getString("tipotrafosalida"));
+
+                lista.add(t);
+            }
+
+            fila = hoja.createRow(0);
+            fila.createCell(0).setCellValue("ITEM");fila.createCell(1).setCellValue("LOTE-OP");
+            fila.createCell(2).setCellValue("N° EMP");fila.createCell(3).setCellValue("N° SERIE");
+            fila.createCell(4).setCellValue("MARCA");fila.createCell(5).setCellValue("KVA");
+            fila.createCell(6).setCellValue("TENSION");fila.createCell(7).setCellValue("SERV");
+            fila.createCell(8).setCellValue("OBSERV");fila.createCell(9).setCellValue("AÑO");
+            fila.createCell(10).setCellValue("PESO");fila.createCell(11).setCellValue("ACE");
+            fila.createCell(12).setCellValue("FASE");fila.createCell(13).setCellValue("CIUDAD");
+            fila.createCell(14).setCellValue("F. RECEP");fila.createCell(15).setCellValue("TIPO");            
+            
+            for (int i = 0; i < lista.size(); i++) {
+                fila = hoja.createRow( (i+1) );
+
+                Transformador t = lista.get(i);
+                fila.createCell(0).setCellValue( (i+1) );
+                fila.createCell(1).setCellValue(t.getEntrada().getLote()+"-"+t.getEntrada().getOp());
+                fila.createCell(2).setCellValue(t.getNumeroempresa());
+                fila.createCell(3).setCellValue(t.getNumeroserie());
+                fila.createCell(4).setCellValue(t.getMarca());
+                fila.createCell(5).setCellValue(t.getKvasalida());
+                fila.createCell(6).setCellValue(t.getTps()+"/"+t.getTss()+"/"+t.getTts());
+                fila.createCell(7).setCellValue(t.getServiciosalida());
+                fila.createCell(8).setCellValue(t.getObservacionsalida());
+                fila.createCell(9).setCellValue(t.getAno());
+                fila.createCell(10).setCellValue(t.getPeso());
+                fila.createCell(11).setCellValue(t.getAceite());
+                fila.createCell(12).setCellValue(t.getFase());
+                fila.createCell(13).setCellValue(t.getEntrada().getCiudad().getNombreCiudad());
+                fila.createCell(14).setCellValue(java.time.format.DateTimeFormatter.ofPattern("EEE, dd MMM yyyy").format(t.getEntrada().getFecharecepcion()));
+                fila.createCell(15).setCellValue(t.getTipotrafosalida());
+                fila.createCell(16).setCellValue(t.getCausadefalla());
+            }
+                       
+            //OBTENEMOS LA CANTIDAD DE TRANSFORMADORES AGRUPADOS POR KVA
+            Map<Double, Long> result = lista.stream()
+                    .filter(t-> !t.getServiciosalida().equals("DADO DE BAJA"))
+                    .collect(Collectors.groupingBy(Transformador::getKvasalida, Collectors.counting()));
+                        
+            Map<Double, Long> finall = new LinkedHashMap<>();
+            //RECORREMOS LA LISTA AGRUPADA, ORDENAMOS DE MENOR A MAYOR POR KVA, Y GUARDAMOS EL ORDENAMIENTO EN UN NUEVO <Map>
+            result.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).forEachOrdered(t -> finall.put(t.getKey(), t.getValue()));
+            //AUMENTAR UNAS POSICIONES DE FILAS EN EL EXCEL Y SEGUIR ESCRIBIENDO
+            int posicionFila = lista.size()+3;
+            //CREAMOS EL ENCABEZADO DONDE MOSTRAREMOS LA CANTIDAD DE TRAFOS AGRUPADOS POR KVA
+            fila = hoja.createRow(posicionFila);
+            fila.createCell(1).setCellValue("KVA");
+            fila.createCell(2).setCellValue("TOTAL");            
+            posicionFila++;
+            //CREAMOS LAS FILAS Y LOS VALORES DE LAS CANTIDADES AGRUPADAS POR KVA
+            for (Map.Entry<Double, Long> entry : finall.entrySet()) {
+                fila = hoja.createRow(posicionFila);                
+                fila.createCell(1).setCellValue(entry.getKey());
+                fila.createCell(2).setCellValue(entry.getValue());
+                posicionFila++;
+            }
+            //CREAMOS LA FILA Y ALMACENAMOS EL VALOR DEL TOTAL DE UNIDADES AGRUPADAS POR KVA
+            hoja.createRow(posicionFila).createCell(2).setCellValue(finall.entrySet().stream().mapToDouble(x->x.getValue()).sum());
+            posicionFila+=2;
+            
+            //CREAMOS LA FILA PARA MOSTRAR EL PESO TOTAL DE LOS TRANSFORMADORES
+            fila = hoja.createRow(posicionFila);
+            fila.createCell(1).setCellValue("PESO TOTAL:");
+            fila.createCell(2).setCellValue( lista.stream().mapToInt(x->x.getPeso()).sum() );
+                        
+            //AJUSTAMOS AL MAXIMO ANCHO DE LAS COLUMNAS DEL EXCEL
+            for (int j = 0; j <= 15; j++) {
+                wb.getSheetAt(0).autoSizeColumn(j);
+            }
+            wb.write(fileOut);
+            fileOut.close();
+            Desktop.getDesktop().open(f);
+            
+            //EMPEZAMOS A CREAR EL OTRO ARCHIVO EXCEL Y REINICIAMOS LA POSICION DE LAS FILAS            
+            
+            wb = new XSSFWorkbook(new FileInputStream(new File("PLANTILLAS EXCEL\\FORMATO DESPACHOS.xlsx")));
+            hoja = wb.getSheetAt(0);            
+            
+            f = File.createTempFile("Despacho Nº "+getNodespacho(),".xlsx");
+            fileOut = new FileOutputStream(f);
+            
+            for (int i = 0; i < lista.size(); i++) {
+            
+                fila = hoja.createRow( (i+3) );
+                Transformador t = lista.get(i);
+                fila.createCell(0).setCellValue((i+1));
+                fila.createCell(1).setCellValue(t.getEntrada().getLote().split("-")[2]);
+                fila.createCell(2).setCellValue(getNodespacho().split("-")[0]);
+                fila.createCell(4).setCellValue(DateTimeFormatter.ofPattern("EEE, dd MMM yyyy").format(t.getEntrada().getFecharecepcion()));
+                fila.createCell(6).setCellValue(t.getEntrada().getCiudad().getNombreCiudad());
+                fila.createCell(7).setCellValue(t.getEntrada().getOp());
+                fila.createCell(8).setCellValue(t.getKvasalida());
+                fila.createCell(9).setCellValue(t.getFase());
+                fila.createCell(10).setCellValue(t.getTps());
+                fila.createCell(11).setCellValue(t.getTss()+"-"+t.getTts());
+                fila.createCell(12).setCellValue(t.getNumeroserie());
+                fila.createCell(13).setCellValue(t.getAno());
+                fila.createCell(14).setCellValue(t.getNumeroempresa());
+                fila.createCell(15).setCellValue(t.getMarca());
+                fila.createCell(17).setCellValue("BARRANQUILLA");
+                fila.createCell(18).setCellValue(t.getServiciosalida());
+                fila.createCell(19).setCellValue(t.getObservacionsalida());
+                fila.createCell(20).setCellValue(t.getCausadefalla());
+            }
+            
+            for (int j = 0; j <= 20; j++) {
+                wb.getSheetAt(0).autoSizeColumn(j);
+            }
+            
+            wb.write(fileOut);
+            
+            fileOut.close();
+            
+            Desktop.getDesktop().open(f);
+            
+            
+            //PROCEDEMOS A CREAR EL OTRO FORMATO LLAMADO ARCHIVO PLANO
+            
+            wb = new XSSFWorkbook(new FileInputStream(new File("PLANTILLAS EXCEL\\Archivo_Plano_TRANSFORMADORES CDM.xlsx")));
+            hoja = wb.getSheetAt(0);            
+            
+            f = File.createTempFile("Archivo_Plano_TRANSFORMADORES CDM",".xlsx");
+            fileOut = new FileOutputStream(f);
+            
+            for (int i = 0; i < lista.size(); i++) {
+                fila = hoja.createRow( (i+1) );
+                
+                Transformador t = lista.get(i);
+                fila.createCell(0).setCellValue(t.getNumeroserie());
+                fila.createCell(1).setCellValue(t.getMarca());
+                fila.createCell(2).setCellValue( (t.getServiciosalida().equals("DADO DE BAJA")?"":"TRAFO URE "+t.getFase()+"F "+t.getKvaentrada()+"KVA ") );
+                fila.createCell(4).setCellValue( (t.getServiciosalida().equals("DADO DE BAJA")?"":"URE") );
+                fila.createCell(5).setCellValue(t.getMarca());
+                fila.createCell(6).setCellValue( (t.getServiciosalida().equals("DADO DE BAJA")?"":"TRAFO URE "+t.getFase()+"F "+t.getKvasalida()+"KVA ") );
+                fila.createCell(9).setCellValue(t.getNumeroserie()+".pdf");
+                fila.createCell(10).setCellValue(t.getCausadefalla());
+                fila.createCell(11).setCellValue(t.getObservacionsalida());
+            }
+            
+            for (int j = 0; j <= 11; j++) {
+                hoja.autoSizeColumn(j);
+            }
+            
+            wb.write(fileOut);
+            fileOut.close();
+            Desktop.getDesktop().open(f);
+            
+        } catch (Exception e) {
+            Logger.getLogger(DespachoARemision2.class.getName()).log(Level.SEVERE, null, e);
+            modelo.Metodos.ERROR(e, "NO SE PUDO GENERAR EL ARCHIVO EXCEL");
+        } finally {
+            con.CERRAR();
+        }
     }//GEN-LAST:event_btnRefrescar3ActionPerformed
 
     private void btnDevolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDevolverActionPerformed
@@ -742,7 +964,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                                 cliente.setNombreCliente(nombrecliente);
 
                                 Lote lote = new Lote();
-                                lote.setIdentrada( ((Lote)tabla.getValueAt(i, 1)).getIdentrada() );
+                                lote.setIdentrada(((Lote) tabla.getValueAt(i, 1)).getIdentrada());
                                 lote.setOp(Integer.parseInt(tabla.getValueAt(i, 3).toString()));
                                 lote.setLote(tabla.getValueAt(i, 1).toString());
                                 lote.setCliente(cliente);
@@ -765,7 +987,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                 } catch (Exception e) {
                     System.out.println(e);
                     modelo.Metodos.ERROR(e, "OCURRIO UN ERROR INESPERADO");
-                }finally{
+                } finally {
                     conexion.CERRAR();
                 }
             }
@@ -835,5 +1057,21 @@ public class DespachoARemision2 extends javax.swing.JFrame {
 
     public void setACTUALIZANDO(boolean ACTUALIZANDO) {
         this.ACTUALIZANDO = ACTUALIZANDO;
+    }
+
+    public String getNodespacho() {
+        return nodespacho;
+    }
+
+    public void setNodespacho(String nodespacho) {
+        this.nodespacho = nodespacho;
+    }
+
+    public String getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(String cliente) {
+        this.cliente = cliente;
     }
 }

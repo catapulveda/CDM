@@ -76,7 +76,7 @@ public class Metodos {
                     XSSFWorkbook wb = new XSSFWorkbook();
                     File f = File.createTempFile(LocalDate.now().toString().replace('-', '_'), ".xlsx");
                     fileOut = new FileOutputStream(f);
-                    XSSFSheet hoja = wb.createSheet(f.getName().replace('-', '_'));
+                    XSSFSheet hoja = wb.createSheet("datos");
                     XSSFRow fila;
                     for(int i=0; i<=table.getRowCount(); i++){
                         if(pm.isCanceled()){

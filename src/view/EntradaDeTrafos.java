@@ -6,6 +6,7 @@ import Dialogos.DialogoRegistrarDiferencias;
 import Dialogos.RegistrarDiferencia;
 import Dialogos.Tensiones;
 import JTableAutoResizeColumn.TableColumnAdjuster;
+import java.awt.Desktop;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
@@ -22,7 +23,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -70,6 +75,9 @@ import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRPdfExporterParameter;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 public class EntradaDeTrafos extends javax.swing.JFrame {
@@ -101,7 +109,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
     ExcelAdapter copypaste;
 
     private int COL_PLACA = 4;
-    
+
     private int INDEX_COL_SERVICES = 20;
     private int INDEX_COL_TIPO_TRAFOS = 21;
     private int INDEX_COL_MARCAS = 5;
@@ -483,7 +491,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
         subMenuImprimirMuestrasDeAceite = new javax.swing.JMenuItem();
         imprimirHojasDeRuta = new javax.swing.JMenuItem();
         tarjetaDeAprobacion = new javax.swing.JMenuItem();
-        imprimirHojasDeRutaDinamico = new javax.swing.JMenuItem();
+        consumoDeAceite = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         panelTabla = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -636,13 +644,13 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
         });
         subMenuImprimirFormatos.add(tarjetaDeAprobacion);
 
-        imprimirHojasDeRutaDinamico.setText("jMenuItem1");
-        imprimirHojasDeRutaDinamico.addActionListener(new java.awt.event.ActionListener() {
+        consumoDeAceite.setText("Consumo de aceite");
+        consumoDeAceite.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                imprimirHojasDeRutaDinamicoActionPerformed(evt);
+                consumoDeAceiteActionPerformed(evt);
             }
         });
-        subMenuImprimirFormatos.add(imprimirHojasDeRutaDinamico);
+        subMenuImprimirFormatos.add(consumoDeAceite);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Entrada de transformadores");
@@ -1639,7 +1647,7 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
             Map<String, Object> p = new HashMap<>();
             p.put("IDENTRADA", getIDENTRADA());
             JasperPrint jp = JasperFillManager.fillReport(reporte, p, conexion.conectar());
-            
+
             JasperViewer jv1 = new JasperViewer(jp, false);
             jv1.setVisible(true);
         } catch (Exception ex) {
@@ -1647,9 +1655,45 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_tarjetaDeAprobacionActionPerformed
 
-    private void imprimirHojasDeRutaDinamicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imprimirHojasDeRutaDinamicoActionPerformed
-         
-    }//GEN-LAST:event_imprimirHojasDeRutaDinamicoActionPerformed
+    private void consumoDeAceiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consumoDeAceiteActionPerformed
+        String sql = "select * from transformador \n"
+                + "where identrada=" + getIDENTRADA() + " and serviciosalida!='DADO DE BAJA';";
+        conexion = new ConexionBD();
+        conexion.conectar();
+        ResultSet rs = conexion.CONSULTAR(sql);
+                
+        try {
+            XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(new File("PLANTILLAS EXCEL\\CONSUMO DE ACEITE.xlsx")));
+            XSSFSheet hoja = wb.getSheetAt(0);
+            XSSFRow fila = null;
+            File f = File.createTempFile("CONSUMO DE ACEITE",".xlsx");
+            FileOutputStream fileOut = new FileOutputStream(f);
+            int posicionFila = 9;
+            while(rs.next()){
+                fila = hoja.createRow(posicionFila);
+                
+                fila.createCell(0).setCellValue(rs.getRow());
+                fila.createCell(1).setCellValue(rs.getInt("fase"));
+                fila.createCell(2).setCellValue(rs.getString("numeroempresa"));
+                fila.createCell(3).setCellValue(rs.getString("numeroserie"));
+                fila.createCell(4).setCellValue(rs.getString("marca"));
+                fila.createCell(5).setCellValue(rs.getDouble("kvasalida"));
+                fila.createCell(6).setCellValue(rs.getString("tipotrafosalida"));
+                fila.createCell(7).setCellValue(rs.getString("serviciosalida"));
+                fila.createCell(8).setCellValue( new BigDecimal((rs.getInt("aceite")/3.785)).setScale(1, RoundingMode.HALF_EVEN).doubleValue() );
+                
+                posicionFila++;
+            }            
+            
+            wb.write(fileOut);
+            fileOut.close();
+            Desktop.getDesktop().open(f);
+        } catch (IOException | SQLException ex) {
+            Logger.getLogger(EntradaDeTrafos.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            conexion.CERRAR();
+        }
+    }//GEN-LAST:event_consumoDeAceiteActionPerformed
 
     private void unirPaginas(JasperPrint source, JasperPrint dst) {
         List<JRPrintPage> pages = source.getPages();
@@ -1716,8 +1760,8 @@ public class EntradaDeTrafos extends javax.swing.JFrame {
     public javax.swing.JComboBox<Ciudad> comboCiudad;
     public javax.swing.JComboBox<Cliente> comboCliente;
     public javax.swing.JComboBox<Conductor> comboConductor;
+    private javax.swing.JMenuItem consumoDeAceite;
     private javax.swing.JMenuItem imprimirHojasDeRuta;
-    private javax.swing.JMenuItem imprimirHojasDeRutaDinamico;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

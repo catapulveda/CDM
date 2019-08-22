@@ -3,6 +3,9 @@ package view;
 import java.awt.Image;
 import java.awt.PopupMenu;
 import java.awt.TrayIcon;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import javax.swing.ImageIcon;
 import modelo.ConexionBD;
 
@@ -19,7 +22,9 @@ public class Principal extends javax.swing.JFrame {
     static final ConexionBD conexion = new ConexionBD();    
     
     public Principal(){
-        initComponents();                
+        initComponents();
+                
+        System.out.println(new BigDecimal((24/3.785)).setScale(1, RoundingMode.HALF_EVEN).doubleValue());
             //REGISTRA LAS ENTRADAS O LOTES
 //        ResultSet rs1 = modelo.Conexion2.CONSULTAR("SELECT * FROM entrada e, conductor c WHERE e.conductor=c.nombre_conductor ORDER BY e.identrada");
 //        try {

@@ -1,5 +1,8 @@
 package view;
 
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 import paneles.PanelControl;
 import paneles.PanelRemisiones;
 import paneles.PanelDespachos;
@@ -13,7 +16,7 @@ public class MENU_NUEVO extends javax.swing.JFrame{
     paneles.PanelControl control = new PanelControl();        
 
     public MENU_NUEVO(){
-        initComponents();
+        initComponents();        
         
         setExtendedState(MAXIMIZED_BOTH);
         

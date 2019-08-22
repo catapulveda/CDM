@@ -253,9 +253,9 @@ public final class PanelDespachos extends javax.swing.JPanel {
                                 conexion.conectar();
                                 ResultSet rs = conexion.CONSULTAR("SELECT * FROM transformador WHERE iddespacho='"+ID_DESPACHO+"' ");
                                 while (rs.next()){
-                                    if (conexion.GUARDAR(" UPDATE transformador SET estado='EN PLANTA' , iddespacho='0' , remision='' "
+                                    if (conexion.GUARDAR(" UPDATE transformador SET estado='EN PLANTA' , iddespacho=null , idremision=null "
                                         + " WHERE identrada='"+rs.getString("identrada")+"' AND item='"+rs.getInt("item")+"' AND numeroserie='"+rs.getString("numeroserie") + "' ")) {
-                                        mensajes += "TRANSFORMADOR " + rs.getString("noplaca") + " ESTÀ AHORA EN PLANTA\n";
+                                        mensajes += "TRANSFORMADOR " + rs.getString("numeroserie") + " EN PLANTA\n";
                                 }
                             }
                             if(conexion.GUARDAR(" DELETE FROM despacho WHERE iddespacho='" + ID_DESPACHO + "' ")){
@@ -316,7 +316,9 @@ public final class PanelDespachos extends javax.swing.JPanel {
             dar.cargarTabla();
             dar.cargarServicios();
             dar.setExtendedState(Frame.MAXIMIZED_BOTH);
-            dar.setTitle("Despacho "+tabla.getValueAt(fila, 1)+" DE "+tabla.getValueAt(fila, 3));            
+            dar.setNodespacho(tabla.getValueAt(fila, 1).toString());
+            dar.setCliente(tabla.getValueAt(fila, 3).toString());
+            dar.setTitle("Despacho "+tabla.getValueAt(fila, 1)+" DE "+tabla.getValueAt(fila, 3));
             dar.setVisible(true);
         }
     }//GEN-LAST:event_tablaMouseClicked

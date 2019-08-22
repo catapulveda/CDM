@@ -513,9 +513,10 @@ public class PROTOS extends javax.swing.JFrame {
                         modelo.Metodos.escribirFichero(ex);
                         modelo.Metodos.ERROR(ex, "ERROR AL GENERAR EL PROTOCOLO");
                     } catch (Exception ex) {
+                        Logger.getLogger(PROTOS.class.getName()).log(Level.SEVERE, null, ex);
                         modelo.Metodos.ERROR(ex, "ERROR AL EXPORTAR Y GUARDAR EL ARCHIVO PDF EN LA CARPTEA 'PROTOCOLOS PDF'\nVERIFIQUE QUE EL NOMBRE DEL CLIENTE NO CONTENGA PUNTOS NI CARACTERES ESPECIALES.");
                     } finally {
-                        btnGuardar.setIcon(new ImageIcon(getClass().getResource("/recursos/images/guardar.png")));
+                        btnGuardar.setIcon(new ImageIcon(getClass().getResource("/recursos/images/Guardar.png")));
                         btnGuardar.setEnabled(true);
                     }
                 }

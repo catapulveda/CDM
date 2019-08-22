@@ -2,7 +2,7 @@ package modelo;
 
 import modelo.Lote;
 
-public class Transformador {
+public class Transformador{
     
     private int idtransformador;
     private int item;
