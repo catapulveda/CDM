@@ -933,7 +933,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         (new Thread() {
             public void run() {
                 try {
-                    JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA_FRENTE_1.jasper").toString()));
+                    JasperReport reporte = (JasperReport) JRLoader.loadObject(new URL(this.getClass().getResource("/REPORTES/HOJADERUTA_LIST.jasper").toString()));
                     java.util.List<modelo.Transformador> lista = new ArrayList<>();
 
                     String sql = "select c.nombrecliente from entrada e\n"
