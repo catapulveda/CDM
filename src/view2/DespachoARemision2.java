@@ -507,7 +507,7 @@ public class DespachoARemision2 extends javax.swing.JFrame {
         try {
             con.conectar();
             ResultSet rs = con.CONSULTAR("select e.lote, e.op, t.numeroempresa, t.numeroserie, \n"
-                    + "t.marca, t.kvaentrada, t.kvasalida, t.tps as  t1, t.tss as t2, t.tts as t3, \n"
+                    + "t.marca, t.kvaentrada, t.kvasalida, t.tpe, t.tps, t.tss, t.tts, \n"
                     + "t.serviciosalida, t.ano, t.peso, t.aceite, ciu.nombreciudad, e.fecharecepcion,\n"
                     + "t.tipotrafosalida, t.observacionsalida, t.causadefalla, t.fase\n"
                     + "from transformador t \n"
@@ -543,9 +543,10 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                 t.setMarca(rs.getString("marca"));
                 t.setKvaentrada(rs.getDouble("kvaentrada"));
                 t.setKvasalida(rs.getDouble("kvasalida"));
-                t.setTps(rs.getInt("t1"));
-                t.setTss(rs.getInt("t2"));
-                t.setTts(rs.getInt("t3"));
+                t.setTpe(rs.getInt("tpe"));
+                t.setTps(rs.getInt("tps"));
+                t.setTss(rs.getInt("tss"));
+                t.setTts(rs.getInt("tts"));
                 t.setServiciosalida(rs.getString("serviciosalida"));
                 t.setObservacionsalida(rs.getString("observacionsalida"));
                 t.setCausadefalla(rs.getString("causadefalla"));
@@ -687,10 +688,10 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                 Transformador t = lista.get(i);
                 fila.createCell(0).setCellValue(t.getNumeroserie());
                 fila.createCell(1).setCellValue(t.getMarca());
-                fila.createCell(2).setCellValue( (t.getServiciosalida().equals("DADO DE BAJA")?"":"TRAFO URE "+t.getFase()+"F "+t.getKvaentrada()+"KVA ") );
+                fila.createCell(2).setCellValue( (t.getServiciosalida().equals("DADO DE BAJA")?"":"TRAFO URE "+t.getFase()+"F "+t.getKvaentrada()+"KVA ")+" "+t.getTpe() );
                 fila.createCell(4).setCellValue( (t.getServiciosalida().equals("DADO DE BAJA")?"":"URE") );
                 fila.createCell(5).setCellValue(t.getMarca());
-                fila.createCell(6).setCellValue( (t.getServiciosalida().equals("DADO DE BAJA")?"":"TRAFO URE "+t.getFase()+"F "+t.getKvasalida()+"KVA ") );
+                fila.createCell(6).setCellValue( (t.getServiciosalida().equals("DADO DE BAJA")?"":"TRAFO URE "+t.getFase()+"F "+t.getKvasalida()+"KVA ")+" "+t.getTps() );
                 fila.createCell(9).setCellValue(t.getNumeroserie()+".pdf");
                 fila.createCell(10).setCellValue(t.getCausadefalla());
                 fila.createCell(11).setCellValue(t.getObservacionsalida());
@@ -808,12 +809,13 @@ public class DespachoARemision2 extends javax.swing.JFrame {
 //        buscar.setTabla(tabla);
 //        buscar.setVisible(true);     
         try {
-            XSSFWorkbook MONO = new XSSFWorkbook(new FileInputStream(new File("PLANTILLA PLACAS.xlsx")));
-            XSSFWorkbook TRIFA = new XSSFWorkbook(new FileInputStream(new File("PLANTILLA PLACAS.xlsx")));
+            XSSFWorkbook MONO = new XSSFWorkbook(new FileInputStream(new File("PLANTILLAS EXCEL\\PLANTILLA PLACAS.xlsx")));
+            XSSFWorkbook TRIFA = new XSSFWorkbook(new FileInputStream(new File("PLANTILLAS EXCEL\\PLANTILLA PLACAS.xlsx")));
 
             XSSFSheet hojaMONO = MONO.getSheetAt(0);
             XSSFSheet hojaTRIF = TRIFA.getSheetAt(0);
 
+            //VECTOR PARA RECORRER LAS COLUMNAS p1 a p5 y colocar el voltaje primario de acuerdo a cada posicion
             int celdas[] = {24, 25, 26, 27, 28};
 
             String sql = "SELECT cl.nombrecliente, e.contrato, e.lote, t.numeroempresa, t.numeroserie, t.fase, t.kvasalida, t.tps, t.tss, t.tts,\n"
@@ -823,7 +825,10 @@ public class DespachoARemision2 extends javax.swing.JFrame {
                     + "(pt.vcc/t.tps)*100 as uz, ((cast((1/(pt.impedanciagarantizada/100)) as numeric)*pt.i2)/1000) as icc, \n"
                     + "(1250/(POWER((1/(pt.impedanciagarantizada/100)), 2))) as tcc,\n"
                     + "CASE \n"
-                    + "	WHEN pt.grupodeconexion='Ii0' THEN (SELECT 'U'::text) \n"
+                    + "	WHEN pt.grupodeconexion='Ii0' TH"
+                    + ""
+                    + ""
+                    + "EN (SELECT 'U'::text) \n"
                     + "	ELSE \n"
                     + "		CASE WHEN pt.grupodeconexion='Ii6' THEN (SELECT 'X'::text) \n"
                     + "		END\n"

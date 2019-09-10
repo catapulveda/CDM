@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HOJA DE RUTA" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="592" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" isSummaryNewPage="true" isSummaryWithPageHeaderAndFooter="true" uuid="f187e0b9-7f19-4b5e-9d41-5302be7eb56e">
-	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="261"/>
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="230"/>
+	<property name="ireport.y" value="39"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -2799,6 +2799,30 @@
 			</rectangle>
 			<rectangle>
 				<reportElement mode="Transparent" x="535" y="520" width="27" height="64" uuid="555447f3-1f69-4814-bbe8-76496ffa155e"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="9" y="6" width="276" height="361" uuid="2a35b456-c325-410d-9829-5686b41bda48"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="310" y="6" width="276" height="361" uuid="cdceff34-78e6-48ae-850c-99e73f373acc"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="9" y="396" width="276" height="361" uuid="73655d95-c1bc-4d75-bebb-fc853cfefd83"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="310" y="396" width="276" height="361" uuid="0d984348-43c4-453c-89ca-4412d33483dc"/>
 				<graphicElement>
 					<pen lineWidth="0.25"/>
 				</graphicElement>
